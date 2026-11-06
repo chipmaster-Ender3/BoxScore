@@ -1,0 +1,2054 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<title>BoxScore</title>
+<meta name="theme-color" content="#0A1014">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="BoxScore">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+</head><body>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Public+Sans:wght@400;600;700&display=swap">
+<style>
+/* Layout: duas metades de toque (jogador 1 | jogador 2) com uma coluna central de sets e games;
+   em retrato as metades empilham. As cores dos jogadores e dos números vêm das configurações
+   (--p1, --p2, --on-p); o resto segue o tema claro/escuro. */
+:root {
+  --bg: #EDF0F2;
+  --panel: #FFFFFF;
+  --ink: #0E1A22;
+  --muted: #56646E;
+  --line: #CDD5DB;
+  --p1: #C4401B;
+  --p2: #0D6A88;
+  --p1t: #B23A17;
+  --p2t: #0A6180;
+  --on-p: #FFFFFF;
+  --ball: #C8E02A;
+  --warn: #F2B31B;
+  --warn-ink: #2A1F00;
+  --overlay: rgba(10, 18, 24, .55);
+  --display: 'Big Shoulders Display', 'Arial Narrow', 'Roboto Condensed', sans-serif;
+  --ui: 'Public Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0A1014; --panel: #121B21; --ink: #EDF2F5; --muted: #8C9DA7; --line: #25333B;
+    --p1t: #FF8F68; --p2t: #5FCDEA; --overlay: rgba(0, 0, 0, .65); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0A1014; --panel: #121B21; --ink: #EDF2F5; --muted: #8C9DA7; --line: #25333B;
+  --p1t: #FF8F68; --p2t: #5FCDEA; --overlay: rgba(0, 0, 0, .65); color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--ui); overflow: hidden; -webkit-text-size-adjust: 100%; }
+button { font: inherit; color: inherit; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+.side:focus-visible { outline-color: #fff; outline-offset: -6px; }
+
+.app { height: 100%; display: grid; grid-template-rows: minmax(0, 1fr) auto; }
+.board { display: grid; grid-template-columns: minmax(0, 1fr) clamp(150px, 23vw, 230px) minmax(0, 1fr); min-height: 0; }
+
+/* metades dos jogadores */
+.side {
+  position: relative; container-type: size; min-width: 0; min-height: 0;
+  background: var(--pc); color: var(--on-p);
+  display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
+  padding: 14px 14px;
+  user-select: none; -webkit-user-select: none; touch-action: manipulation; cursor: pointer;
+  -webkit-tap-highlight-color: transparent; transition: filter .2s;
+}
+.side.p1 { --pc: var(--p1); padding-left: max(16px, env(safe-area-inset-left, 0px)); }
+.side.p2 { --pc: var(--p2); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.side:active { filter: brightness(1.1); }
+.side.lose { filter: saturate(.45) brightness(.78); }
+.who { display: flex; align-items: center; gap: 10px; min-width: 0; --avs: clamp(30px, 13cqh, 54px); }
+.avs { display: flex; flex: none; }
+.avs .av + .av { margin-left: calc(var(--avs) * -.3); }
+.av {
+  width: var(--avs, 44px); height: var(--avs, 44px); border-radius: 50%; flex: none; overflow: hidden; display: grid; place-items: center;
+  background: rgba(255, 255, 255, .22); border: 2px solid rgba(255, 255, 255, .75); color: inherit;
+  font: 800 calc(var(--avs, 44px) * .42)/1 var(--ui); text-transform: uppercase;
+}
+.av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.av.big { --avs: 96px; background: var(--line); border-color: var(--line); color: var(--muted); }
+.nm {
+  font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: .02em;
+  font-size: clamp(22px, 11cqh, 46px); line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+}
+.pts {
+  align-self: center; justify-self: center; font-family: var(--display); font-weight: 900; line-height: .86;
+  font-size: min(60cqh, 58cqw); font-variant-numeric: tabular-nums; letter-spacing: -.01em;
+}
+.pts.small { font-size: min(20cqh, 24cqw); letter-spacing: .04em; }
+.side.flash .pts { animation: pop .28s ease-out; }
+@keyframes pop { 0% { transform: scale(.9); } 55% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+/* rodapé da metade: lado do saque (a bolinha troca de lado a cada ponto) */
+.foot {
+  --bs: clamp(26px, 10cqh, 38px);
+  min-height: calc(var(--bs) + 8px + 1.5em + 6px);
+  display: grid; justify-items: center; align-content: end; gap: 6px;
+  font: 700 clamp(13px, 5cqh, 18px)/1.2 var(--ui); text-align: center;
+}
+.fsv { min-height: 1.2em; opacity: .95; }
+.track { position: relative; width: min(72%, 280px); height: calc(var(--bs) + 8px); border-radius: 999px; background: rgba(255, 255, 255, .2); }
+.track::before { content: ""; position: absolute; left: 50%; top: 7px; bottom: 7px; width: 2px; margin-left: -1px; background: rgba(255, 255, 255, .4); border-radius: 2px; }
+.tball { position: absolute; top: 4px; left: 4px; width: var(--bs); height: var(--bs); transition: left .28s ease; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .35)); }
+.track.right .tball { left: calc(100% - var(--bs) - 4px); }
+
+/* coluna central */
+.mid {
+  background: var(--panel); min-width: 0; min-height: 0; padding: 10px 8px;
+  display: grid; grid-template-rows: auto 1fr 1fr auto auto; gap: 6px; text-align: center;
+  border-left: 1px solid var(--line); border-right: 1px solid var(--line);
+}
+.status {
+  justify-self: center; max-width: 100%; padding: 6px 12px; border-radius: 999px; background: var(--line); color: var(--ink);
+  font: 800 12px/1.2 var(--ui); letter-spacing: .09em; text-transform: uppercase; cursor: default;
+}
+.status.warn { background: var(--warn); color: var(--warn-ink); cursor: pointer; }
+.status.hint { background: transparent; color: var(--muted); font-weight: 600; letter-spacing: .02em; text-transform: none; font-size: 12px; }
+.cnt { display: grid; align-content: center; gap: 2px; min-height: 0; }
+.lbl { font: 700 11px/1 var(--ui); letter-spacing: .16em; color: var(--muted); text-transform: uppercase; }
+.pair { display: flex; justify-content: center; align-items: center; gap: 8px; font-family: var(--display); font-weight: 900; line-height: 1; font-size: clamp(34px, 14vmin, 66px); font-variant-numeric: tabular-nums; }
+.pair .c1 { color: var(--p1t); }
+.pair .c2 { color: var(--p2t); }
+.pair .dash { width: 10px; height: 4px; background: var(--line); }
+.sets { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 12px; min-height: 18px; font: 800 clamp(15px, 4.4vmin, 20px)/1.3 var(--ui); color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.clock { display: flex; justify-content: center; align-items: baseline; gap: 6px; font: 800 clamp(15px, 4.4vmin, 20px)/1.2 var(--ui); color: var(--ink); font-variant-numeric: tabular-nums; }
+.clock small { font: 700 11px/1 var(--ui); letter-spacing: .16em; color: var(--muted); text-transform: uppercase; }
+
+/* perfil */
+.prof-top { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
+.prof-top .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.prof-top .btn { min-height: 44px; font-size: 14px; }
+.sec { margin: 20px 0 10px; font: 900 22px/1 var(--display); letter-spacing: .03em; text-transform: uppercase; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.tile { border: 1px solid var(--line); border-radius: 12px; background: var(--bg); padding: 12px; display: grid; gap: 4px; align-content: start; }
+.tile small { font: 700 11px/1.25 var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.tile b { font: 900 34px/1 var(--display); font-variant-numeric: tabular-nums; }
+.tile i { font: 600 13px/1.3 var(--ui); font-style: normal; color: var(--muted); font-variant-numeric: tabular-nums; }
+.tile .meter { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.tile .meter span { display: block; height: 100%; background: var(--p2); }
+.plist { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.plist button { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; min-height: 56px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); cursor: pointer; }
+.plist .av { --avs: 40px; background: var(--line); border-color: var(--line); color: var(--muted); }
+.plist .pn { flex: 1; min-width: 0; font-weight: 700; overflow-wrap: anywhere; }
+.plist .pr { font: 600 13px var(--ui); color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* enquadrar foto */
+.crop-wrap { display: grid; justify-items: center; gap: 12px; }
+.crop { position: relative; width: min(100%, 300px); aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #000; touch-action: none; cursor: grab; }
+.crop canvas { width: 100%; height: 100%; display: block; }
+.crop::after { content: ""; position: absolute; inset: 0; border-radius: 50%; box-shadow: 0 0 0 999px rgba(0, 0, 0, .55); border: 2px solid #fff; pointer-events: none; }
+.tile .lnk { justify-self: start; min-height: 36px; margin-top: 2px; padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; background: transparent; font: 700 13px var(--ui); cursor: pointer; }
+
+.mlist { display: grid; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
+.mlist li { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 4px 6px 4px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); }
+.mlist .mn { flex: 1; min-width: 0; font-weight: 600; overflow-wrap: anywhere; }
+.mlist .btn { min-height: 40px; font-size: 14px; padding: 0 14px; }
+.btn.danger { color: #B3261E; border-color: #B3261E; }
+.linkbtn { background: none; border: 0; padding: 6px 0; font: 700 14px var(--ui); color: var(--p2t, var(--ink)); text-decoration: underline; cursor: pointer; }
+
+/* barra inferior */
+.bar {
+  display: flex; align-items: center; gap: 6px; background: var(--panel); border-top: 1px solid var(--line);
+  padding: 6px max(12px, env(safe-area-inset-right, 0px)) 6px max(12px, env(safe-area-inset-left, 0px));
+}
+.bar .grow { flex: 1; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 48px; min-height: 48px; padding: 0 14px;
+  border: 1px solid var(--line); background: transparent; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 15px;
+}
+.btn:hover { border-color: var(--muted); }
+.btn:disabled { opacity: .4; cursor: default; }
+.btn.primary { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+.btn.ghost { border-color: transparent; }
+.ico { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+@media (orientation: portrait) {
+  .board { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto minmax(0, 1fr); }
+  .side.p1, .side.p2 { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .mid {
+    grid-template-columns: 1fr 1fr; grid-template-rows: auto auto auto; border: 0;
+    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    padding: 10px max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px));
+  }
+  .status, .sets, .clock { grid-column: 1 / -1; }
+  .status:empty { display: none; }
+  .pair { font-size: clamp(34px, 11vw, 56px); }
+}
+
+/* janelas */
+.sheet {
+  position: fixed; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center; background: var(--overlay);
+  padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(10px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+}
+.card {
+  --px: 20px; --pb: 20px;
+  background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 14px; width: min(640px, 100%);
+  max-height: 100%; overflow: auto; padding: 16px var(--px) var(--pb);
+}
+.card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.card h2 { margin: 0; font: 900 30px/1 var(--display); letter-spacing: .02em; text-transform: uppercase; text-wrap: balance; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px 18px; }
+.field { display: grid; gap: 6px; min-width: 0; align-content: start; }
+.field > label, .field > .flabel { font: 700 12px/1 var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.field .hint { font: 400 13px/1.35 var(--ui); color: var(--muted); }
+input[type=text], input[type=date], select {
+  width: 100%; min-height: 48px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); font: 400 16px var(--ui);
+}
+input[type=range] { width: 100%; min-height: 40px; accent-color: var(--p2); }
+.seg { display: flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.seg button { flex: 1; min-height: 46px; padding: 4px 8px; border: 0; border-left: 1px solid var(--line); background: transparent; font-weight: 700; font-size: 14px; line-height: 1.15; cursor: pointer; min-width: 0; overflow-wrap: anywhere; }
+.seg button:first-child { border-left: 0; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--panel); }
+.check { display: flex; align-items: center; gap: 12px; min-height: 48px; font-size: 16px; cursor: pointer; }
+.check input { width: 24px; height: 24px; accent-color: var(--p2); flex: none; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.actions .btn { flex: 1 1 140px; }
+.actions.stick {
+  position: sticky; bottom: 0; z-index: 1; margin: 14px calc(var(--px) * -1) calc(var(--pb) * -1);
+  padding: 12px var(--px) 14px; background: var(--panel); border-top: 1px solid var(--line);
+}
+.note { margin: 12px 0 0; font-size: 13px; line-height: 1.4; color: var(--muted); }
+.warnbox { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--bg); border: 1px solid var(--line); font-size: 14px; line-height: 1.4; }
+.big-result { font: 900 clamp(40px, 12vmin, 72px)/1 var(--display); text-transform: uppercase; margin: 6px 0 4px; text-wrap: balance; }
+.sets-line { font: 800 clamp(24px, 7vmin, 40px)/1.2 var(--display); letter-spacing: .03em; font-variant-numeric: tabular-nums; color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); font: 600 14px var(--ui); cursor: pointer; }
+.vstatus { margin: 10px 0 0; font-size: 13px; line-height: 1.4; color: var(--muted); min-height: 1.4em; }
+
+/* cores */
+.swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+.swatch { position: relative; width: 44px; height: 44px; padding: 0; border-radius: 999px; border: 2px solid var(--line); cursor: pointer; flex: none; }
+.swatch[aria-pressed="true"] { outline: 3px solid var(--ink); outline-offset: 2px; }
+.swatch.custom { background: conic-gradient(#e33, #ee3, #3e3, #3ee, #33e, #e3e, #e33); }
+.swatch.custom input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; padding: 0; }
+.preview { display: grid; grid-template-columns: 1fr 1fr; border-radius: 10px; overflow: hidden; }
+.pv { height: 76px; display: grid; place-items: center; font: 900 52px/1 var(--display); color: var(--on-p); font-variant-numeric: tabular-nums; }
+.pv.a { background: var(--p1); }
+.pv.b { background: var(--p2); }
+
+/* histórico */
+.hist { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.hist details { border: 1px solid var(--line); border-radius: 10px; background: var(--bg); }
+.hist summary { display: grid; gap: 4px; padding: 12px 14px; cursor: pointer; list-style: none; min-height: 48px; }
+.hist summary::-webkit-details-marker { display: none; }
+.hist .h-top { display: flex; justify-content: space-between; gap: 10px; font: 700 16px/1.25 var(--ui); }
+.hist .h-top span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.hist .h-sub { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.hist .h-body { padding: 0 14px 14px; display: grid; gap: 10px; }
+.hist .h-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.hist .h-actions .btn { min-height: 44px; font-size: 14px; }
+textarea.copybox { width: 100%; min-height: 84px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--ink); font: 13px/1.4 ui-monospace, Menlo, monospace; padding: 8px; }
+.empty { padding: 22px 6px; text-align: center; color: var(--muted); line-height: 1.5; }
+
+.toast {
+  position: fixed; left: 50%; transform: translateX(-50%); z-index: 30; max-width: min(560px, calc(100% - 32px));
+  bottom: calc(72px + env(safe-area-inset-bottom, 0px)); padding: 12px 16px; border-radius: 12px;
+  background: var(--ink); color: var(--panel); font: 600 14px/1.4 var(--ui); text-align: center;
+}
+
+/* aquecimento guiado: tela cheia, com a fase, o tempo e o toque para avançar */
+.warm {
+  position: fixed; inset: 0; z-index: 25; background: var(--panel); color: var(--ink);
+  display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; gap: 12px;
+  padding: max(14px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(14px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+}
+.w-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; min-width: 0; }
+.w-top .lbl { flex: none; }
+.w-names { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 800 clamp(14px, 3.6vmin, 18px)/1.2 var(--ui); }
+.w-bar { display: flex; gap: 6px; }
+.w-seg { flex: 1 1 0; min-width: 8px; height: 10px; border-radius: 5px; background: var(--line); overflow: hidden; }
+.w-seg span { display: block; height: 100%; width: 0; background: var(--ink); }
+.w-main {
+  display: grid; align-content: center; justify-items: center; gap: 8px; text-align: center; min-height: 0; border-radius: 14px;
+  cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+}
+.w-main:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+.w-count { font: 700 12px/1 var(--ui); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.w-phase { font: 900 clamp(30px, 9vmin, 64px)/1 var(--display); text-transform: uppercase; letter-spacing: .02em; text-wrap: balance; }
+.w-sub { min-height: 1.3em; font: 800 clamp(16px, 4.4vmin, 24px)/1.2 var(--ui); color: var(--p2t); }
+.w-time { font: 900 min(34vh, 42vw)/.9 var(--display); font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+.w-tip { max-width: 36ch; margin: 0; font: 400 clamp(14px, 3.6vmin, 18px)/1.4 var(--ui); color: var(--muted); text-wrap: balance; }
+.w-foot { display: grid; gap: 10px; justify-items: center; text-align: center; }
+.w-total { font: 700 clamp(14px, 3.6vmin, 17px)/1.3 var(--ui); color: var(--muted); font-variant-numeric: tabular-nums; }
+.w-total b { color: var(--ink); font-weight: 800; }
+.w-btns { display: flex; flex-wrap: wrap; gap: 10px; width: 100%; max-width: 560px; }
+.w-btns .btn { flex: 1 1 160px; min-height: 52px; }
+@media (max-height: 480px) {
+  .warm { gap: 8px; }
+  .w-tip { display: none; }
+  .w-time { font-size: min(30vh, 34vw); }
+  .w-btns .btn { min-height: 44px; }
+}
+.wopts { display: grid; gap: 12px; margin-top: 4px; }
+.wsum { font: 600 13px/1.4 var(--ui); color: var(--muted); font-variant-numeric: tabular-nums; }
+.field.need .seg { outline: 3px solid var(--warn); outline-offset: 2px; }
+.btn.mini { min-height: 40px; font-size: 14px; padding: 0 14px; justify-self: start; }
+
+@media (max-height: 480px) {
+  .card { --px: 18px; --pb: 16px; padding-top: 12px; }
+  .card h2 { font-size: 26px; }
+  .grid { gap: 10px 16px; }
+  .actions { margin-top: 12px; }
+}
+@media (max-width: 520px) { .bar { gap: 4px; } #bNew .lab, #bFull { display: none; } .bar .btn { padding: 0 10px; } .bar #bUndo { padding: 0 12px; } }
+@media (prefers-reduced-motion: reduce) { .side.flash .pts { animation: none; } .side { transition: none; } .tball { transition: none; } }
+</style>
+
+<h1 class="sr">BoxScore Placar</h1>
+<div class="app">
+  <main class="board" id="board">
+    <section class="side p1" id="side0" role="button" tabindex="0" aria-label="Marcar ponto para o jogador 1">
+      <div class="who"><span class="avs" id="av0"></span><span class="nm" id="nm0">Jogador 1</span></div>
+      <div class="pts" id="pts0">0</div>
+      <div class="foot">
+        <span class="fsv" id="fsv0"></span>
+        <div class="track" id="track0" aria-hidden="true"><svg class="tball" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="var(--ball)"/><path d="M4.5 5c5 3.2 5 10.8 0 14M19.5 5c-5 3.2-5 10.8 0 14" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/></svg></div>
+      </div>
+    </section>
+
+    <section class="mid" aria-label="Sets e games">
+      <div class="status" id="status" hidden></div>
+      <div class="cnt"><span class="lbl">Sets</span><div class="pair"><b class="c1" id="sets0">0</b><i class="dash"></i><b class="c2" id="sets1">0</b></div></div>
+      <div class="cnt"><span class="lbl">Games</span><div class="pair"><b class="c1" id="games0">0</b><i class="dash"></i><b class="c2" id="games1">0</b></div></div>
+      <div class="sets" id="setchips"></div>
+      <div class="clock" aria-label="Tempo de jogo"><small>Tempo</small><span id="clock">00:00</span></div>
+    </section>
+
+    <section class="side p2" id="side1" role="button" tabindex="0" aria-label="Marcar ponto para o jogador 2">
+      <div class="who"><span class="avs" id="av1"></span><span class="nm" id="nm1">Jogador 2</span></div>
+      <div class="pts" id="pts1">0</div>
+      <div class="foot">
+        <span class="fsv" id="fsv1"></span>
+        <div class="track" id="track1" aria-hidden="true"><svg class="tball" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="var(--ball)"/><path d="M4.5 5c5 3.2 5 10.8 0 14M19.5 5c-5 3.2-5 10.8 0 14" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/></svg></div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bar" aria-label="Controles">
+    <button class="btn primary" id="bUndo" type="button" aria-label="Desfazer o último ponto">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>Desfazer
+    </button>
+    <span class="grow"></span>
+    <button class="btn ghost" id="bSpeak" type="button" aria-label="Falar o placar">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>
+    </button>
+    <button class="btn ghost" id="bHist" type="button" aria-label="Histórico de partidas">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>
+    </button>
+    <button class="btn ghost" id="bProf" type="button" aria-label="Perfil e estatísticas">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+    </button>
+    <button class="btn ghost" id="bSet" type="button" aria-label="Configurações">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h10M20 18h0"/><circle cx="15" cy="6" r="2.2"/><circle cx="9" cy="12" r="2.2"/><circle cx="17" cy="18" r="2.2"/></svg>
+    </button>
+    <button class="btn ghost" id="bFull" type="button" aria-label="Tela cheia" hidden>
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+    </button>
+    <button class="btn" id="bNew" type="button">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="lab">Novo jogo</span>
+    </button>
+  </nav>
+</div>
+<div class="sr" aria-live="polite" id="live"></div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<!-- Aquecimento -->
+<div class="warm" id="warm" role="dialog" aria-modal="true" aria-label="Aquecimento" hidden>
+  <div class="w-top"><span class="lbl">Aquecimento</span><span class="w-names" id="wNames"></span></div>
+  <div class="w-bar" id="wBar" aria-hidden="true"></div>
+  <div class="w-main" id="wMain" role="button" tabindex="0" aria-label="Ir para a próxima fase">
+    <span class="w-count" id="wCount"></span>
+    <div class="w-phase" id="wPhase"></div>
+    <div class="w-sub" id="wSub"></div>
+    <div class="w-time" id="wTime" aria-hidden="true">0:00</div>
+    <p class="w-tip" id="wTip"></p>
+  </div>
+  <div class="w-foot">
+    <div class="w-total">Saca primeiro: <b id="wServe"></b> · Faltam <b id="wTotal">0:00</b></div>
+    <div class="w-btns"><button class="btn primary" type="button" id="wNext">Próxima fase</button><button class="btn" type="button" id="wEnd">Encerrar aquecimento</button></div>
+  </div>
+</div>
+
+<!-- Novo jogo -->
+<div class="sheet" id="shNew" data-sticky hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="hNew">
+    <div class="card-head"><h2 id="hNew">Novo jogo</h2><button class="btn ghost" type="button" data-close aria-label="Fechar"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <div class="grid">
+      <div class="field" style="grid-column:1/-1"><span class="flabel">Modalidade</span>
+        <div class="seg" data-key="mode"><button type="button" data-v="singles">Simples</button><button type="button" data-v="doubles">Duplas</button></div>
+      </div>
+      <div class="field"><label for="nA1" id="lA">Jogador 1</label><input type="text" id="nA1" maxlength="24" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="words" enterkeyhint="done"><input type="text" id="nA2" maxlength="24" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="words" enterkeyhint="done" placeholder="Parceiro" hidden></div>
+      <div class="field"><label for="nB1" id="lB">Jogador 2</label><input type="text" id="nB1" maxlength="24" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="words" enterkeyhint="done"><input type="text" id="nB2" maxlength="24" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="words" enterkeyhint="done" placeholder="Parceiro" hidden></div>
+      <div class="field" style="grid-column:1/-1" id="fRecent" hidden><span class="flabel">Jogadores recentes (toque para preencher)</span><div class="chips" id="recentChips"></div><button class="linkbtn" type="button" id="nManage">Remover nomes e locais salvos</button></div>
+      <div class="field" style="grid-column:1/-1"><label for="nPlace">Local do jogo</label><input type="text" id="nPlace" maxlength="40" list="placeList" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="words" enterkeyhint="done" placeholder="Ex.: Clube, quadra 2"><datalist id="placeList"></datalist></div>
+      <div class="field" style="grid-column:1/-1"><label for="nSurface">Tipo de piso</label><select id="nSurface"><option value="">Não informar</option><option value="saibro">Saibro</option><option value="rapida">Rápida (quadra dura)</option><option value="grama">Grama</option><option value="carpete">Carpete / sintético</option><option value="outro">Outro</option></select></div>
+      <div class="field"><span class="flabel">Partida</span>
+        <div class="seg" data-key="bestOf"><button type="button" data-v="1">1 set</button><button type="button" data-v="3">Melhor de 3</button><button type="button" data-v="5">Melhor de 5</button></div>
+      </div>
+      <div class="field" id="fFinal"><span class="flabel">Set decisivo</span>
+        <div class="seg" data-key="finalSet"><button type="button" data-v="same">Igual</button><button type="button" data-v="super">Super TB</button><button type="button" data-v="advantage">Sem TB</button></div>
+        <span class="hint" id="hFinal"></span>
+      </div>
+      <div class="field" id="fFirst"><span class="flabel">Quem saca primeiro</span>
+        <div class="seg" data-key="first"><button type="button" data-v="0" id="fs0">Jogador 1</button><button type="button" data-v="1" id="fs1">Jogador 2</button></div>
+        <span class="hint" id="hFirst"></span>
+        <button class="btn mini" type="button" id="ngDraw">Sortear saque</button>
+      </div>
+      <div class="field"><span class="flabel">Regras</span>
+        <label class="check"><input type="checkbox" id="swTb"> Tie-break aos 6-6</label>
+        <label class="check"><input type="checkbox" id="swNoAd"> Ponto decisivo (sem vantagem)</label>
+      </div>
+      <div class="field" style="grid-column:1/-1" id="fWarm"><span class="flabel">Aquecimento</span>
+        <div class="seg" data-key="warm"><button type="button" data-v="off">Sem aquecimento</button><button type="button" data-v="on">Com aquecimento</button></div>
+        <div class="wopts" id="warmOpts" hidden>
+          <div class="seg" data-key="wtime"><button type="button" data-v="std">Padrão: 5 min</button><button type="button" data-v="custom">Outro tempo</button></div>
+          <div id="wRange" hidden><label for="wMin" class="flabel" style="display:block;margin-bottom:2px">Duração <output id="oWMin"></output></label><input type="range" id="wMin" min="3" max="15" step="1" value="5"></div>
+          <div><span class="flabel" style="display:block">Fases</span>
+            <label class="check"><input type="checkbox" id="wPhq"> Mini-tênis no quadradinho</label>
+            <label class="check"><input type="checkbox" id="wPhf"> Três quartos e fundo de quadra</label>
+            <label class="check"><input type="checkbox" id="wPhv"> Voleios e smashes</label>
+            <label class="check"><input type="checkbox" id="wPhs"> Saques</label>
+          </div>
+          <span class="wsum" id="wSum"></span>
+          <span class="hint">A Box fala cada fase. Toque na tela para ir para a próxima, ou espere o tempo acabar. No fim, ela diz quem saca.</span>
+        </div>
+      </div>
+    </div>
+    <p class="warnbox" id="ngWarn" hidden></p>
+    <p class="warnbox" id="ngErr" role="alert" hidden></p>
+    <div class="actions stick"><button class="btn primary" type="button" id="ngGo">Começar</button><button class="btn" type="button" data-close>Cancelar</button></div>
+  </div>
+</div>
+
+<!-- Perfil -->
+<div class="sheet" id="shProf" data-sticky hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="hProf">
+    <div class="card-head"><h2 id="hProf">Meu perfil</h2><button class="btn ghost" type="button" data-close aria-label="Fechar"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <div class="prof-top">
+      <span class="av big" id="pAv"></span>
+      <div class="btns">
+        <button class="btn" type="button" id="pPhoto">Escolher foto</button>
+        <button class="btn" type="button" id="pPhotoDel" hidden>Remover</button>
+        <button class="btn" type="button" id="pBack" hidden>Voltar ao meu perfil</button>
+      </div>
+      <input type="file" id="pFile" accept="image/*" hidden>
+    </div>
+    <div class="grid">
+      <div class="field" style="grid-column:1/-1"><label for="pName">Nome</label><input type="text" id="pName" maxlength="24" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="words" enterkeyhint="done"></div>
+      <div class="field"><label for="pHeight">Estatura (cm)</label><input type="text" id="pHeight" inputmode="numeric" maxlength="3" autocomplete="off"></div>
+      <div class="field"><label for="pWeight">Peso (kg)</label><input type="text" id="pWeight" inputmode="decimal" maxlength="5" autocomplete="off"></div>
+      <div class="field"><label for="pRBrand">Raquete: marca</label><input type="text" id="pRBrand" maxlength="30" autocomplete="off" spellcheck="false" autocapitalize="words" enterkeyhint="done" placeholder="Ex.: Babolat"></div>
+      <div class="field"><label for="pRModel">Raquete: modelo</label><input type="text" id="pRModel" maxlength="40" autocomplete="off" spellcheck="false" autocapitalize="words" enterkeyhint="done" placeholder="Ex.: Pure Drive"></div>
+      <div class="field"><label for="pBirth">Data de nascimento</label><input type="date" id="pBirth" min="1900-01-01"><span class="hint" id="pAgeOut"></span></div>
+      <div class="field"><span class="flabel">Sexo</span><div class="seg" data-pkey="sex"><button type="button" data-v="M">Masc.</button><button type="button" data-v="F">Fem.</button><button type="button" data-v="O">Outro</button></div></div>
+      <div class="field"><span class="flabel">Mão dominante</span><div class="seg" data-pkey="hand"><button type="button" data-v="R">Destro</button><button type="button" data-v="L">Canhoto</button></div></div>
+      <div class="field"><span class="flabel">Backhand</span><div class="seg" data-pkey="backhand"><button type="button" data-v="1">Uma mão</button><button type="button" data-v="2">Duas mãos</button></div></div>
+    </div>
+    <p class="hint" id="pHint" style="margin:8px 0 0;color:var(--muted);font-size:13px"></p>
+    <h3 class="sec">Resumo estatístico</h3>
+    <div class="tiles" id="pStats"></div>
+    <p class="note" id="pStatsNote"></p>
+    <div id="pOppWrap" hidden>
+      <h3 class="sec">Adversários e parceiros</h3>
+      <ul class="plist" id="pOpp"></ul>
+      <p class="note">Toque em um jogador para completar o perfil dele (foto, dados) e ver as estatísticas dele.</p>
+    </div>
+    <div class="actions"><button class="btn" type="button" id="pExport">Copiar meus dados (JSON)</button><button class="btn primary" type="button" data-close>Pronto</button></div>
+    <div id="pBox"></div>
+    <p class="note">Tudo fica só neste aparelho por enquanto. Cada jogador e cada partida já têm um código único, para depois sincronizar com uma conta online e ligar seu perfil ao de quem também usa o app.</p>
+  </div>
+</div>
+
+<!-- Enquadrar foto -->
+<div class="sheet" id="shCrop" data-sticky hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="hCrop">
+    <div class="card-head"><h2 id="hCrop">Enquadrar foto</h2></div>
+    <div class="crop-wrap">
+      <div class="crop" id="cropBox"><canvas id="cropCv" width="300" height="300"></canvas></div>
+      <p class="note" style="margin:0;text-align:center">Arraste a foto para centralizar o rosto no círculo e use o controle para aproximar.</p>
+      <input type="range" id="cropZoom" min="1" max="4" step="0.01" value="1" aria-label="Zoom da foto" style="max-width:300px">
+    </div>
+    <div class="actions"><button class="btn primary" type="button" id="cropOk">Usar foto</button><button class="btn" type="button" id="cropCancel">Cancelar</button></div>
+  </div>
+</div>
+
+<!-- Configurações -->
+<div class="sheet" id="shSet" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="hSet">
+    <div class="card-head"><h2 id="hSet">Configurações</h2><button class="btn ghost" type="button" data-close aria-label="Fechar"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <div class="grid">
+      <div class="field">
+        <label class="check"><input type="checkbox" id="sVoice"> Narrar o placar</label>
+        <label class="check"><input type="checkbox" id="sName"> Dizer o nome de quem fez o ponto</label>
+        <label class="check"><input type="checkbox" id="sStakes"> Anunciar match point e set point</label>
+        <label class="check"><input type="checkbox" id="sWake"> Manter a tela ligada</label>
+        <label class="check"><input type="checkbox" id="sGood"> Dizer "Bom jogo" no fim do aquecimento</label>
+      </div>
+      <div class="field">
+        <label for="sRate">Velocidade da voz <output id="oRate"></output></label>
+        <input type="range" id="sRate" min="0.7" max="1.4" step="0.05">
+        <label for="sVol" style="margin-top:8px">Volume da voz <output id="oVol"></output></label>
+        <input type="range" id="sVol" min="0.2" max="1" step="0.05">
+        <label for="sVoiceName" style="margin-top:8px">Voz</label>
+        <select id="sVoiceName"></select>
+        <span class="hint" id="hVoice"></span>
+      </div>
+
+      <div class="field" style="grid-column:1/-1"><span class="flabel">Cores</span>
+        <div class="preview" aria-hidden="true"><div class="pv a">30</div><div class="pv b">15</div></div>
+        <span class="hint" id="cWarn" hidden></span>
+      </div>
+      <div class="field"><span class="flabel" id="cl-p1">Fundo do jogador 1</span><div class="swatches" id="sw-p1"></div></div>
+      <div class="field"><span class="flabel" id="cl-p2">Fundo do jogador 2</span><div class="swatches" id="sw-p2"></div></div>
+      <div class="field"><span class="flabel">Cor dos números e nomes</span><div class="swatches" id="sw-num"></div></div>
+    </div>
+    <div class="actions"><button class="btn" type="button" id="sTest">Testar voz</button><button class="btn" type="button" id="cReset">Restaurar cores</button><button class="btn primary" type="button" data-close>Pronto</button></div>
+    <p class="vstatus" id="vStatus"></p>
+    <div class="actions"><button class="btn" type="button" id="sManage">Gerenciar dados salvos</button></div>
+    <p class="note">Saque: a bolinha mostra o lado. Pontos pares (0-0, 30-30...) saem pela direita e os ímpares pela esquerda. As partidas e as configurações ficam salvas só neste aparelho e neste navegador.</p>
+  </div>
+</div>
+
+<!-- Dados salvos -->
+<div class="sheet" id="shData" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="hData">
+    <div class="card-head"><h2 id="hData">Dados salvos</h2><button class="btn ghost" type="button" data-close aria-label="Fechar"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <h3 class="sec">Jogadores</h3>
+    <ul class="mlist" id="dPlayers"></ul>
+    <h3 class="sec">Locais</h3>
+    <ul class="mlist" id="dPlaces"></ul>
+    <h3 class="sec">Partidas</h3>
+    <ul class="mlist"><li><span class="mn" id="dHistInfo"></span><button class="btn danger" type="button" id="dHist">Apagar todas</button></li></ul>
+    <h3 class="sec">Tudo</h3>
+    <ul class="mlist"><li><span class="mn">Perfil, jogadores, locais, histórico e configurações</span><button class="btn danger" type="button" id="dAll">Apagar tudo</button></li></ul>
+    <p class="note">Excluir um jogador tira o nome da lista de recentes; as partidas já jogadas continuam no histórico. Toque duas vezes em um botão vermelho para confirmar.</p>
+    <div class="actions"><button class="btn primary" type="button" data-close>Pronto</button></div>
+  </div>
+</div>
+
+<!-- Histórico -->
+<div class="sheet" id="shHist" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="hHist">
+    <div class="card-head"><h2 id="hHist">Histórico</h2><button class="btn ghost" type="button" data-close aria-label="Fechar"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <ul class="hist" id="histList"></ul>
+    <div id="histEmpty" class="empty" hidden>Nenhuma partida salva ainda. As partidas encerradas aparecem aqui, e a que você deixa pela metade ao começar outra também.</div>
+    <div class="actions" id="histActions"><button class="btn" type="button" id="hAll">Copiar tudo (JSON)</button></div>
+    <div id="histBox"></div>
+    <p class="note">Copie o resultado de uma partida para lançar em outro app, como o ranking do seu clube.</p>
+  </div>
+</div>
+
+<!-- Fim de jogo -->
+<div class="sheet" id="shEnd" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="hEnd">
+    <div class="lbl" style="font:700 12px var(--ui);letter-spacing:.16em;color:var(--muted);text-transform:uppercase">Fim de jogo</div>
+    <div class="big-result" id="hEnd"></div>
+    <div class="sets-line" id="endSets"></div>
+    <div class="actions">
+      <button class="btn primary" type="button" id="eNew">Novo jogo</button>
+      <button class="btn" type="button" id="eCopy">Copiar resultado</button>
+      <button class="btn" type="button" id="eUndo">Desfazer último ponto</button>
+      <button class="btn" type="button" data-close>Ver placar</button>
+    </div>
+    <div id="endBox"></div>
+  </div>
+</div>
+
+<script>
+/*
+ * Motor de pontuação do tênis (sem tela, sem rádio, sem áudio).
+ * Funciona no navegador e no Node. O estado é JSON puro, então pode ser salvo.
+ *
+ * Times são 0 e 1. Em simples, cada time é um jogador.
+ */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory();
+  else root.TennisEngine = factory();
+})(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
+
+  var DEFAULTS = {
+    mode: 'singles',          // 'singles' | 'doubles'
+    bestOf: 3,                // 1, 3 ou 5 sets
+    gamesPerSet: 6,
+    tiebreak: true,           // tie-break quando chega a gamesPerSet iguais
+    tiebreakPoints: 7,
+    finalSet: 'same',         // 'same' | 'super' | 'advantage' (set decisivo)
+    superTiebreakPoints: 10,
+    noAd: false,              // ponto decisivo no 40 iguais
+    firstServer: 0
+  };
+
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function setsToWin(cfg) { return Math.ceil(cfg.bestOf / 2); }
+
+  function isDeciding(s) {
+    var n = setsToWin(s.cfg);
+    return s.cfg.bestOf > 1 && s.setsWon[0] === n - 1 && s.setsWon[1] === n - 1;
+  }
+
+  function hasTiebreak(s) {
+    return s.cfg.tiebreak && !(isDeciding(s) && s.cfg.finalSet === 'advantage');
+  }
+
+  // ---- saque -------------------------------------------------------------
+
+  function startGame(s, team) {
+    s.server = team;
+    s.serverPlayer = s.cfg.mode === 'doubles' ? s.servedGames[team] % 2 : 0;
+    s.servedGames[team]++;
+  }
+
+  function startTb(s, kind, target, firstTeam) {
+    s.tb = {
+      kind: kind,
+      target: target,
+      first: firstTeam,
+      xp: s.servedGames[firstTeam] % 2,
+      yp: s.servedGames[1 - firstTeam] % 2
+    };
+    s.server = firstTeam;
+    s.serverPlayer = s.cfg.mode === 'doubles' ? s.tb.xp : 0;
+  }
+
+  // No tie-break, o primeiro saca 1 ponto e depois cada lado saca 2 em 2.
+  function updateTbServer(s) {
+    var t = s.points[0] + s.points[1];
+    var slot = Math.floor((t + 1) / 2) % 4;
+    var x = s.tb.first;
+    s.server = slot % 2 === 0 ? x : 1 - x;
+    if (s.cfg.mode === 'doubles') {
+      s.serverPlayer = [s.tb.xp, s.tb.yp, 1 - s.tb.xp, 1 - s.tb.yp][slot];
+    }
+  }
+
+  // ---- criação -----------------------------------------------------------
+
+  function newMatch(config) {
+    var cfg = Object.assign({}, DEFAULTS, config || {});
+    var s = {
+      cfg: cfg,
+      sets: [],            // [{games:[a,b], tb:null|[a,b], kind:'normal'|'super'}]
+      setsWon: [0, 0],
+      games: [0, 0],
+      points: [0, 0],
+      tb: null,
+      server: cfg.firstServer,
+      serverPlayer: 0,
+      servedGames: [0, 0],
+      gameLog: [],         // games normais: [{srv: time que sacou, w: time que ganhou}] (tie-breaks ficam de fora)
+      winner: null,
+      pointsPlayed: 0
+    };
+    startGame(s, cfg.firstServer);
+    return s;
+  }
+
+  // ---- fluxo -------------------------------------------------------------
+
+  function beginSet(s, ev, firstTeam) {
+    s.games = [0, 0];
+    s.points = [0, 0];
+    if (isDeciding(s) && s.cfg.finalSet === 'super') {
+      startTb(s, 'super', s.cfg.superTiebreakPoints, firstTeam);
+      ev.push({ type: 'tiebreakStart', kind: 'super' });
+    } else {
+      s.tb = null;
+      startGame(s, firstTeam);
+    }
+  }
+
+  function endSet(s, w, ev, rec, lastServerTeam) {
+    s.sets.push(rec);
+    s.setsWon[w]++;
+    ev.push({ type: 'set', winner: w, games: rec.games.slice(), tb: rec.tb ? rec.tb.slice() : null, kind: rec.kind });
+    if (s.setsWon[w] === setsToWin(s.cfg)) {
+      s.winner = w;
+      s.games = [0, 0];
+      s.points = [0, 0];
+      s.tb = null;
+      ev.push({ type: 'match', winner: w });
+      return;
+    }
+    var total = rec.kind === 'super' ? 0 : rec.games[0] + rec.games[1];
+    if (total % 2 === 1) ev.push({ type: 'changeEnds' });
+    beginSet(s, ev, 1 - lastServerTeam);
+  }
+
+  function tbPoint(s, w, ev) {
+    var l = 1 - w;
+    var p = s.points[w], q = s.points[l];
+    var t = s.points[0] + s.points[1];
+    if (p >= s.tb.target && p - q >= 2) {
+      var first = s.tb.first;
+      var rec;
+      if (s.tb.kind === 'super') {
+        rec = { games: w === 0 ? [1, 0] : [0, 1], tb: s.points.slice(), kind: 'super' };
+      } else {
+        s.games[w]++;
+        rec = { games: s.games.slice(), tb: s.points.slice(), kind: 'normal' };
+      }
+      s.servedGames[first]++;
+      s.servedGames[1 - first]++;
+      s.tb = null;
+      endSet(s, w, ev, rec, first);
+      return;
+    }
+    if (t % 6 === 0) ev.push({ type: 'changeEnds' });
+    updateTbServer(s);
+  }
+
+  function pointWon(prev, w) {
+    if (prev.winner !== null) return { state: prev, events: [] };
+    var s = clone(prev);
+    var ev = [];
+    s.pointsPlayed++;
+    s.points[w]++;
+    ev.push({ type: 'point', winner: w });
+
+    if (s.tb) {
+      tbPoint(s, w, ev);
+      return { state: s, events: ev };
+    }
+
+    var l = 1 - w;
+    var p = s.points[w], q = s.points[l];
+    var won = s.cfg.noAd ? p >= 4 : (p >= 4 && p - q >= 2);
+
+    if (!won) {
+      if (s.cfg.noAd) {
+        if (p === 3 && q === 3) ev.push({ type: 'deciding' });
+      } else if (p >= 3 && q >= 3) {
+        if (p === q) ev.push({ type: 'deuce' });
+        else ev.push({ type: 'advantage', player: w });
+      }
+      return { state: s, events: ev };
+    }
+
+    // game
+    s.games[w]++;
+    s.points = [0, 0];
+    ev.push({ type: 'game', winner: w });
+    if (!s.gameLog) s.gameLog = [];
+    s.gameLog.push({ srv: s.server, w: w });
+    var gps = s.cfg.gamesPerSet;
+    var a = s.games[w], b = s.games[l];
+    var gameServer = s.server;
+
+    if (a >= gps && a - b >= 2) {
+      endSet(s, w, ev, { games: s.games.slice(), tb: null, kind: 'normal' }, gameServer);
+    } else if (hasTiebreak(s) && a === gps && b === gps) {
+      ev.push({ type: 'tiebreakStart', kind: 'normal' });
+      startTb(s, 'normal', s.cfg.tiebreakPoints, 1 - gameServer);
+    } else {
+      if ((a + b) % 2 === 1) ev.push({ type: 'changeEnds' });
+      startGame(s, 1 - gameServer);
+    }
+    return { state: s, events: ev };
+  }
+
+  // ---- histórico (Undo) ----------------------------------------------------
+
+  function createGame(config) {
+    return { state: newMatch(config), past: [] };
+  }
+
+  function addPoint(game, w) {
+    if (game.state.winner !== null) return { game: game, events: [] };
+    var r = pointWon(game.state, w);
+    return { game: { state: r.state, past: game.past.concat([game.state]) }, events: r.events };
+  }
+
+  function undo(game) {
+    if (!game.past.length) return game;
+    return { state: game.past[game.past.length - 1], past: game.past.slice(0, -1) };
+  }
+
+  // ---- exibição ------------------------------------------------------------
+
+  var PT = ['0', '15', '30', '40'];
+
+  // Quem tem match point / set point agora: simula o próximo ponto de cada jogador.
+  function stakes(s) {
+    var out = { matchPoint: [false, false], setPoint: [false, false] };
+    if (s.winner !== null) return out;
+    for (var p = 0; p < 2; p++) {
+      var ev = pointWon(s, p).events;
+      var isM = false, isS = false;
+      for (var i = 0; i < ev.length; i++) { if (ev[i].type === 'match') isM = true; if (ev[i].type === 'set') isS = true; }
+      if (isM) out.matchPoint[p] = true; else if (isS) out.setPoint[p] = true;
+    }
+    return out;
+  }
+  function stakesText(s, names, on) {
+    if (on === false) return '';
+    var nm = function (i) { return (names && names[i]) || (i === 0 ? 'jogador 1' : 'jogador 2'); };
+    var k = stakes(s), parts = [];
+    [0, 1].forEach(function (p) { if (k.matchPoint[p]) parts.push('Match point, ' + nm(p) + '.'); });
+    if (!parts.length) [0, 1].forEach(function (p) { if (k.setPoint[p]) parts.push('Set point, ' + nm(p) + '.'); });
+    return parts.join(' ');
+  }
+
+  function display(s) {
+    var out = {
+      points: ['0', '0'], games: s.games.slice(), sets: s.sets, setsWon: s.setsWon.slice(),
+      server: s.server, serverPlayer: s.serverPlayer,
+      // lado do saque: direita (quadra de iguais) nos pontos pares, esquerda nos ímpares
+      serveSide: (s.points[0] + s.points[1]) % 2 === 0 ? 'right' : 'left',
+      tiebreak: !!s.tb,
+      tbKind: s.tb ? s.tb.kind : null, deuce: false, advantage: null, deciding: false,
+      winner: s.winner, matchPoint: null, setPoint: null
+    };
+    if (s.winner !== null) { out.points = ['', '']; return out; }
+    var sk = stakes(s);
+    out.matchPoint = sk.matchPoint[0] ? 0 : sk.matchPoint[1] ? 1 : null;
+    out.setPoint = sk.setPoint[0] ? 0 : sk.setPoint[1] ? 1 : null;
+    var a = s.points[0], b = s.points[1];
+    if (s.tb) { out.points = [String(a), String(b)]; return out; }
+    if (a >= 3 && b >= 3) {
+      if (s.cfg.noAd) {
+        out.points = ['40', '40'];
+        out.deciding = true;
+      } else if (a === b) {
+        out.points = ['40', '40'];
+        out.deuce = true;
+      } else {
+        out.advantage = a > b ? 0 : 1;
+        out.points = a > b ? ['AD', '40'] : ['40', 'AD'];
+      }
+      return out;
+    }
+    out.points = [PT[a], PT[b]];
+    return out;
+  }
+
+  // ---- narração em português ------------------------------------------------
+
+  var NUM = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 'oito', 'nove', 'dez',
+    'onze', 'doze', 'treze', 'catorze', 'quinze', 'dezesseis', 'dezessete', 'dezoito', 'dezenove', 'vinte'];
+  var PTW = ['zero', 'quinze', 'trinta', 'quarenta'];
+
+  function num(n) { return n <= 20 ? NUM[n] : String(n); }
+
+  /*
+   * Devolve uma lista de frases para falar, na ordem.
+   * s = estado depois do ponto; events = eventos devolvidos por pointWon.
+   * names = ['Leandro', 'Gisele'] (nome de cada time).
+   * opts.nameOnPoint: diz o nome de quem fez o ponto depois do placar.
+   */
+  function announce(s, events, names, opts) {
+    opts = Object.assign({ nameOnPoint: true, stakes: true }, opts || {});
+    var nm = function (i) { return (names && names[i]) || (i === 0 ? 'jogador 1' : 'jogador 2'); };
+    var find = function (t) { for (var i = 0; i < events.length; i++) if (events[i].type === t) return events[i]; return null; };
+    var out = [];
+    var m = find('match'), st = find('set'), g = find('game'), pt = find('point');
+
+    if (m) {
+      var w = m.winner;
+      out.push('Fim de jogo. Vitória de ' + nm(w) + '.');
+      out.push(s.sets.map(function (r) {
+        return r.kind === 'super'
+          ? 'super tie-break ' + num(r.tb[w]) + ' a ' + num(r.tb[1 - w])
+          : num(r.games[w]) + ' a ' + num(r.games[1 - w]);
+      }).join(', ') + '.');
+      return out;
+    }
+    if (st) {
+      var sw = st.winner;
+      if (st.kind === 'super') out.push('Super tie-break para ' + nm(sw) + ', ' + num(st.tb[sw]) + ' a ' + num(st.tb[1 - sw]) + '.');
+      else out.push('Set para ' + nm(sw) + ', ' + num(st.games[sw]) + ' a ' + num(st.games[1 - sw]) + '.');
+    } else if (g) {
+      var gw = g.winner;
+      out.push('Game ' + nm(gw) + ', ' + num(s.games[gw]) + ' a ' + num(s.games[1 - gw]) + '.');
+    } else if (pt) {
+      var wn = pt.winner;
+      var tail = opts.nameOnPoint ? ', ' + nm(wn) : '';
+      var adv = find('advantage');
+      if (find('deuce')) out.push('Iguais' + tail + '.');
+      else if (adv) out.push('Vantagem ' + nm(adv.player) + '.');
+      else if (find('deciding')) out.push('Ponto decisivo.');
+      else {
+        var sv = s.server, rc = 1 - sv;
+        var sp = s.points[sv], rp = s.points[rc];
+        var phrase;
+        if (s.tb) phrase = num(sp) + ' a ' + num(rp);
+        else if (sp === rp) phrase = PTW[sp] + ' iguais';
+        else phrase = PTW[sp] + ' a ' + PTW[rp];
+        out.push(phrase.charAt(0).toUpperCase() + phrase.slice(1) + tail + '.');
+      }
+    }
+    var ts = find('tiebreakStart');
+    if (ts) out.push(ts.kind === 'super' ? 'Super tie-break.' : 'Tie-break.');
+    if (!m && opts.stakes !== false) { var sx = stakesText(s, names, true); if (sx) out.push(sx); }
+    if (find('changeEnds')) out.push('Troca de lado.');
+    return out;
+  }
+
+  function cap(x) { return x.charAt(0).toUpperCase() + x.slice(1); }
+
+  // Placar atual falado (para o botão "falar placar" e para o desfazer).
+  function scoreText(s, names) {
+    var nm = function (i) { return (names && names[i]) || (i === 0 ? 'jogador 1' : 'jogador 2'); };
+    if (s.winner !== null) return 'Fim de jogo. Vitória de ' + nm(s.winner) + '.';
+    var sv = s.server, rc = 1 - sv, sp = s.points[sv], rp = s.points[rc];
+    if (s.tb) return cap(num(sp) + ' a ' + num(rp)) + '.';
+    if (sp >= 3 && rp >= 3) {
+      if (s.cfg.noAd) return 'Ponto decisivo.';
+      if (sp === rp) return 'Iguais.';
+      return 'Vantagem ' + nm(sp > rp ? sv : rc) + '.';
+    }
+    if (sp === rp) return (sp === 0 ? 'Zero a zero' : cap(PTW[sp]) + ' iguais').replace(/^zero a zero$/i, 'Zero a zero') + '.';
+    return cap(PTW[sp] + ' a ' + PTW[rp]) + '.';
+  }
+
+  // Resumo falado: sets, games e o placar do game.
+  function fullText(s, names) {
+    var nm = function (i) { return (names && names[i]) || (i === 0 ? 'jogador 1' : 'jogador 2'); };
+    if (s.winner !== null) return scoreText(s, names);
+    var out = [];
+    if (s.sets.length) out.push('Sets: ' + nm(0) + ' ' + num(s.setsWon[0]) + ', ' + nm(1) + ' ' + num(s.setsWon[1]) + '.');
+    if (!s.tb || s.tb.kind === 'normal') out.push('Games: ' + nm(0) + ' ' + num(s.games[0]) + ', ' + nm(1) + ' ' + num(s.games[1]) + '.');
+    out.push(scoreText(s, names));
+    var sx = stakesText(s, names, true); if (sx) out.push(sx);
+    return out.join(' ');
+  }
+
+  return {
+    scoreText: scoreText,
+    stakes: stakes,
+    fullText: fullText,
+    DEFAULTS: DEFAULTS,
+    newMatch: newMatch,
+    pointWon: pointWon,
+    createGame: createGame,
+    addPoint: addPoint,
+    undo: undo,
+    display: display,
+    announce: announce
+  };
+});
+
+</script>
+<script>
+(function () {
+  'use strict';
+  var E = window.TennisEngine;
+  var KEY = 'boxscore.placar.v1';
+  var LOCK_MS = 450;
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* ---------- armazenamento (opcional) ---------- */
+  var memData = null;
+  function load() {
+    try { var r = localStorage.getItem(KEY); if (r) return JSON.parse(r); } catch (e) {}
+    return memData;
+  }
+  var wiping = false;
+  function persist() {
+    if (wiping) return;
+    P.game = G;
+    if (P.game.past.length > 500) P.game.past = P.game.past.slice(-500);
+    memData = P;
+    try { localStorage.setItem(KEY, JSON.stringify(P)); } catch (e) {}
+  }
+
+  /* ---------- estado ---------- */
+  var DEFAULT_COLORS = { p1: '#C4401B', p2: '#0D6A88', num: '#FFFFFF' };
+  var DEFAULT_SETTINGS = { voice: true, nameOnPoint: true, stakes: true, wake: true, rate: 1, volume: 1, voiceName: '', goodLuck: false };
+  var DEFAULT_WARM = { on: false, time: 'std', minutes: 5, phases: { quad: true, fundo: true, vol: true, saq: true } };
+  var P = load() || {};
+  P.settings = Object.assign({}, DEFAULT_SETTINGS, P.settings || {});
+  P.settings.colors = Object.assign({}, DEFAULT_COLORS, P.settings.colors || {});
+  // última escolha de aquecimento (lembrada para a próxima partida)
+  P.settings.warm = Object.assign({}, DEFAULT_WARM, P.settings.warm || {});
+  P.settings.warm.phases = Object.assign({}, DEFAULT_WARM.phases, P.settings.warm.phases || {});
+  P.history = Array.isArray(P.history) ? P.history : [];
+  P.recent = Array.isArray(P.recent) ? P.recent : [];
+  P.places = Array.isArray(P.places) ? P.places : [];
+  P.placeSurf = P.placeSurf && typeof P.placeSurf === 'object' ? P.placeSurf : {};
+  var SURF = { saibro: 'Saibro', rapida: 'Rápida', grama: 'Grama', carpete: 'Carpete', outro: 'Outro piso' };
+  // Modelo pronto para sincronizar: ids únicos (uuid), updatedAt e linkedUserId (futura conta online).
+  P.schema = 2;
+  P.players = P.players && typeof P.players === 'object' ? P.players : {};
+  P.deviceId = P.deviceId || uid();
+  P.meId = P.meId && P.players[P.meId] ? P.meId : null;
+
+  function uid() {
+    try { if (window.crypto && crypto.randomUUID) return crypto.randomUUID(); } catch (e) {}
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+  }
+  function teamName(arr) { return arr.filter(Boolean).join(' / '); }
+  function mkGame(players, cfg, pids) {
+    var g = E.createGame(cfg);
+    g.meta = { id: uid(), startedAt: Date.now(), players: players, names: players.map(teamName), pids: pids || players.map(function (t) { return t.map(function () { return null; }); }) };
+    return g;
+  }
+  function normName(n) { return String(n || '').trim().toLowerCase(); }
+  function findByName(n) {
+    var k = normName(n), r = null;
+    Object.keys(P.players).forEach(function (id) { var pl = P.players[id]; if (!pl.deleted && normName(pl.name) === k) r = pl; });
+    return r;
+  }
+  function newPlayer(name, kind) {
+    var pl = { id: uid(), kind: kind, name: name, photo: '', height: '', weight: '', birth: '', racketBrand: '', racketModel: '', sex: '', hand: '', backhand: '', linkedUserId: null, createdAt: Date.now(), updatedAt: Date.now(), deleted: false };
+    P.players[pl.id] = pl; return pl;
+  }
+  function touch(pl) { pl.updatedAt = Date.now(); persist(); }
+  function me() { return P.meId ? P.players[P.meId] : null; }
+  var G = (P.game && P.game.state && P.game.state.cfg && P.game.meta) ? P.game : mkGame([['Jogador 1'], ['Jogador 2']], {});
+  var ui = { ends: false, lockUntil: 0 };
+
+  function fmtDur(ms) {
+    var t = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(t / 3600), m = Math.floor(t % 3600 / 60), sec = t % 60;
+    function z(n) { return (n < 10 ? '0' : '') + n; }
+    return h ? h + ':' + z(m) + ':' + z(sec) : z(m) + ':' + z(sec);
+  }
+  function fmtDurText(ms) {
+    var m = Math.round(ms / 60000), h = Math.floor(m / 60);
+    return h ? h + ' h ' + (m % 60) + ' min' : Math.max(m, 1) + ' min';
+  }
+  function elapsed(g) {
+    if (!g.meta.playStart) return 0;
+    return (g.meta.endedAt || Date.now()) - g.meta.playStart;
+  }
+  function tick() { var c = document.getElementById('clock'); if (c) c.textContent = fmtDur(elapsed(G)); }
+  setInterval(tick, 1000);
+
+  function speakNames() { return G.meta.names.map(function (n) { return n.replace(/ \/ /g, ' e '); }); }
+
+  /* ---------- cores ---------- */
+  function hexToRgb(h) {
+    h = String(h).replace('#', '');
+    if (h.length === 3) h = h.split('').map(function (c) { return c + c; }).join('');
+    var n = parseInt(h, 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+  function rgbToHex(r) { return '#' + r.map(function (v) { return ('0' + Math.round(v).toString(16)).slice(-2); }).join('').toUpperCase(); }
+  function lum(rgb) {
+    var a = rgb.map(function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+    return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
+  }
+  function contrast(h1, h2) {
+    var a = lum(hexToRgb(h1)), b = lum(hexToRgb(h2));
+    return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+  }
+  function panelHex() {
+    var v = '';
+    try { v = getComputedStyle(document.documentElement).getPropertyValue('--panel').trim(); } catch (e) {}
+    return /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v) ? v : '#FFFFFF';
+  }
+  // Clareia ou escurece a cor do jogador até ela ser legível sobre o painel central.
+  function legibleOnPanel(hex) {
+    var panel = panelHex(), rgb = hexToRgb(hex);
+    var target = lum(hexToRgb(panel)) > 0.5 ? [0, 0, 0] : [255, 255, 255];
+    for (var t = 0; t <= 1.0001; t += 0.1) {
+      var c = rgbToHex(rgb.map(function (v, i) { return v + (target[i] - v) * t; }));
+      if (contrast(c, panel) >= 3) return c;
+    }
+    return rgbToHex(target);
+  }
+  function applyColors() {
+    var c = P.settings.colors, st = document.documentElement.style;
+    ['p1', 'p2'].forEach(function (k) {
+      if (c[k].toUpperCase() === DEFAULT_COLORS[k]) { st.removeProperty('--' + k); st.removeProperty('--' + k + 't'); }
+      else { st.setProperty('--' + k, c[k]); st.setProperty('--' + k + 't', legibleOnPanel(c[k])); }
+    });
+    if (c.num.toUpperCase() === DEFAULT_COLORS.num) st.removeProperty('--on-p'); else st.setProperty('--on-p', c.num);
+    var warn = $('cWarn'), bad = [];
+    if (contrast(c.num, c.p1) < 3) bad.push('jogador 1');
+    if (contrast(c.num, c.p2) < 3) bad.push('jogador 2');
+    warn.hidden = !bad.length;
+    warn.textContent = bad.length ? 'Pouco contraste entre os números e o fundo do ' + bad.join(' e do ') + '. Ao sol pode ficar difícil de ler.' : '';
+  }
+  var BG_SWATCHES = ['#C4401B', '#0D6A88', '#1F7A4D', '#6B3FA0', '#B3261E', '#1B2A6B', '#E8710A', '#00796B', '#C2185B', '#5B6770', '#111111', '#E0B000'];
+  var NUM_SWATCHES = ['#FFFFFF', '#111111', '#FFE45C', '#D7F13A', '#FFB4A0', '#BFEFFF'];
+  function setColor(key, hex) {
+    P.settings.colors[key] = hex.toUpperCase();
+    applyColors(); syncColorUI(); persist();
+  }
+  function buildSwatches(key, list) {
+    var host = $('sw-' + key); host.innerHTML = '';
+    list.forEach(function (hex) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'swatch'; b.style.background = hex; b.setAttribute('data-hex', hex); b.setAttribute('aria-label', 'Cor ' + hex);
+      b.addEventListener('click', function () { setColor(key, hex); });
+      host.appendChild(b);
+    });
+    var lab = document.createElement('label'); lab.className = 'swatch custom'; lab.title = 'Outra cor';
+    var inp = document.createElement('input'); inp.type = 'color'; inp.id = 'cc-' + key; inp.setAttribute('aria-label', 'Escolher outra cor');
+    inp.addEventListener('input', function () { setColor(key, inp.value); });
+    lab.appendChild(inp); host.appendChild(lab);
+  }
+  function syncColorUI() {
+    ['p1', 'p2', 'num'].forEach(function (key) {
+      var cur = P.settings.colors[key].toUpperCase();
+      Array.prototype.forEach.call($('sw-' + key).querySelectorAll('.swatch[data-hex]'), function (b) {
+        b.setAttribute('aria-pressed', b.getAttribute('data-hex').toUpperCase() === cur ? 'true' : 'false');
+      });
+      var inp = $('cc-' + key); if (inp) inp.value = cur.toLowerCase();
+    });
+  }
+  buildSwatches('p1', BG_SWATCHES); buildSwatches('p2', BG_SWATCHES); buildSwatches('num', NUM_SWATCHES);
+  $('cReset').addEventListener('click', function () { P.settings.colors = Object.assign({}, DEFAULT_COLORS); applyColors(); syncColorUI(); persist(); });
+  try {
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    (mq.addEventListener ? mq.addEventListener.bind(mq, 'change') : mq.addListener.bind(mq))(applyColors);
+    new MutationObserver(applyColors).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  } catch (e) {}
+  applyColors(); syncColorUI();
+
+  /* ---------- aviso rápido ---------- */
+  var toastTimer = null;
+  function showToast(msg) {
+    var t = $('toast'); t.textContent = msg; t.hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.hidden = true; }, 7000);
+  }
+
+  /* ---------- voz ---------- */
+  var voices = [], spokeOnce = false, warned = false;
+  var synth = ('speechSynthesis' in window) ? window.speechSynthesis : null;
+  function setVStatus(msg) { $('vStatus').textContent = msg; }
+  function warnVoice(msg) { setVStatus(msg); if (!warned) { warned = true; showToast(msg); } }
+  function loadVoices() {
+    if (!synth) { $('hVoice').textContent = 'Este visualizador não oferece voz sintetizada.'; return; }
+    voices = synth.getVoices().filter(function (v) { return /^pt/i.test(v.lang); });
+    var sel = $('sVoiceName');
+    sel.innerHTML = '';
+    var o = document.createElement('option'); o.value = ''; o.textContent = 'Automática (português do Brasil)'; sel.appendChild(o);
+    voices.forEach(function (v) { var x = document.createElement('option'); x.value = v.name; x.textContent = v.name + ' (' + v.lang + ')'; sel.appendChild(x); });
+    sel.value = P.settings.voiceName;
+    $('hVoice').textContent = voices.length
+      ? voices.length + (voices.length === 1 ? ' voz em português encontrada.' : ' vozes em português encontradas.')
+      : 'Nenhuma voz em português listada. A narração ainda pode funcionar com a voz padrão do aparelho: toque em Testar voz.';
+  }
+  function pickVoice() {
+    if (P.settings.voiceName) { var v = voices.filter(function (x) { return x.name === P.settings.voiceName; })[0]; if (v) return v; }
+    return voices.filter(function (v) { return /pt[-_]BR/i.test(v.lang); })[0] || voices[0] || null;
+  }
+  function speak(parts, opts) {
+    $('live').textContent = parts.join(' ');
+    if (!(opts && opts.force) && !P.settings.voice) return;
+    if (!synth) { warnVoice('Este visualizador não oferece voz. Abra o link no Chrome do celular para ouvir a narração.'); return; }
+    try {
+      if (synth.speaking || synth.pending) synth.cancel();
+      var voice = pickVoice();
+      parts.forEach(function (text) {
+        var u = new SpeechSynthesisUtterance(text);
+        u.lang = 'pt-BR'; u.rate = P.settings.rate; u.volume = P.settings.volume;
+        if (voice) u.voice = voice;
+        u.onstart = function () { spokeOnce = true; if ($('vStatus').textContent) setVStatus('Voz funcionando.'); };
+        u.onerror = function (e) {
+          if (e && (e.error === 'canceled' || e.error === 'interrupted')) return;
+          warnVoice('A voz falhou (' + ((e && e.error) || 'erro desconhecido') + ').');
+        };
+        synth.speak(u);
+      });
+      setTimeout(function () {
+        if (!spokeOnce) warnVoice('A narração não começou. Este visualizador pode não ter voz: abra o link no Chrome do celular.');
+      }, 2200);
+    } catch (e) { warnVoice('Não foi possível usar a voz: ' + (e && e.message)); }
+  }
+
+  /* ---------- tela ligada e tela cheia ---------- */
+  var wl = null;
+  function wake() {
+    try {
+      if (!P.settings.wake) { if (wl) { wl.release(); wl = null; } return; }
+      if (wl || !navigator.wakeLock) return;
+      navigator.wakeLock.request('screen').then(function (l) { wl = l; l.addEventListener('release', function () { wl = null; }); }, function () {});
+    } catch (e) {}
+  }
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') wake(); else persist(); });
+
+  /* ---------- exibição ---------- */
+  function setText(r) {
+    if (r.kind === 'super') return '[' + r.tb[0] + '-' + r.tb[1] + ']';
+    if (r.tb) return r.games[0] + '-' + r.games[1] + '(' + Math.min(r.tb[0], r.tb[1]) + ')';
+    return r.games[0] + '-' + r.games[1];
+  }
+
+  function initials(n) { return String(n || '?').trim().charAt(0) || '?'; }
+  function fillAv(el, pl) {
+    el.innerHTML = '';
+    if (pl && pl.photo) { var im = document.createElement('img'); im.alt = ''; im.src = pl.photo; el.appendChild(im); }
+    else el.textContent = initials(pl && pl.name);
+  }
+  function renderAvs(host, ids) {
+    var key = ids.map(function (id) { var pl = P.players[id]; return id ? id + ':' + (pl ? pl.updatedAt : 0) : ''; }).join('|');
+    if (host.getAttribute('data-k') === key) return;
+    host.setAttribute('data-k', key); host.innerHTML = '';
+    ids.forEach(function (id) {
+      var pl = id && P.players[id]; if (!pl) return;
+      var a = document.createElement('span'); a.className = 'av'; fillAv(a, pl); host.appendChild(a);
+    });
+  }
+
+  function render() {
+    var s = G.state, d = E.display(s), m = G.meta;
+    for (var i = 0; i < 2; i++) {
+      $('nm' + i).textContent = m.names[i];
+      renderAvs($('av' + i), (m.pids && m.pids[i]) || []);
+      var pts = $('pts' + i);
+      pts.textContent = s.winner !== null ? (s.winner === i ? 'Venceu' : '') : d.points[i];
+      pts.classList.toggle('small', s.winner !== null);
+      $('side' + i).classList.toggle('lose', s.winner !== null && s.winner !== i);
+      $('side' + i).setAttribute('aria-label', 'Marcar ponto para ' + m.names[i]);
+
+      // lado do saque: a bolinha fica na metade de quem saca e troca de lado a cada ponto
+      var serving = s.winner === null && d.server === i;
+      var track = $('track' + i);
+      track.style.visibility = serving ? 'visible' : 'hidden';
+      track.classList.toggle('right', d.serveSide === 'right');
+      var cap = '';
+      if (serving) {
+        var who = s.cfg.mode === 'doubles' ? m.players[i][d.serverPlayer] : '';
+        cap = (who ? who + ' saca pela ' : 'Saque pela ') + (d.serveSide === 'right' ? 'direita' : 'esquerda');
+      }
+      $('fsv' + i).textContent = cap;
+
+      $('sets' + i).textContent = d.setsWon[i];
+      $('games' + i).textContent = d.games[i];
+    }
+    $('setchips').textContent = d.sets.map(setText).join('   ');
+
+    var st = $('status'), text = '', cls = 'status';
+    if (ui.ends && s.winner === null) { text = 'Troque de lado'; cls += ' warn'; }
+    else if (s.winner !== null) text = '';
+    else if (d.matchPoint !== null) { text = 'Match point · ' + m.names[d.matchPoint]; cls += ' warn'; }
+    else if (d.setPoint !== null) { text = 'Set point · ' + m.names[d.setPoint]; cls += ' warn'; }
+    else if (d.tiebreak) text = d.tbKind === 'super' ? 'Super tie-break' : 'Tie-break';
+    else if (d.deuce) text = 'Iguais';
+    else if (d.advantage !== null) text = 'Vantagem ' + m.names[d.advantage];
+    else if (d.deciding) text = 'Ponto decisivo';
+    else if (s.pointsPlayed === 0 && !s.sets.length) { text = 'Toque na metade de quem ganhou o ponto'; cls += ' hint'; }
+    st.className = cls; st.textContent = text; st.hidden = !text;
+    $('bUndo').disabled = !G.past.length;
+    tick();
+  }
+
+  /* ---------- jogo ---------- */
+  function anySheetOpen() { return !!document.querySelector('.sheet:not([hidden])'); }
+
+  function point(w) {
+    if (anySheetOpen() || G.state.winner !== null || warmActive()) return;
+    var now = Date.now();
+    if (now < ui.lockUntil) return;      // evita ponto duplo por toque repetido
+    ui.lockUntil = now + LOCK_MS;
+    wake();
+    if (!G.meta.playStart) G.meta.playStart = now;
+    var r = E.addPoint(G, w);
+    var evT = r.events.map(function (e) { return e.type; });
+    if (evT.indexOf('game') >= 0 || evT.indexOf('set') >= 0) G.meta.marks = (G.meta.marks || []).concat([{ k: 'g', t: now, n: r.game.state.pointsPlayed }]);
+    if (evT.indexOf('set') >= 0) G.meta.marks = G.meta.marks.concat([{ k: 's', t: now, n: r.game.state.pointsPlayed }]);
+    G = { state: r.game.state, past: r.game.past, meta: G.meta };
+    ui.ends = r.events.some(function (e) { return e.type === 'changeEnds'; });
+    var el = $('side' + w); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+    speak(E.announce(G.state, r.events, speakNames(), { nameOnPoint: P.settings.nameOnPoint, stakes: P.settings.stakes }));
+    if (G.state.winner !== null) { G.meta.endedAt = Date.now(); upsert(entryFrom(G, true)); render(); persist(); showEnd(); return; }
+    render(); persist();
+  }
+
+  function undo() {
+    if (!G.past.length) return;
+    var wasDone = G.state.winner !== null;
+    var u = E.undo(G);
+    G = { state: u.state, past: u.past, meta: G.meta };
+    ui.ends = false; ui.lockUntil = 0;
+    if (wasDone) { removeEntry(G.meta.id); delete G.meta.endedAt; }
+    G.meta.marks = (G.meta.marks || []).filter(function (m) { return m.n <= G.state.pointsPlayed; });
+    closeSheets();
+    speak(['Ponto desfeito.', E.scoreText(G.state, speakNames())]);
+    render(); persist();
+  }
+
+  /* ---------- aquecimento ---------- */
+  // Quatro fases em ordem. O tempo total é dividido por pesos, em múltiplos de 5 s.
+  var PHASES = {
+    quad: { name: 'Mini-tênis no quadradinho', w: 20, tip: 'Trocas curtas entre as linhas de saque, com bola macia e controle.' },
+    fundo: { name: 'Três quartos e fundo de quadra', w: 40, tip: 'Abra a quadra aos poucos: bolas de três quartos e depois do fundo, ganhando ritmo e profundidade.' },
+    vol: { name: 'Voleios e smashes', w: 20, tip: 'Voleios de direita e de esquerda na rede. Na segunda metade, smashes.' },
+    saq: { name: 'Saques', w: 20, tip: 'Alguns saques de cada lado da quadra, aumentando a velocidade aos poucos.' }
+  };
+  var PHASE_ORDER = ['quad', 'fundo', 'vol', 'saq'];
+  var PH_ID = { quad: 'wPhq', fundo: 'wPhf', vol: 'wPhv', saq: 'wPhs' };
+  var PH_SHORT = { quad: 'Quadradinho', fundo: 'Fundo de quadra', vol: 'Voleios e smashes', saq: 'Saques' };
+  var wf = { idx: -1, t30: false, cd: false, half: false };   // avisos já falados na fase atual
+  var warmLast = 0, wEndArmed = false;
+
+  function clk(sec) { var m = Math.floor(sec / 60), s = sec % 60; return m + ':' + (s < 10 ? '0' : '') + s; }
+  var UN = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 'oito', 'nove', 'dez', 'onze', 'doze', 'treze', 'catorze', 'quinze', 'dezesseis', 'dezessete', 'dezoito', 'dezenove'];
+  var TENS = { 20: 'vinte', 30: 'trinta', 40: 'quarenta', 50: 'cinquenta' };
+  function w59(n) { if (n < 20) return UN[n]; var t = Math.floor(n / 10) * 10, u = n % 10; return TENS[t] + (u ? ' e ' + UN[u] : ''); }
+  function spokenDur(sec) {
+    var m = Math.floor(sec / 60), s = sec % 60, out = [];
+    if (m) out.push(m === 1 ? 'um minuto' : w59(m) + ' minutos');
+    if (s) out.push(s === 1 ? 'um segundo' : w59(s) + ' segundos');
+    return out.join(' e ');
+  }
+
+  function planWarm(minutes, on) {
+    var keys = PHASE_ORDER.filter(function (k) { return on[k]; });
+    if (!keys.length) return [];
+    var total = Math.round(minutes * 60), wsum = 0;
+    keys.forEach(function (k) { wsum += PHASES[k].w; });
+    var secs = keys.map(function (k) { return Math.max(5, Math.round(total * PHASES[k].w / wsum / 5) * 5); });
+    var diff = total - secs.reduce(function (a, b) { return a + b; }, 0), big = 0;
+    secs.forEach(function (s, i) { if (s > secs[big]) big = i; });
+    secs[big] += diff;
+    return keys.map(function (k, i) { return { k: k, sec: secs[i] }; });
+  }
+  function warmFromUI() { var ph = {}; PHASE_ORDER.forEach(function (k) { ph[k] = $(PH_ID[k]).checked; }); return ph; }
+  function readWarm() {
+    var on = ng.warm === 'on', minutes = ng.wtime === 'custom' ? Number($('wMin').value) : 5, phases = warmFromUI();
+    return { on: on, minutes: minutes, phases: phases, plan: planWarm(minutes, phases) };
+  }
+  function syncWarmUI() {
+    var on = ng.warm === 'on', r = readWarm();
+    $('warmOpts').hidden = !on;
+    $('wRange').hidden = !(on && ng.wtime === 'custom');
+    $('oWMin').textContent = r.minutes + ' min';
+    $('wSum').textContent = r.plan.length ? r.plan.map(function (p) { return PH_SHORT[p.k] + ' ' + clk(p.sec); }).join(' · ') : 'Escolha pelo menos uma fase.';
+    var hint = '';
+    if (ng.drawn && ng.firstChosen) hint = 'Sorteado: ' + $('fs' + ng.first).textContent + ' saca primeiro.';
+    else if (on && !ng.firstChosen) hint = 'Com aquecimento, escolha quem saca primeiro. A Box fala o sacador no fim.';
+    $('hFirst').textContent = hint;
+    var err = '';
+    if (ng.err === 'first' && on && !ng.firstChosen) err = 'Escolha quem saca primeiro. Com aquecimento, a Box fala o sacador no final.';
+    else if (ng.err === 'phases' && on && !r.plan.length) err = 'Escolha pelo menos uma fase do aquecimento.';
+    else ng.err = '';
+    $('ngErr').hidden = !err; $('ngErr').textContent = err;
+    $('fFirst').classList.toggle('need', ng.err === 'first');
+  }
+
+  function warmActive() { return !!(G.meta.warm && !G.meta.warm.done); }
+  function warmServerName() {
+    var s = G.state, m = G.meta, srv = s.server;
+    var who = s.cfg.mode === 'doubles' ? (m.players[srv][s.serverPlayer] || '') : '';
+    return who || speakNames()[srv];
+  }
+  function phaseIntro(w, idx) {
+    var p = w.plan[idx], nm = PHASES[p.k].name;
+    var lead = idx === 0 ? nm : 'Agora, ' + nm.charAt(0).toLowerCase() + nm.slice(1);
+    var parts = [lead + ', ' + spokenDur(p.sec) + '.'];
+    if (p.k === 'vol') parts.push('Primeiro, voleios.');
+    return parts;
+  }
+  function warmInfo(g) {
+    var w = g.meta.warm; if (!w) return null;
+    return { plannedSec: w.total, actualMs: (w.endedAt || Date.now()) - w.startedAt, skipped: w.skipped, ended: w.ended, done: w.done,
+      phases: w.plan.map(function (p) { return { phase: p.k, sec: p.sec }; }) };
+  }
+  function buildBar() {
+    var w = G.meta.warm, bar = $('wBar'); bar.innerHTML = '';
+    w.plan.forEach(function (p) {
+      var seg = document.createElement('div'); seg.className = 'w-seg'; seg.style.flexGrow = p.sec;
+      seg.appendChild(document.createElement('span')); bar.appendChild(seg);
+    });
+  }
+  function showWarm() {
+    buildBar();
+    $('wNames').textContent = G.meta.names[0] + ' x ' + G.meta.names[1];
+    $('wServe').textContent = warmServerName();
+    $('warm').hidden = false;
+    try { document.querySelector('.app').inert = true; } catch (e) {}
+    renderWarm();
+    try { $('wMain').focus(); } catch (e) {}
+  }
+  function hideWarm() {
+    $('warm').hidden = true;
+    try { document.querySelector('.app').inert = false; } catch (e) {}
+  }
+  function renderWarm() {
+    var w = G.meta.warm; if (!w || w.done) return;
+    var now = Date.now(), p = w.plan[w.idx], ph = PHASES[p.k], elapsed = now - w.phaseStart;
+    var left = Math.max(0, Math.ceil((p.sec * 1000 - elapsed) / 1000)), later = 0;
+    for (var i = w.idx + 1; i < w.plan.length; i++) later += w.plan[i].sec;
+    $('wPhase').textContent = ph.name;
+    $('wSub').textContent = p.k === 'vol' ? (elapsed < p.sec * 500 ? 'Agora: voleios' : 'Agora: smashes') : '';
+    $('wCount').textContent = 'Fase ' + (w.idx + 1) + ' de ' + w.plan.length;
+    $('wTime').textContent = clk(left);
+    $('wTip').textContent = ph.tip;
+    $('wTotal').textContent = clk(left + later);
+    $('wNext').textContent = w.idx === w.plan.length - 1 ? 'Terminar aquecimento' : 'Próxima fase';
+    var segs = $('wBar').children;
+    for (var k = 0; k < segs.length; k++) {
+      var pct = k < w.idx ? 100 : k === w.idx ? Math.min(100, elapsed / (p.sec * 10)) : 0;
+      segs[k].firstChild.style.width = pct + '%';
+    }
+  }
+  function beginWarm(plan) {
+    var now = Date.now(), total = plan.reduce(function (a, p) { return a + p.sec; }, 0);
+    G.meta.warm = { plan: plan, total: total, idx: 0, phaseStart: now, startedAt: now, done: false, endedAt: null, skipped: 0, ended: '' };
+    wf = { idx: 0, t30: false, cd: false, half: false };
+    showWarm();
+  }
+  function finishWarm(how, silent) {
+    var w = G.meta.warm; if (!w || w.done) return;
+    var now = Date.now();
+    w.done = true; w.endedAt = now; w.ended = how;
+    hideWarm();
+    ui.lockUntil = now + 3500;     // o toque que avançou a última fase não pode virar ponto
+    if (!silent) {
+      var parts = ['Fim do aquecimento.', 'Saque: ' + warmServerName() + '.'];
+      if (P.settings.goodLuck) parts.push('Bom jogo.');
+      speak(parts);
+    }
+    render(); persist();
+  }
+  function advanceWarm() {
+    var w = G.meta.warm; if (!w || w.done) return;
+    var now = Date.now();
+    if (now - warmLast < 500) return;       // toque duplo não pula duas fases
+    warmLast = now;
+    if (w.idx >= w.plan.length - 1) { finishWarm('manual'); return; }
+    // o tempo pulado não é redistribuído: a próxima fase começa com a duração completa
+    w.idx++; w.phaseStart = now; w.skipped++;
+    wf = { idx: w.idx, t30: false, cd: false, half: false };
+    speak(phaseIntro(w, w.idx));
+    renderWarm(); persist();
+  }
+  function warmTick(silent) {
+    var w = G.meta.warm; if (!w || w.done) return;
+    var now = Date.now(), moved = 0;
+    while (now - w.phaseStart >= w.plan[w.idx].sec * 1000) {
+      w.phaseStart += w.plan[w.idx].sec * 1000;
+      w.idx++; moved++;
+      if (w.idx >= w.plan.length) { finishWarm('time', silent); return; }
+    }
+    if (moved) { wf = { idx: w.idx, t30: false, cd: false, half: false }; if (!silent) speak(phaseIntro(w, w.idx)); persist(); }
+    var p = w.plan[w.idx], elapsed = now - w.phaseStart, leftMs = p.sec * 1000 - elapsed;
+    if (wf.idx !== w.idx) wf = { idx: w.idx, t30: leftMs <= 30000, cd: leftMs <= 3000, half: elapsed >= p.sec * 500 };   // retomada
+    var say = [];
+    if (p.k === 'vol' && !wf.half && elapsed >= p.sec * 500) { wf.half = true; say.push('Agora, smashes.'); }
+    if (!wf.t30 && p.sec >= 45 && leftMs <= 30000) { wf.t30 = true; say.push('Faltam trinta segundos.'); }
+    if (!wf.cd && p.sec >= 20 && leftMs <= 3000) { wf.cd = true; say.push('Três. Dois. Um.'); }
+    if (say.length && !silent) speak(say);
+    renderWarm();
+  }
+
+  /* ---------- histórico ---------- */
+  function entryFrom(g, finished) {
+    var s = g.state, d = E.display(s);
+    return {
+      schema: 2, warmup: warmInfo(g), ownerId: P.meId || null, deviceId: P.deviceId, updatedAt: Date.now(), pids: g.meta.pids || null, place: g.meta.place || '', surface: g.meta.surface || '', marks: g.meta.marks || [], gameLog: s.gameLog || [],
+      id: g.meta.id, startedAt: g.meta.startedAt, endedAt: g.meta.endedAt || Date.now(), playStart: g.meta.playStart || g.meta.startedAt, names: g.meta.names.slice(), players: g.meta.players,
+      mode: s.cfg.mode, bestOf: s.cfg.bestOf, cfg: s.cfg, sets: s.sets, setsWon: s.setsWon.slice(), winner: s.winner, finished: finished,
+      current: finished ? null : { games: s.games.slice(), points: d.points }
+    };
+  }
+  function upsert(e) {
+    var i = -1; P.history.forEach(function (x, k) { if (x.id === e.id) i = k; });
+    if (i >= 0) P.history[i] = e; else P.history.unshift(e);
+    if (P.history.length > 200) P.history.length = 200;
+  }
+  function removeEntry(id) { P.history = P.history.filter(function (x) { return x.id !== id; }); }
+  function fmtDateFull(t) {
+    try { return new Date(t).toLocaleString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).replace(',', ''); } catch (e) { return ''; }
+  }
+  function fmtDate(t) { try { return new Date(t).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; } }
+  function resultText(e) {
+    var line = fmtDateFull(e.playStart || e.startedAt) + (e.place ? ' · ' + e.place : '') + (e.surface ? ' · ' + SURF[e.surface] : '') + ' · ' + e.names[0] + ' ' + e.setsWon[0] + ' x ' + e.setsWon[1] + ' ' + e.names[1];
+    var sets = (e.sets || []).map(setText).join(' ');
+    if (sets) line += ' (' + sets + ')';
+    if (e.endedAt && e.playStart) line += ' · ' + fmtDurText(e.endedAt - e.playStart);
+    if (!e.finished && e.current) line += ' · inacabada, games ' + e.current.games[0] + '-' + e.current.games[1];
+    return line;
+  }
+
+  function copyText(text, boxId, btn) {
+    var original = btn ? btn.textContent : '';
+    function ok() { if (btn) { btn.textContent = 'Copiado'; setTimeout(function () { btn.textContent = original; }, 1500); } }
+    function fallback() {
+      var box = $(boxId); box.innerHTML = '';
+      var ta = document.createElement('textarea'); ta.className = 'copybox'; ta.readOnly = true; ta.value = text; box.appendChild(ta);
+      ta.focus(); ta.select();
+      if (btn) { btn.textContent = 'Selecione e copie'; setTimeout(function () { btn.textContent = original; }, 2500); }
+    }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, fallback);
+      else fallback();
+    } catch (e) { fallback(); }
+  }
+
+  var pendingDelete = null;
+  function renderHistory() {
+    var ul = $('histList'); ul.innerHTML = '';
+    $('histEmpty').hidden = P.history.length > 0;
+    $('histActions').hidden = P.history.length === 0;
+    P.history.forEach(function (e) {
+      var li = document.createElement('li');
+      var det = document.createElement('details'); det.setAttribute('data-id', e.id);
+      var sum = document.createElement('summary');
+      var top = document.createElement('div'); top.className = 'h-top';
+      var a = document.createElement('span'); a.textContent = e.names[0] + ' x ' + e.names[1];
+      var b = document.createElement('span'); b.textContent = e.setsWon[0] + ' x ' + e.setsWon[1];
+      top.appendChild(a); top.appendChild(b);
+      var sub = document.createElement('div'); sub.className = 'h-sub';
+      sub.textContent = [fmtDateFull(e.playStart || e.startedAt), [e.place, e.surface ? SURF[e.surface] : ''].filter(Boolean).join(' · '), (e.sets || []).map(setText).join(' '), e.endedAt && e.playStart ? fmtDurText(e.endedAt - e.playStart) : '', e.finished ? '' : 'inacabada'].filter(Boolean).join(' · ');
+      sum.appendChild(top); sum.appendChild(sub);
+      var body = document.createElement('div'); body.className = 'h-body';
+      var p = document.createElement('div'); p.className = 'h-sub';
+      p.textContent = (e.mode === 'doubles' ? 'Duplas' : 'Simples') + ' · ' + (e.bestOf === 1 ? '1 set' : 'melhor de ' + e.bestOf) +
+        (e.cfg && e.cfg.noAd ? ' · ponto decisivo' : '') + (e.warmup && e.warmup.done ? ' · aquecimento ' + fmtDur(e.warmup.actualMs) : '') + (e.finished && e.winner !== null ? ' · vitória de ' + e.names[e.winner] : '');
+      var act = document.createElement('div'); act.className = 'h-actions';
+      var c1 = document.createElement('button'); c1.className = 'btn'; c1.type = 'button'; c1.textContent = 'Copiar resultado';
+      c1.addEventListener('click', function () { copyText(resultText(e), 'hb-' + e.id, c1); });
+      var c2 = document.createElement('button'); c2.className = 'btn'; c2.type = 'button'; c2.textContent = 'Copiar JSON';
+      c2.addEventListener('click', function () { copyText(JSON.stringify(e, null, 2), 'hb-' + e.id, c2); });
+      var del = document.createElement('button'); del.className = 'btn'; del.type = 'button';
+      del.textContent = pendingDelete === e.id ? 'Confirmar exclusão' : 'Excluir';
+      del.addEventListener('click', function () {
+        if (pendingDelete === e.id) { removeEntry(e.id); pendingDelete = null; persist(); renderHistory(); }
+        else { pendingDelete = e.id; del.textContent = 'Confirmar exclusão'; setTimeout(function () { if (pendingDelete === e.id) { pendingDelete = null; del.textContent = 'Excluir'; } }, 3000); }
+      });
+      act.appendChild(c1); act.appendChild(c2); act.appendChild(del);
+      var box = document.createElement('div'); box.id = 'hb-' + e.id;
+      body.appendChild(p); body.appendChild(act); body.appendChild(box);
+      det.appendChild(sum); det.appendChild(body); li.appendChild(det); ul.appendChild(li);
+    });
+  }
+
+  /* ---------- janelas ---------- */
+  function openSheet(id) { closeSheets(); $(id).hidden = false; fitSheets(); var f = $(id).querySelector('button, input'); if (f && id !== 'shNew') try { f.focus(); } catch (e) {} }
+  function closeSheets() { Array.prototype.forEach.call(document.querySelectorAll('.sheet'), function (s) { s.hidden = true; }); }
+  // Com o teclado aberto, a janela passa a ocupar só a área visível, para o botão Começar não ficar escondido.
+  function fitSheets() {
+    var vv = window.visualViewport;
+    Array.prototype.forEach.call(document.querySelectorAll('.sheet'), function (s) {
+      if (vv && vv.height < window.innerHeight - 80) { s.style.top = vv.offsetTop + 'px'; s.style.height = vv.height + 'px'; s.style.bottom = 'auto'; }
+      else { s.style.top = ''; s.style.height = ''; s.style.bottom = ''; }
+    });
+  }
+  if (window.visualViewport) { window.visualViewport.addEventListener('resize', fitSheets); window.visualViewport.addEventListener('scroll', fitSheets); }
+  Array.prototype.forEach.call(document.querySelectorAll('.sheet'), function (s) {
+    // a janela de novo jogo não fecha ao tocar fora, para não perder o que foi digitado
+    s.addEventListener('click', function (e) { if (e.target === s && !s.hasAttribute('data-sticky')) closeSheets(); });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-close]'), function (b) { b.addEventListener('click', closeSheets); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSheets(); });
+
+  function showEnd() {
+    var w = G.state.winner, m = G.meta;
+    $('hEnd').textContent = 'Vitória de ' + m.names[w];
+    $('endSets').textContent = G.state.sets.map(setText).join('   ') + (elapsed(G) ? '  ·  ' + fmtDurText(elapsed(G)) : '');
+    $('endBox').innerHTML = '';
+    $('endSets').textContent += '  ·  ' + fmtDateFull(m.playStart || m.startedAt) + (m.place ? '  ·  ' + m.place : '') + (m.surface ? '  ·  ' + SURF[m.surface] : '');
+    openSheet('shEnd');
+  }
+
+  /* ---------- novo jogo ---------- */
+  var ng = { mode: 'singles', bestOf: 3, finalSet: 'same', first: 0, firstChosen: false, drawn: false, warm: 'off', wtime: 'std', err: '' };
+  var draftActive = false;     // enquanto true, o que foi digitado fica guardado mesmo se a janela fechar
+  var lastField = 'nA1';
+  var HINT_FINAL = {
+    same: 'Decide como os outros sets, com tie-break aos 6-6.',
+    super: 'Um super tie-break de 10 pontos no lugar do último set.',
+    advantage: 'Sem tie-break: vence quem abrir 2 games de diferença.'
+  };
+  function syncSeg() {
+    Array.prototype.forEach.call(document.querySelectorAll('.seg'), function (seg) {
+      var key = seg.getAttribute('data-key');
+      Array.prototype.forEach.call(seg.querySelectorAll('button'), function (b) {
+        // com aquecimento, o sacador precisa ser escolhido: nenhum botão vem marcado
+        var hide = key === 'first' && ng.warm === 'on' && !ng.firstChosen;
+        b.setAttribute('aria-pressed', !hide && String(b.getAttribute('data-v')) === String(ng[key]) ? 'true' : 'false');
+      });
+    });
+    var dbl = ng.mode === 'doubles';
+    $('nA2').hidden = !dbl; $('nB2').hidden = !dbl;
+    $('lA').textContent = dbl ? 'Dupla 1' : 'Jogador 1';
+    $('lB').textContent = dbl ? 'Dupla 2' : 'Jogador 2';
+    $('fFinal').hidden = ng.bestOf === 1;
+    $('hFinal').textContent = HINT_FINAL[ng.finalSet];
+    var a = teamName([$('nA1').value.trim(), dbl ? $('nA2').value.trim() : '']) || (dbl ? 'Dupla 1' : 'Jogador 1');
+    var b = teamName([$('nB1').value.trim(), dbl ? $('nB2').value.trim() : '']) || (dbl ? 'Dupla 2' : 'Jogador 2');
+    $('fs0').textContent = a; $('fs1').textContent = b;
+    syncWarmUI();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.seg button'), function (b) {
+    b.addEventListener('click', function () {
+      var key = b.parentNode.getAttribute('data-key'), v = b.getAttribute('data-v');
+      ng[key] = (key === 'bestOf' || key === 'first') ? Number(v) : v;
+      if (key === 'first') { ng.firstChosen = true; ng.drawn = false; }
+      syncSeg();
+    });
+  });
+  (function () {
+    var el = $('nPlace');
+    el.addEventListener('focus', function () { setTimeout(function () { try { el.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {} }, 300); });
+    el.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); el.blur(); } });
+    el.addEventListener('input', function () { var sf = P.placeSurf[normName(el.value)]; if (sf) $('nSurface').value = sf; });
+  })();
+  ['nA1', 'nA2', 'nB1', 'nB2'].forEach(function (id) {
+    var el = $(id);
+    el.addEventListener('input', syncSeg);
+    el.addEventListener('focus', function () {
+      lastField = id;
+      setTimeout(function () { try { el.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {} }, 300);
+    });
+    el.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); el.blur(); } });
+  });
+  function renderRecent() {
+    var host = $('recentChips'); host.innerHTML = '';
+    var names = P.recent.slice(0, 12);
+    if (me()) names = [me().name].concat(names.filter(function (x) { return normName(x) !== normName(me().name); }));
+    $('fRecent').hidden = !names.length;
+    names.forEach(function (n) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = n;
+      b.addEventListener('click', function () {
+        var target = $(lastField); if (target.hidden) target = $('nA1');
+        target.value = n; syncSeg();
+      });
+      host.appendChild(b);
+    });
+  }
+
+  function openNew() {
+    var s = G.state, m = G.meta;
+    if (!draftActive) {
+      ng.mode = s.cfg.mode; ng.bestOf = s.cfg.bestOf; ng.finalSet = s.cfg.finalSet; ng.first = 0;
+      ng.firstChosen = false; ng.drawn = false; ng.err = '';
+      var WM = P.settings.warm; ng.warm = WM.on ? 'on' : 'off'; ng.wtime = WM.time === 'custom' ? 'custom' : 'std';
+      $('wMin').value = WM.minutes;
+      PHASE_ORDER.forEach(function (k) { $(PH_ID[k]).checked = !!WM.phases[k]; });
+      $('swTb').checked = s.cfg.tiebreak; $('swNoAd').checked = s.cfg.noAd;
+      $('nA1').value = m.players[0][0] || ''; $('nA2').value = m.players[0][1] || '';
+      $('nB1').value = m.players[1][0] || ''; $('nB2').value = m.players[1][1] || '';
+      $('nPlace').value = m.place || P.places[0] || '';
+      $('nSurface').value = m.surface || P.placeSurf[normName($('nPlace').value)] || '';
+      draftActive = true;
+    }
+    renderRecent();
+    $('placeList').innerHTML = '';
+    P.places.forEach(function (x) { var o = document.createElement('option'); o.value = x; $('placeList').appendChild(o); });
+    var w = $('ngWarn');
+    if (s.pointsPlayed > 0 && s.winner === null) { w.hidden = false; w.textContent = 'A partida em andamento (' + m.names[0] + ' x ' + m.names[1] + ') será guardada no histórico como inacabada.'; }
+    else w.hidden = true;
+    syncSeg(); openSheet('shNew');
+  }
+
+  function startNew() {
+    var WM = readWarm();
+    if (WM.on && !ng.firstChosen) {
+      ng.err = 'first'; syncSeg();
+      try { $('fFirst').scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {}
+      return;
+    }
+    if (WM.on && !WM.plan.length) { ng.err = 'phases'; syncSeg(); try { $('fWarm').scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {} return; }
+    var dbl = ng.mode === 'doubles';
+    var A = [$('nA1').value.trim()], B = [$('nB1').value.trim()];
+    if (dbl) { A.push($('nA2').value.trim()); B.push($('nB2').value.trim()); }
+    A = A.filter(Boolean); B = B.filter(Boolean);
+    if (!A.length) A = [dbl ? 'Dupla 1' : 'Jogador 1'];
+    if (!B.length) B = [dbl ? 'Dupla 2' : 'Jogador 2'];
+    // cada nome vira (ou reaproveita) um jogador cadastrado; assim as estatísticas ficam por pessoa
+    var pids = [A, B].map(function (team) {
+      return team.map(function (n) {
+        if (/^(Jogador|Dupla) [12]$/.test(n)) return null;
+        var pl = findByName(n) || newPlayer(n, 'guest');
+        return pl.id;
+      });
+    });
+    if (G.state.pointsPlayed > 0 && G.state.winner === null) upsert(entryFrom(G, false));
+    A.concat(B).forEach(function (n) {
+      if (/^(Jogador|Dupla) [12]$/.test(n)) return;
+      P.recent = [n].concat(P.recent.filter(function (x) { return x !== n; })).slice(0, 30);
+    });
+    G = mkGame([A, B], { mode: ng.mode, bestOf: ng.bestOf, finalSet: ng.finalSet, tiebreak: $('swTb').checked, noAd: $('swNoAd').checked, firstServer: ng.first }, pids);
+    var place = $('nPlace').value.trim();
+    G.meta.place = place;
+    G.meta.surface = $('nSurface').value;
+    if (place) P.placeSurf[normName(place)] = G.meta.surface;
+    if (place) P.places = [place].concat(P.places.filter(function (x) { return normName(x) !== normName(place); })).slice(0, 12);
+    ui.ends = false; ui.lockUntil = 0; draftActive = false;
+    P.settings.warm = { on: WM.on, time: ng.wtime, minutes: Number($('wMin').value), phases: WM.phases };
+    closeSheets(); wake();
+    var n = speakNames();
+    if (WM.on) {
+      beginWarm(WM.plan);
+      render(); persist();
+      speak([n[0] + ' contra ' + n[1] + '.', 'Aquecimento de ' + spokenDur(G.meta.warm.total) + '.'].concat(phaseIntro(G.meta.warm, 0)));
+    } else {
+      render(); persist();
+      speak([n[0] + ' contra ' + n[1] + '.', 'Saca ' + n[ng.first] + '.']);
+    }
+  }
+
+  /* ---------- perfil e estatísticas ---------- */
+  var viewId = null;           // jogador exibido na janela de perfil
+  function pct(a, b) { return b > 0 ? Math.round(a * 1000 / b) / 10 : null; }
+  function fmtPct(v) { return v === null ? '–' : String(v).replace('.', ',') + '%'; }
+  function sideOf(e, pl) {
+    for (var i = 0; i < 2; i++) if (e.pids && e.pids[i] && e.pids[i].indexOf(pl.id) >= 0) return i;
+    if (!e.pids && me() && pl.id === P.meId) {          // partidas antigas, sem ids: tenta pelo nome
+      for (var j = 0; j < 2; j++) if (e.players && e.players[j] && e.players[j].some(function (n) { return normName(n) === normName(pl.name); })) return j;
+    }
+    return -1;
+  }
+  function statsFor(pl) {
+    var r = { totalMs: 0, longG: null, longS: null, longM: null, matches: 0, wins: 0, sw: 0, sl: 0, gw: 0, gl: 0, sg: 0, sgw: 0, rg: 0, rgw: 0, noLog: 0 };
+    P.history.forEach(function (e) {
+      if (!e.finished) return;
+      var me_ = sideOf(e, pl); if (me_ < 0) return;
+      r.matches++; if (e.winner === me_) r.wins++;
+      if (e.endedAt && e.playStart) {
+        var ms = e.endedAt - e.playStart; r.totalMs += ms;
+        if (!r.longM || ms > r.longM.ms) r.longM = { ms: ms, id: e.id };
+        ['g', 's'].forEach(function (k) {
+          var prev = e.playStart;
+          (e.marks || []).filter(function (x) { return x.k === k; }).forEach(function (x) {
+            var d = x.t - prev; prev = x.t;
+            var key = k === 'g' ? 'longG' : 'longS';
+            if (!r[key] || d > r[key].ms) r[key] = { ms: d, id: e.id };
+          });
+        });
+      }
+      (e.sets || []).forEach(function (st) {
+        var w = st.kind === 'super' ? (st.tb[0] > st.tb[1] ? 0 : 1) : (st.games[0] > st.games[1] ? 0 : 1);
+        if (w === me_) r.sw++; else r.sl++;
+        if (st.kind !== 'super') { r.gw += st.games[me_]; r.gl += st.games[1 - me_]; }
+      });
+      if (!e.gameLog) { r.noLog++; return; }
+      e.gameLog.forEach(function (g) {
+        if (g.srv === me_) { r.sg++; if (g.w === me_) r.sgw++; }
+        else { r.rg++; if (g.w === me_) r.rgw++; }
+      });
+    });
+    return r;
+  }
+  function tile(label, big, sub, meter, link) {
+    var d = document.createElement('div'); d.className = 'tile';
+    var l = document.createElement('small'); l.textContent = label;
+    var b = document.createElement('b'); b.textContent = big;
+    if (big.length > 6) b.style.fontSize = '28px';
+    var i = document.createElement('i'); i.textContent = sub || '';
+    d.appendChild(l); d.appendChild(b); d.appendChild(i);
+    if (meter !== undefined && meter !== null) { var m = document.createElement('div'); m.className = 'meter'; var sp = document.createElement('span'); sp.style.width = meter + '%'; m.appendChild(sp); d.appendChild(m); }
+    if (link) { var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'lnk'; bt.textContent = 'Ver a partida'; bt.addEventListener('click', function () { openMatch(link); }); d.appendChild(bt); }
+    return d;
+  }
+  function matchLabel(id) {
+    var e = P.history.filter(function (x) { return x.id === id; })[0];
+    return e ? e.names[0] + ' x ' + e.names[1] + ' · ' + fmtDateFull(e.playStart || e.startedAt) + (e.place ? ' · ' + e.place : '') : '';
+  }
+  function openMatch(id) {
+    pendingDelete = null; renderHistory(); openSheet('shHist');
+    var d = document.querySelector('#histList details[data-id="' + id + '"]');
+    if (d) { d.open = true; try { d.scrollIntoView({ block: 'center' }); } catch (e) {} }
+  }
+  function fmtHours(ms) { var m = Math.round(ms / 60000), h = Math.floor(m / 60); return h ? h + ' h ' + (m % 60 < 10 ? '0' : '') + (m % 60) : m + ' min'; }
+  function ageOf(iso) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); if (!m) return null;
+    var n = new Date(), a = n.getFullYear() - Number(m[1]);
+    if (n.getMonth() + 1 < Number(m[2]) || (n.getMonth() + 1 === Number(m[2]) && n.getDate() < Number(m[3]))) a--;
+    return a >= 0 && a < 130 ? a : null;
+  }
+  function renderProf() {
+    var pl = viewId && P.players[viewId] ? P.players[viewId] : me();
+    var isMe = !pl || pl.id === P.meId;
+    $('hProf').textContent = isMe ? 'Meu perfil' : 'Jogador';
+    $('pBack').hidden = isMe;
+    var f = pl || { name: '', photo: '', height: '', weight: '', birth: '', racketBrand: '', racketModel: '', sex: '', hand: '', backhand: '' };
+    var act = document.activeElement;
+    if (act !== $('pName')) $('pName').value = f.name;
+    if (act !== $('pHeight')) $('pHeight').value = f.height;
+    if (act !== $('pWeight')) $('pWeight').value = f.weight;
+    if (act !== $('pRBrand')) $('pRBrand').value = f.racketBrand || '';
+    if (act !== $('pRModel')) $('pRModel').value = f.racketModel || '';
+    if (act !== $('pBirth')) $('pBirth').value = f.birth || '';
+    $('pAgeOut').textContent = ageOf(f.birth) !== null ? ageOf(f.birth) + ' anos hoje' : 'A idade é calculada a partir da data.';
+    Array.prototype.forEach.call(document.querySelectorAll('[data-pkey]'), function (seg) {
+      var k = seg.getAttribute('data-pkey');
+      Array.prototype.forEach.call(seg.querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-v') === String(f[k])));});
+    });
+    fillAv($('pAv'), pl);
+    $('pPhotoDel').hidden = !(pl && pl.photo);
+    $('pHint').textContent = pl ? '' : 'Digite seu nome para criar o perfil. Quando você jogar com esse nome, as partidas entram nas suas estatísticas.';
+    var host = $('pStats'); host.innerHTML = '';
+    var st = pl ? statsFor(pl) : null;
+    if (!st || !st.matches) {
+      $('pStatsNote').textContent = pl ? 'Sem partidas encerradas ainda. Termine uma partida com este nome para ver as estatísticas.' : '';
+    } else {
+      var wp = pct(st.wins, st.matches), sp = pct(st.sw, st.sw + st.sl), gp = pct(st.gw, st.gw + st.gl), sv = pct(st.sgw, st.sg), rt = pct(st.rgw, st.rg);
+      host.appendChild(tile('Partidas', String(st.matches), st.wins + (st.wins === 1 ? ' vitória · ' : ' vitórias · ') + (st.matches - st.wins) + (st.matches - st.wins === 1 ? ' derrota' : ' derrotas')));
+      host.appendChild(tile('Vitórias', fmtPct(wp), st.wins + ' de ' + st.matches, wp));
+      host.appendChild(tile('Sets', st.sw + ' x ' + st.sl, fmtPct(sp) + ' vencidos', sp));
+      host.appendChild(tile('Games', st.gw + ' x ' + st.gl, fmtPct(gp) + ' vencidos', gp));
+      host.appendChild(tile('Games com o saque', fmtPct(sv), st.sg ? st.sgw + ' de ' + st.sg + ' games' : 'sem dados', sv));
+      host.appendChild(tile('Games na devolução', fmtPct(rt), st.rg ? st.rgw + ' de ' + st.rg + ' games' : 'sem dados', rt));
+      host.appendChild(tile('Tempo total de jogo', fmtHours(st.totalMs), st.matches + (st.matches === 1 ? ' partida' : ' partidas')));
+      if (st.longM) host.appendChild(tile('Partida mais longa', fmtDur(st.longM.ms), matchLabel(st.longM.id), null, st.longM.id));
+      if (st.longS) host.appendChild(tile('Set mais longo', fmtDur(st.longS.ms), matchLabel(st.longS.id), null, st.longS.id));
+      if (st.longG) host.appendChild(tile('Game mais longo', fmtDur(st.longG.ms), matchLabel(st.longG.id), null, st.longG.id));
+      $('pStatsNote').textContent = 'Conta só partidas encerradas. Games de tie-break e super tie-break ficam fora das contas de saque e devolução' +
+        (st.noLog ? '; ' + st.noLog + ' partida(s) antiga(s) não têm o detalhe de saque.' : '.');
+    }
+    // lista de outros jogadores, com campanha contra/ao lado do meu perfil
+    var ul = $('pOpp'); ul.innerHTML = '';
+    var others = Object.keys(P.players).map(function (id) { return P.players[id]; }).filter(function (x) { return !x.deleted && x.id !== (pl && pl.id); });
+    others.sort(function (a, b) { return b.updatedAt - a.updatedAt; });
+    $('pOppWrap').hidden = !others.length;
+    others.forEach(function (o) {
+      var li = document.createElement('li'), b = document.createElement('button'); b.type = 'button';
+      var a = document.createElement('span'); a.className = 'av'; fillAv(a, o);
+      var n = document.createElement('span'); n.className = 'pn'; n.textContent = o.name + (o.id === P.meId ? ' (eu)' : '');
+      var s2 = statsFor(o), r = document.createElement('span'); r.className = 'pr'; r.textContent = s2.matches ? s2.wins + 'V ' + (s2.matches - s2.wins) + 'D' : '';
+      b.appendChild(a); b.appendChild(n); b.appendChild(r);
+      b.addEventListener('click', function () { viewId = o.id; renderProf(); try { $('hProf').scrollIntoView({ block: 'start' }); } catch (e) {} });
+      li.appendChild(b); ul.appendChild(li);
+    });
+  }
+  function profPlayer() {            // jogador sendo editado; cria o meu perfil na primeira digitação
+    var pl = viewId && P.players[viewId];
+    if (pl) return pl;
+    pl = me();
+    return pl;
+  }
+  function saveField(key, val) {
+    var pl = profPlayer();
+    if (!pl) {
+      if (key !== 'name' || !String(val).trim()) return;
+      pl = newPlayer(String(val).trim(), 'me'); P.meId = pl.id; viewId = pl.id;
+      // partidas antigas com esse nome passam a contar; o jogo atual também
+      G.meta.players.forEach(function (t, i) { t.forEach(function (n, j) { if (normName(n) === normName(pl.name)) { G.meta.pids = G.meta.pids || [[], []]; G.meta.pids[i][j] = pl.id; } }); });
+    }
+    if (key === 'name') { val = String(val).trim() || pl.name; }
+    pl[key] = val; touch(pl);
+    render();
+  }
+  function bindProf() {
+    var map = { pName: 'name', pHeight: 'height', pWeight: 'weight', pBirth: 'birth', pRBrand: 'racketBrand', pRModel: 'racketModel' };
+    Object.keys(map).forEach(function (id) {
+      var el = $(id);
+      el.addEventListener('input', function () {
+        var v = el.value;
+        if (id === 'pHeight' || id === 'pWeight') { v = v.replace(id === 'pWeight' ? /[^0-9.,]/g : /[^0-9]/g, ''); if (v !== el.value) el.value = v; }
+        saveField(map[id], v);
+      });
+      el.addEventListener('blur', function () { renderProf(); });
+      el.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); el.blur(); } });
+      el.addEventListener('focus', function () { setTimeout(function () { try { el.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {} }, 300); });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-pkey] button'), function (b) {
+      b.addEventListener('click', function () {
+        var k = b.parentNode.getAttribute('data-pkey'), v = b.getAttribute('data-v');
+        var pl = profPlayer(); if (!pl) { $('pHint').textContent = 'Digite o nome primeiro.'; return; }
+        pl[k] = pl[k] === v ? '' : v; touch(pl); renderProf();
+      });
+    });
+    $('pPhoto').addEventListener('click', function () { if (!profPlayer()) { $('pHint').textContent = 'Digite o nome primeiro, depois escolha a foto.'; return; } $('pFile').click(); });
+    $('pFile').addEventListener('change', function () {
+      var f = this.files && this.files[0], pl = profPlayer(); if (!f || !pl) return;
+      startCrop(f);
+      this.value = '';
+    });
+    $('pPhotoDel').addEventListener('click', function () { var pl = profPlayer(); if (pl) { pl.photo = ''; touch(pl); renderProf(); render(); } });
+    $('pBack').addEventListener('click', function () { viewId = null; renderProf(); });
+    $('pExport').addEventListener('click', function () { copyText(JSON.stringify(exportBundle(), null, 2), 'pBox', $('pExport')); });
+  }
+  var crop = null;
+  function cropDraw() {
+    var cv = $('cropCv'), c = cv.getContext('2d'), V = cv.width;
+    c.fillStyle = '#000'; c.fillRect(0, 0, V, V);
+    c.drawImage(crop.img, crop.x, crop.y, crop.img.width * crop.s, crop.img.height * crop.s);
+  }
+  function cropClamp() {
+    var V = 300, w = crop.img.width * crop.s, h = crop.img.height * crop.s;
+    crop.x = Math.min(0, Math.max(V - w, crop.x)); crop.y = Math.min(0, Math.max(V - h, crop.y));
+  }
+  function cropZoom(z) {
+    var V = 300, old = crop.s, ns = crop.min * z, cx = (V / 2 - crop.x) / old, cy = (V / 2 - crop.y) / old;
+    crop.s = ns; crop.x = V / 2 - cx * ns; crop.y = V / 2 - cy * ns; cropClamp(); cropDraw();
+  }
+  function startCrop(file) {
+    var fr = new FileReader();
+    fr.onerror = function () { $('pHint').textContent = 'Não consegui abrir essa imagem.'; };
+    fr.onload = function () {
+      var img = new Image();
+      img.onerror = function () { $('pHint').textContent = 'Não consegui abrir essa imagem.'; };
+      img.onload = function () {
+        var V = 300, min = Math.max(V / img.width, V / img.height);
+        crop = { img: img, min: min, s: min, x: (V - img.width * min) / 2, y: (V - img.height * min) / 2 };
+        $('cropZoom').value = 1; cropDraw(); openSheet('shCrop');
+      };
+      img.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  }
+  (function bindCrop() {
+    var box = $('cropBox'), drag = null;
+    box.addEventListener('pointerdown', function (e) { if (!crop) return; drag = { x: e.clientX, y: e.clientY, cx: crop.x, cy: crop.y }; try { box.setPointerCapture(e.pointerId); } catch (x) {} });
+    box.addEventListener('pointermove', function (e) {
+      if (!drag || !crop) return;
+      var k = 300 / box.getBoundingClientRect().width;
+      crop.x = drag.cx + (e.clientX - drag.x) * k; crop.y = drag.cy + (e.clientY - drag.y) * k; cropClamp(); cropDraw();
+    });
+    ['pointerup', 'pointercancel'].forEach(function (n) { box.addEventListener(n, function () { drag = null; }); });
+    box.addEventListener('wheel', function (e) { if (!crop) return; e.preventDefault(); var z = $('cropZoom'); z.value = Math.min(4, Math.max(1, Number(z.value) - e.deltaY / 500)); cropZoom(Number(z.value)); }, { passive: false });
+    $('cropZoom').addEventListener('input', function () { if (crop) cropZoom(Number(this.value)); });
+    $('cropCancel').addEventListener('click', function () { crop = null; openSheet('shProf'); renderProf(); });
+    $('cropOk').addEventListener('click', function () {
+      var pl = profPlayer(); if (!crop || !pl) return;
+      var S = 192, c = document.createElement('canvas'); c.width = c.height = S;
+      var k = S / 300, x = c.getContext('2d');
+      x.drawImage(crop.img, crop.x * k, crop.y * k, crop.img.width * crop.s * k, crop.img.height * crop.s * k);
+      pl.photo = c.toDataURL('image/jpeg', 0.85); touch(pl); crop = null;
+      openSheet('shProf'); renderProf(); render();
+    });
+  })();
+  function readPhoto(file, cb) {
+    var fr = new FileReader();
+    fr.onerror = function () { cb(null); };
+    fr.onload = function () {
+      var img = new Image();
+      img.onerror = function () { cb(null); };
+      img.onload = function () {
+        try {
+          var S = 192, c = document.createElement('canvas'); c.width = c.height = S;
+          var m = Math.min(img.width, img.height), sx = (img.width - m) / 2, sy = (img.height - m) / 2;
+          c.getContext('2d').drawImage(img, sx, sy, m, m, 0, 0, S, S);
+          cb(c.toDataURL('image/jpeg', 0.82));
+        } catch (e) { cb(null); }
+      };
+      img.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  }
+  // Pacote único para sincronizar com um servidor depois (jogadores + partidas, todos com id e updatedAt).
+  function exportBundle() {
+    return { schema: 2, exportedAt: Date.now(), deviceId: P.deviceId, meId: P.meId,
+      players: Object.keys(P.players).map(function (id) { var x = Object.assign({}, P.players[id]); return x; }),
+      matches: P.history };
+  }
+  bindProf();
+
+  /* ---------- gerenciar dados salvos ---------- */
+  var armed = null;
+  function confirmBtn(btn, key, label, fn) {
+    btn.textContent = armed === key ? 'Confirmar' : label;
+    btn.onclick = function () {
+      if (armed === key) { armed = null; fn(); return; }
+      armed = key; btn.textContent = 'Confirmar';
+      setTimeout(function () { if (armed === key) { armed = null; btn.textContent = label; } }, 3000);
+    };
+  }
+  function renderData() {
+    var ul = $('dPlayers'); ul.innerHTML = '';
+    var guests = Object.keys(P.players).map(function (id) { return P.players[id]; }).filter(function (x) { return !x.deleted && x.id !== P.meId; });
+    var names = {}; guests.forEach(function (g) { names[normName(g.name)] = 1; });
+    var extra = P.recent.filter(function (n) { return !names[normName(n)] && !(me() && normName(me().name) === normName(n)); });
+    function row(list, text, key, fn) {
+      var li = document.createElement('li'), t = document.createElement('span'); t.className = 'mn'; t.textContent = text;
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'btn danger';
+      li.appendChild(t); li.appendChild(b); list.appendChild(li); confirmBtn(b, key, 'Excluir', fn);
+    }
+    guests.forEach(function (g) { row(ul, g.name, 'p' + g.id, function () { g.deleted = true; touch(g); P.recent = P.recent.filter(function (n) { return normName(n) !== normName(g.name); }); renderData(); render(); }); });
+    extra.forEach(function (n) { row(ul, n, 'n' + n, function () { P.recent = P.recent.filter(function (x) { return x !== n; }); persist(); renderData(); }); });
+    if (!ul.children.length) { var e = document.createElement('li'); e.textContent = 'Nenhum jogador salvo.'; ul.appendChild(e); }
+    var pl = $('dPlaces'); pl.innerHTML = '';
+    P.places.forEach(function (x) { row(pl, x, 'l' + x, function () { P.places = P.places.filter(function (y) { return y !== x; }); delete P.placeSurf[normName(x)]; persist(); renderData(); }); });
+    if (!pl.children.length) { var e2 = document.createElement('li'); e2.textContent = 'Nenhum local salvo.'; pl.appendChild(e2); }
+    $('dHistInfo').textContent = P.history.length + (P.history.length === 1 ? ' partida no histórico' : ' partidas no histórico');
+    confirmBtn($('dHist'), 'hist', 'Apagar todas', function () { P.history = []; persist(); renderData(); });
+    confirmBtn($('dAll'), 'all', 'Apagar tudo', function () {
+      wiping = true;
+      try { localStorage.removeItem(KEY); } catch (e) {}
+      location.reload();
+    });
+  }
+  function openData() { armed = null; renderData(); openSheet('shData'); }
+  $('sManage').addEventListener('click', openData);
+  $('nManage').addEventListener('click', openData);
+
+  /* ---------- eventos ---------- */
+  [0, 1].forEach(function (i) {
+    var el = $('side' + i);
+    el.addEventListener('click', function () { point(i); });
+    el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); point(i); } });
+  });
+  $('status').addEventListener('click', function () { if (ui.ends) { ui.ends = false; render(); } });
+  $('bUndo').addEventListener('click', undo);
+  $('bSpeak').addEventListener('click', function () { speak([E.fullText(G.state, speakNames())], { force: true }); });
+  $('bHist').addEventListener('click', function () { pendingDelete = null; renderHistory(); openSheet('shHist'); });
+  $('bNew').addEventListener('click', openNew);
+  $('bProf').addEventListener('click', function () { viewId = null; renderProf(); openSheet('shProf'); });
+  $('ngGo').addEventListener('click', startNew);
+  $('ngDraw').addEventListener('click', function () { ng.first = Math.random() < 0.5 ? 0 : 1; ng.firstChosen = true; ng.drawn = true; syncSeg(); });
+  $('wMin').addEventListener('input', syncSeg);
+  PHASE_ORDER.forEach(function (k) { $(PH_ID[k]).addEventListener('change', syncSeg); });
+  $('wMain').addEventListener('click', advanceWarm);
+  $('wMain').addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); advanceWarm(); } });
+  $('wNext').addEventListener('click', advanceWarm);
+  $('wEnd').addEventListener('click', function () {
+    var b = $('wEnd');
+    if (wEndArmed) { wEndArmed = false; b.textContent = 'Encerrar aquecimento'; finishWarm('manual'); return; }
+    wEndArmed = true; b.textContent = 'Toque de novo para encerrar';
+    setTimeout(function () { wEndArmed = false; b.textContent = 'Encerrar aquecimento'; }, 3000);
+  });
+  setInterval(function () { if (warmActive()) warmTick(false); }, 250);
+  $('hAll').addEventListener('click', function () { copyText(JSON.stringify(P.history, null, 2), 'histBox', $('hAll')); });
+  $('eNew').addEventListener('click', openNew);
+  $('eUndo').addEventListener('click', undo);
+  $('eCopy').addEventListener('click', function () { copyText(resultText(entryFrom(G, true)), 'endBox', $('eCopy')); });
+
+  $('bSet').addEventListener('click', function () {
+    $('sVoice').checked = P.settings.voice; $('sName').checked = P.settings.nameOnPoint; $('sStakes').checked = P.settings.stakes; $('sWake').checked = P.settings.wake; $('sGood').checked = P.settings.goodLuck;
+    $('sVol').value = P.settings.volume; $('oVol').textContent = Math.round(P.settings.volume * 100) + '%';
+    $('sRate').value = P.settings.rate; $('oRate').textContent = Number(P.settings.rate).toFixed(2).replace(/0$/, '') + '×';
+    $('cl-p1').textContent = 'Fundo de ' + G.meta.names[0];
+    $('cl-p2').textContent = 'Fundo de ' + G.meta.names[1];
+    setVStatus('');
+    loadVoices(); syncColorUI(); applyColors(); openSheet('shSet');
+  });
+  $('sVoice').addEventListener('change', function () { P.settings.voice = this.checked; persist(); });
+  $('sStakes').addEventListener('change', function () { P.settings.stakes = this.checked; persist(); });
+  $('sName').addEventListener('change', function () { P.settings.nameOnPoint = this.checked; persist(); });
+  $('sWake').addEventListener('change', function () { P.settings.wake = this.checked; persist(); wake(); });
+  $('sRate').addEventListener('input', function () { P.settings.rate = Number(this.value); $('oRate').textContent = Number(this.value).toFixed(2).replace(/0$/, '') + '×'; persist(); });
+  $('sVoiceName').addEventListener('change', function () { P.settings.voiceName = this.value; persist(); });
+  $('sGood').addEventListener('change', function () { P.settings.goodLuck = this.checked; persist(); });
+  $('sVol').addEventListener('input', function () { P.settings.volume = Number(this.value); $('oVol').textContent = Math.round(this.value * 100) + '%'; persist(); });
+  $('sTest').addEventListener('click', function () {
+    var n = speakNames();
+    warned = false; spokeOnce = false; setVStatus('Testando a voz...');
+    speak(['Quinze a zero, ' + n[0] + '.', 'Troca de lado.'], { force: true });
+  });
+
+  var full = $('bFull');
+  if (document.documentElement.requestFullscreen) {
+    full.hidden = false;
+    full.addEventListener('click', function () {
+      try {
+        if (document.fullscreenElement) document.exitFullscreen();
+        else document.documentElement.requestFullscreen().catch(function () {});
+      } catch (e) {}
+    });
+  }
+
+  if (synth) { loadVoices(); synth.onvoiceschanged = loadVoices; [600, 1800, 4000].forEach(function (ms) { setTimeout(loadVoices, ms); }); }
+  render(); persist(); wake();
+  if (warmActive()) { showWarm(); warmTick(true); }     // retoma um aquecimento que estava em andamento
+  window.__placar = { planWarm: planWarm, spokenDur: spokenDur, get warm() { return G.meta.warm; }, openMatch: openMatch, get game() { return G; }, get P() { return P; }, statsFor: statsFor, renderProf: renderProf, saveField: saveField, point: point, undo: undo };   // facilita testes
+})();
+</script>
+
+<script>
+if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
+  window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+}
+</script>
+</body></html>
