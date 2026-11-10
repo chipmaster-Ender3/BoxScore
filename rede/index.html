@@ -1,0 +1,402 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BoxScore Rede</title>
+<meta name="theme-color" content="#0A1014"><link rel="manifest" href="../manifest.webmanifest"><link rel="icon" href="../icons/icon-192.png">
+<style>:root{--bg:#0A1014;--panel:#16222b;--ink:#eef3f6;--line:#2a3a44;--muted:#8fa2ad;--acc:#c6f24a;--bad:#ff7a6b;--ui:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color-scheme:dark}
+@media (prefers-color-scheme:light){:root{--bg:#f3f6f8;--panel:#fff;--ink:#0d1a22;--line:#d3dde3;--muted:#5b6e79;--acc:#4a6b00;--bad:#c0392b;color-scheme:light}}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui)}[hidden]{display:none!important}
+main{max-width:640px;margin:0 auto;padding:14px 14px 40px;display:grid;gap:12px}
+header{display:flex;align-items:center;gap:10px}header h1{flex:1;margin:0;font:900 24px/1 var(--ui);letter-spacing:.02em;text-transform:uppercase}header small{font:700 11px var(--ui);color:var(--muted);letter-spacing:.08em}
+.btn{min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font:700 14px var(--ui);cursor:pointer}.btn.pri{background:var(--ink);color:var(--bg)}.btn.bad{color:var(--bad)}.btn[disabled]{opacity:.5}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;position:sticky;top:0;background:var(--bg);padding:4px 0;z-index:2}
+.tabs button{min-height:52px;border-radius:16px;border:1px solid var(--line);background:var(--panel);color:var(--muted);font:700 13px var(--ui);display:grid;place-items:center;gap:2px;cursor:pointer;position:relative}
+.tabs button svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.tabs button[aria-selected=true]{color:var(--ink);border-color:var(--ink)}
+.dot{position:absolute;top:6px;right:10px;min-width:18px;height:18px;border-radius:9px;background:var(--acc);color:#0A1014;font:800 11px/18px var(--ui);text-align:center;padding:0 4px}
+.card{border:1px solid var(--line);background:var(--panel);border-radius:18px;padding:14px;display:grid;gap:10px}.card.off{opacity:.6}
+.when{font:800 18px/1.2 var(--ui)}.sub{color:var(--muted);font:400 13.5px/1.35 var(--ui)}.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{font:700 12px/1 var(--ui);padding:6px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}.chip.ok{color:var(--acc);border-color:var(--acc)}.chip.bad{color:var(--bad);border-color:var(--bad)}
+.who{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.who span{flex:1;min-width:120px;font:600 15px var(--ui)}
+.f{display:grid;gap:5px;font:700 12px var(--ui);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+input,select{min-height:46px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:0 12px;font:500 16px var(--ui);width:100%}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px}.seg button{min-height:46px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--muted);font:700 14px var(--ui);cursor:pointer}.seg button[aria-pressed=true]{color:var(--ink);border-color:var(--ink)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.msg{color:var(--bad);font:600 14px var(--ui)}.empty{text-align:center;color:var(--muted);padding:24px 8px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font:700 14px var(--ui);z-index:9}</style>
+<script src="../shared/modules.js"></script>
+</head><body>
+<main>
+<header><h1 id="ttl"></h1><small id="ver"></small><button class="btn" id="back" type="button"></button></header>
+<div id="gate" class="card" hidden><div class="sub" id="gateT"></div><button class="btn pri" id="login" type="button"></button><div class="msg" id="gateE" hidden></div></div>
+<div id="app" hidden>
+<nav class="tabs" id="tabs"></nav>
+<section id="pFind"><div class="two" style="margin-bottom:10px"><input id="fCity" type="search"></div><div id="lFind" style="display:grid;gap:10px"></div></section>
+<section id="pMine" hidden><div id="lMine" style="display:grid;gap:10px"></div></section>
+<section id="pNew" hidden></section>
+</div>
+</main>
+<script>
+(function () {
+  'use strict';
+  BXMods.mark('rede');
+  var VERSION = '0.3.0';
+  var FB_CFG = { apiKey: 'AIzaSyD_L90YxJAVRuTfPqwNbETJlbV9BYdnuYI', authDomain: 'boxsocore.firebaseapp.com', projectId: 'boxsocore', storageBucket: 'boxsocore.firebasestorage.app', messagingSenderId: '639383913161', appId: '1:639383913161:web:a9bb75fcf99f4b03378318' };
+  var FB_VER = '10.12.2', FB_LIBS = ['app', 'auth', 'firestore'];
+  var HOUR = 3600000;
+
+  var D = {
+    'pt-BR': { rede: 'Rede', find: 'Jogos', mine: 'Meus', neu: 'Criar', login_t: 'Entre com sua conta Google para marcar jogos e encontrar com quem jogar.', login: 'Entrar com Google', loading: 'Carregando...', e_find: 'Nenhum jogo aberto por aqui. Que tal marcar o primeiro?', e_mine: 'Você ainda não marcou nem pediu nenhum jogo.', err: 'Não foi possível carregar. Verifique a internet.', city_f: 'Filtrar por cidade', singles: 'Simples', doubles: 'Duplas', any: 'Qualquer nível', beginner: 'Iniciante', intermediate: 'Intermediário', advanced: 'Avançado', friends: 'Amigos', open: 'Aberto', vis_f: 'Só seus amigos veem este jogo.', vis_o: 'Qualquer usuário do app vê este jogo.', f_mode: 'Formato', f_date: 'Data', f_time: 'Hora', f_place: 'Local (quadra ou clube)', f_city: 'Cidade', f_slots: 'Vagas', f_band: 'Nível desejado', f_vis: 'Quem vê', f_note: 'Recado (opcional)', publish: 'Publicar jogo', by: 'por {0}', slots: 'Vagas: {0}', ask: 'Pedir para entrar', asked: 'Pedido enviado', cancel_ask: 'Cancelar pedido', in_: 'Você está confirmado', declined: 'Pedido recusado', accept: 'Aceitar', decline: 'Recusar', reqs: 'Pedidos', plrs: 'Confirmados', start: 'Iniciar partida', cancel_game: 'Cancelar jogo', share: 'Compartilhar', st_open: 'Aberto', st_full: 'Completo', st_cancelled: 'Cancelado', st_started: 'Iniciado', need_place: 'Informe o local.', need_when: 'Escolha uma data e hora futuras.', created: 'Jogo publicado.', need_one: 'Confirme ao menos um jogador para iniciar.', sure: 'Toque de novo', share_t: 'Vamos jogar tênis? {0} · {1} ({2}). Marque pelo BoxScore: {3}', fail: 'Não foi possível concluir. Tente de novo.', host: 'Você marcou' },
+    'pt-PT': { rede: 'Rede', find: 'Jogos', mine: 'Meus', neu: 'Criar', login_t: 'Entre com a sua conta Google para marcar jogos e encontrar com quem jogar.', login: 'Entrar com Google', loading: 'A carregar...', e_find: 'Nenhum jogo aberto por aqui. Que tal marcar o primeiro?', e_mine: 'Ainda não marcou nem pediu nenhum jogo.', err: 'Não foi possível carregar. Verifique a internet.', city_f: 'Filtrar por cidade', singles: 'Singulares', doubles: 'Pares', any: 'Qualquer nível', beginner: 'Iniciante', intermediate: 'Intermédio', advanced: 'Avançado', friends: 'Amigos', open: 'Aberto', vis_f: 'Só os seus amigos veem este jogo.', vis_o: 'Qualquer utilizador da app vê este jogo.', f_mode: 'Formato', f_date: 'Data', f_time: 'Hora', f_place: 'Local (campo ou clube)', f_city: 'Cidade', f_slots: 'Vagas', f_band: 'Nível pretendido', f_vis: 'Quem vê', f_note: 'Recado (opcional)', publish: 'Publicar jogo', by: 'por {0}', slots: 'Vagas: {0}', ask: 'Pedir para entrar', asked: 'Pedido enviado', cancel_ask: 'Cancelar pedido', in_: 'Está confirmado', declined: 'Pedido recusado', accept: 'Aceitar', decline: 'Recusar', reqs: 'Pedidos', plrs: 'Confirmados', start: 'Iniciar partida', cancel_game: 'Cancelar jogo', share: 'Partilhar', st_open: 'Aberto', st_full: 'Completo', st_cancelled: 'Cancelado', st_started: 'Iniciado', need_place: 'Indique o local.', need_when: 'Escolha uma data e hora futuras.', created: 'Jogo publicado.', need_one: 'Confirme pelo menos um jogador para iniciar.', sure: 'Toque de novo', share_t: 'Vamos jogar ténis? {0} · {1} ({2}). Marque pelo BoxScore: {3}', fail: 'Não foi possível concluir. Tente de novo.', host: 'Marcou' },
+    en: { rede: 'Network', find: 'Games', mine: 'Mine', neu: 'Create', login_t: 'Sign in with Google to set up matches and find someone to play with.', login: 'Sign in with Google', loading: 'Loading...', e_find: 'No open games here yet. Why not set up the first one?', e_mine: 'You have not set up or requested any game yet.', err: 'Could not load. Check your internet.', city_f: 'Filter by city', singles: 'Singles', doubles: 'Doubles', any: 'Any level', beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced', friends: 'Friends', open: 'Open', vis_f: 'Only your friends see this game.', vis_o: 'Any app user sees this game.', f_mode: 'Format', f_date: 'Date', f_time: 'Time', f_place: 'Place (court or club)', f_city: 'City', f_slots: 'Spots', f_band: 'Wanted level', f_vis: 'Who sees it', f_note: 'Note (optional)', publish: 'Publish game', by: 'by {0}', slots: 'Spots: {0}', ask: 'Ask to join', asked: 'Request sent', cancel_ask: 'Cancel request', in_: 'You are confirmed', declined: 'Request declined', accept: 'Accept', decline: 'Decline', reqs: 'Requests', plrs: 'Confirmed', start: 'Start match', cancel_game: 'Cancel game', share: 'Share', st_open: 'Open', st_full: 'Full', st_cancelled: 'Cancelled', st_started: 'Started', need_place: 'Enter the place.', need_when: 'Pick a future date and time.', created: 'Game published.', need_one: 'Confirm at least one player to start.', sure: 'Tap again', share_t: 'Tennis? {0} · {1} ({2}). Join via BoxScore: {3}', fail: 'Could not complete. Try again.', host: 'You set up' },
+    es: { rede: 'Red', find: 'Partidos', mine: 'Míos', neu: 'Crear', login_t: 'Entra con tu cuenta de Google para organizar partidos y encontrar con quién jugar.', login: 'Entrar con Google', loading: 'Cargando...', e_find: 'Aún no hay partidos abiertos. ¿Organizas el primero?', e_mine: 'Todavía no has organizado ni pedido ningún partido.', err: 'No se pudo cargar. Revisa tu internet.', city_f: 'Filtrar por ciudad', singles: 'Individual', doubles: 'Dobles', any: 'Cualquier nivel', beginner: 'Principiante', intermediate: 'Intermedio', advanced: 'Avanzado', friends: 'Amigos', open: 'Abierto', vis_f: 'Solo tus amigos ven este partido.', vis_o: 'Cualquier usuario de la app ve este partido.', f_mode: 'Formato', f_date: 'Fecha', f_time: 'Hora', f_place: 'Lugar (pista o club)', f_city: 'Ciudad', f_slots: 'Plazas', f_band: 'Nivel deseado', f_vis: 'Quién lo ve', f_note: 'Nota (opcional)', publish: 'Publicar partido', by: 'por {0}', slots: 'Plazas: {0}', ask: 'Pedir unirme', asked: 'Solicitud enviada', cancel_ask: 'Cancelar solicitud', in_: 'Estás confirmado', declined: 'Solicitud rechazada', accept: 'Aceptar', decline: 'Rechazar', reqs: 'Solicitudes', plrs: 'Confirmados', start: 'Iniciar partido', cancel_game: 'Cancelar partido', share: 'Compartir', st_open: 'Abierto', st_full: 'Completo', st_cancelled: 'Cancelado', st_started: 'Iniciado', need_place: 'Indica el lugar.', need_when: 'Elige una fecha y hora futuras.', created: 'Partido publicado.', need_one: 'Confirma al menos un jugador para iniciar.', sure: 'Toca de nuevo', share_t: '¿Jugamos al tenis? {0} · {1} ({2}). Únete con BoxScore: {3}', fail: 'No se pudo completar. Inténtalo de nuevo.', host: 'Lo organizaste' },
+    fr: { rede: 'Réseau', find: 'Matchs', mine: 'Les miens', neu: 'Créer', login_t: 'Connectez-vous avec Google pour organiser des matchs et trouver des partenaires.', login: 'Se connecter avec Google', loading: 'Chargement...', e_find: 'Aucun match ouvert ici. Et si vous organisiez le premier ?', e_mine: 'Vous n\'avez encore organisé ni demandé aucun match.', err: 'Chargement impossible. Vérifiez votre connexion.', city_f: 'Filtrer par ville', singles: 'Simple', doubles: 'Double', any: 'Tout niveau', beginner: 'Débutant', intermediate: 'Intermédiaire', advanced: 'Avancé', friends: 'Amis', open: 'Ouvert', vis_f: 'Seuls vos amis voient ce match.', vis_o: 'Tout utilisateur de l\'app voit ce match.', f_mode: 'Format', f_date: 'Date', f_time: 'Heure', f_place: 'Lieu (court ou club)', f_city: 'Ville', f_slots: 'Places', f_band: 'Niveau souhaité', f_vis: 'Qui le voit', f_note: 'Note (facultatif)', publish: 'Publier le match', by: 'par {0}', slots: 'Places : {0}', ask: 'Demander à rejoindre', asked: 'Demande envoyée', cancel_ask: 'Annuler la demande', in_: 'Vous êtes confirmé', declined: 'Demande refusée', accept: 'Accepter', decline: 'Refuser', reqs: 'Demandes', plrs: 'Confirmés', start: 'Démarrer le match', cancel_game: 'Annuler le match', share: 'Partager', st_open: 'Ouvert', st_full: 'Complet', st_cancelled: 'Annulé', st_started: 'Commencé', need_place: 'Indiquez le lieu.', need_when: 'Choisissez une date et une heure futures.', created: 'Match publié.', need_one: 'Confirmez au moins un joueur pour démarrer.', sure: 'Touchez encore', share_t: 'On joue au tennis ? {0} · {1} ({2}). Rejoignez via BoxScore : {3}', fail: 'Échec. Réessayez.', host: 'Vous avez organisé' },
+    de: { rede: 'Netzwerk', find: 'Spiele', mine: 'Meine', neu: 'Anlegen', login_t: 'Mit Google anmelden, um Spiele zu verabreden und Partner zu finden.', login: 'Mit Google anmelden', loading: 'Wird geladen...', e_find: 'Noch keine offenen Spiele. Wie wäre es mit dem ersten?', e_mine: 'Du hast noch kein Spiel angelegt oder angefragt.', err: 'Laden nicht möglich. Internet prüfen.', city_f: 'Nach Stadt filtern', singles: 'Einzel', doubles: 'Doppel', any: 'Jedes Niveau', beginner: 'Anfänger', intermediate: 'Mittel', advanced: 'Fortgeschritten', friends: 'Freunde', open: 'Offen', vis_f: 'Nur deine Freunde sehen dieses Spiel.', vis_o: 'Jeder App-Nutzer sieht dieses Spiel.', f_mode: 'Format', f_date: 'Datum', f_time: 'Uhrzeit', f_place: 'Ort (Platz oder Verein)', f_city: 'Stadt', f_slots: 'Plätze', f_band: 'Gewünschtes Niveau', f_vis: 'Wer sieht es', f_note: 'Notiz (optional)', publish: 'Spiel veröffentlichen', by: 'von {0}', slots: 'Plätze: {0}', ask: 'Teilnahme anfragen', asked: 'Anfrage gesendet', cancel_ask: 'Anfrage zurückziehen', in_: 'Du bist bestätigt', declined: 'Anfrage abgelehnt', accept: 'Annehmen', decline: 'Ablehnen', reqs: 'Anfragen', plrs: 'Bestätigt', start: 'Spiel starten', cancel_game: 'Spiel absagen', share: 'Teilen', st_open: 'Offen', st_full: 'Voll', st_cancelled: 'Abgesagt', st_started: 'Gestartet', need_place: 'Ort angeben.', need_when: 'Zukünftiges Datum und Uhrzeit wählen.', created: 'Spiel veröffentlicht.', need_one: 'Mindestens einen Spieler bestätigen.', sure: 'Nochmal tippen', share_t: 'Tennis? {0} · {1} ({2}). Mach mit über BoxScore: {3}', fail: 'Nicht möglich. Erneut versuchen.', host: 'Von dir angelegt' }
+  };
+
+  var X = {
+    'pt-BR': { vis_i: 'Convidados', vis_i_t: 'Só quem você convidar vê este jogo.', inv_h: 'Convidar jogadores', inv_fr: 'Seus amigos', inv_code: 'Buscar por nome ou código', inv_add: 'Convidar', inv_none: 'Nenhum convidado ainda.', inv_bad: 'Ninguém encontrado. Confira o nome ou o código.', need_inv: 'Escolha pelo menos um jogador para convidar.', invited: 'Convite', accept_inv: 'Aceitar convite', decline_inv: 'Recusar convite', waiting: 'Aguardando resposta', f_level: 'Nível desejado', lv_any: 'Qualquer nível', lv_sys: 'Sistema de nível', lv_from: 'De', lv_to: 'Até', lv_cls: 'Classe {0}', lv_abc: 'Categoria {0}', lv_p: 'Principiante', sys_cls: 'Classe (1 a 5)', sys_abc: 'Categoria (A a C)', sys_ntrp: 'NTRP (1.0 a 7.0)', f_cost: 'Custo da quadra', f_hour: 'Valor da hora', f_hours: 'Duração', f_cur: 'Moeda', cost_none: 'Sem custo informado.', cost_tot: 'Total {0}', cost_per: '{0} por jogador', cost_n: '({0} jogadores)', hrs: '{0} h', kind_f: 'Amistoso', lvl_of: 'Nível' },
+    'pt-PT': { vis_i: 'Convidados', vis_i_t: 'Só quem convidar vê este jogo.', inv_h: 'Convidar jogadores', inv_fr: 'Os seus amigos', inv_code: 'Buscar por nome ou código', inv_add: 'Convidar', inv_none: 'Ainda sem convidados.', inv_bad: 'Ninguém encontrado. Confira o nome ou o código.', need_inv: 'Escolha pelo menos um jogador para convidar.', invited: 'Convite', accept_inv: 'Aceitar convite', decline_inv: 'Recusar convite', waiting: 'A aguardar resposta', f_level: 'Nível pretendido', lv_any: 'Qualquer nível', lv_sys: 'Sistema de nível', lv_from: 'De', lv_to: 'Até', lv_cls: 'Classe {0}', lv_abc: 'Categoria {0}', lv_p: 'Iniciante', sys_cls: 'Classe (1 a 5)', sys_abc: 'Categoria (A a C)', sys_ntrp: 'NTRP (1.0 a 7.0)', f_cost: 'Custo do campo', f_hour: 'Valor da hora', f_hours: 'Duração', f_cur: 'Moeda', cost_none: 'Sem custo indicado.', cost_tot: 'Total {0}', cost_per: '{0} por jogador', cost_n: '({0} jogadores)', hrs: '{0} h', kind_f: 'Amigável', lvl_of: 'Nível' },
+    en: { vis_i: 'Invitees', vis_i_t: 'Only the people you invite see this game.', inv_h: 'Invite players', inv_fr: 'Your friends', inv_code: 'Search by name or code', inv_add: 'Invite', inv_none: 'No invitees yet.', inv_bad: 'No one found. Check the name or code.', need_inv: 'Pick at least one player to invite.', invited: 'Invite', accept_inv: 'Accept invite', decline_inv: 'Decline invite', waiting: 'Waiting for reply', f_level: 'Wanted level', lv_any: 'Any level', lv_sys: 'Level system', lv_from: 'From', lv_to: 'To', lv_cls: 'Class {0}', lv_abc: 'Category {0}', lv_p: 'Beginner', sys_cls: 'Class (1 to 5)', sys_abc: 'Category (A to C)', sys_ntrp: 'NTRP (1.0 to 7.0)', f_cost: 'Court cost', f_hour: 'Price per hour', f_hours: 'Duration', f_cur: 'Currency', cost_none: 'No cost entered.', cost_tot: 'Total {0}', cost_per: '{0} per player', cost_n: '({0} players)', hrs: '{0} h', kind_f: 'Friendly', lvl_of: 'Level' },
+    es: { vis_i: 'Invitados', vis_i_t: 'Solo quien invites ve este partido.', inv_h: 'Invitar jugadores', inv_fr: 'Tus amigos', inv_code: 'Buscar por nombre o código', inv_add: 'Invitar', inv_none: 'Aún sin invitados.', inv_bad: 'No se encontró a nadie. Revisa el nombre o el código.', need_inv: 'Elige al menos un jugador para invitar.', invited: 'Invitación', accept_inv: 'Aceptar invitación', decline_inv: 'Rechazar invitación', waiting: 'Esperando respuesta', f_level: 'Nivel deseado', lv_any: 'Cualquier nivel', lv_sys: 'Sistema de nivel', lv_from: 'Desde', lv_to: 'Hasta', lv_cls: 'Clase {0}', lv_abc: 'Categoría {0}', lv_p: 'Principiante', sys_cls: 'Clase (1 a 5)', sys_abc: 'Categoría (A a C)', sys_ntrp: 'NTRP (1.0 a 7.0)', f_cost: 'Coste de la pista', f_hour: 'Precio por hora', f_hours: 'Duración', f_cur: 'Moneda', cost_none: 'Sin coste indicado.', cost_tot: 'Total {0}', cost_per: '{0} por jugador', cost_n: '({0} jugadores)', hrs: '{0} h', kind_f: 'Amistoso', lvl_of: 'Nivel' },
+    fr: { vis_i: 'Invités', vis_i_t: 'Seules les personnes invitées voient ce match.', inv_h: 'Inviter des joueurs', inv_fr: 'Vos amis', inv_code: 'Chercher par nom ou code', inv_add: 'Inviter', inv_none: 'Aucun invité pour l\'instant.', inv_bad: 'Personne trouvé. Vérifiez le nom ou le code.', need_inv: 'Choisissez au moins un joueur à inviter.', invited: 'Invitation', accept_inv: 'Accepter l\'invitation', decline_inv: 'Refuser l\'invitation', waiting: 'En attente de réponse', f_level: 'Niveau souhaité', lv_any: 'Tout niveau', lv_sys: 'Système de niveau', lv_from: 'De', lv_to: 'À', lv_cls: 'Classe {0}', lv_abc: 'Catégorie {0}', lv_p: 'Débutant', sys_cls: 'Classe (1 à 5)', sys_abc: 'Catégorie (A à C)', sys_ntrp: 'NTRP (1.0 à 7.0)', f_cost: 'Coût du court', f_hour: 'Prix par heure', f_hours: 'Durée', f_cur: 'Devise', cost_none: 'Aucun coût indiqué.', cost_tot: 'Total {0}', cost_per: '{0} par joueur', cost_n: '({0} joueurs)', hrs: '{0} h', kind_f: 'Amical', lvl_of: 'Niveau' },
+    de: { vis_i: 'Eingeladene', vis_i_t: 'Nur von dir Eingeladene sehen dieses Spiel.', inv_h: 'Spieler einladen', inv_fr: 'Deine Freunde', inv_code: 'Suche nach Name oder Code', inv_add: 'Einladen', inv_none: 'Noch keine Eingeladenen.', inv_bad: 'Niemand gefunden. Name oder Code prüfen.', need_inv: 'Mindestens einen Spieler einladen.', invited: 'Einladung', accept_inv: 'Einladung annehmen', decline_inv: 'Einladung ablehnen', waiting: 'Warte auf Antwort', f_level: 'Gewünschtes Niveau', lv_any: 'Jedes Niveau', lv_sys: 'Niveau-System', lv_from: 'Von', lv_to: 'Bis', lv_cls: 'Klasse {0}', lv_abc: 'Kategorie {0}', lv_p: 'Anfänger', sys_cls: 'Klasse (1 bis 5)', sys_abc: 'Kategorie (A bis C)', sys_ntrp: 'NTRP (1.0 bis 7.0)', f_cost: 'Platzkosten', f_hour: 'Preis pro Stunde', f_hours: 'Dauer', f_cur: 'Währung', cost_none: 'Keine Kosten angegeben.', cost_tot: 'Gesamt {0}', cost_per: '{0} pro Spieler', cost_n: '({0} Spieler)', hrs: '{0} Std.', kind_f: 'Freundschaftsspiel', lvl_of: 'Niveau' }
+  };
+  Object.keys(X).forEach(function (l) { Object.assign(D[l], X[l]); });
+  var CUR = { 'pt-BR': 'BRL', 'pt-PT': 'EUR', en: 'USD', es: 'EUR', fr: 'EUR', de: 'EUR' };
+  var LV = { cls: ['P', '5', '4', '3', '2', '1'], abc: ['C', 'B', 'A'], ntrp: ['1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0', '5.5', '6.0', '6.5', '7.0'] };
+  function lvL(sys, v) { if (!sys || !v) return ''; if (sys === 'cls') return v === 'P' ? T('lv_p') : Tf('lv_cls', v); if (sys === 'abc') return Tf('lv_abc', v); return 'NTRP ' + v; }
+  function lvRange(g) { if (!g.lvSys) return ''; var a = lvL(g.lvSys, g.lvFrom), b = lvL(g.lvSys, g.lvTo); return !a ? '' : (!b || b === a ? a : a + ' – ' + b); }
+  function money(v, cur) { try { return new Intl.NumberFormat(LG, { style: 'currency', currency: cur || 'BRL' }).format(v); } catch (e) { return (cur || '') + ' ' + v.toFixed(2); } }
+  function nPlayers(g) { return g.mode === 'doubles' ? 4 : 2; }
+  var LG = BXMods.lang();
+  function T(k) { var d = D[LG] || D.en; return d[k] != null ? d[k] : (D['pt-BR'][k] || k); }
+  function Tf(k) { var s = T(k); for (var i = 1; i < arguments.length; i++) s = s.replace('{' + (i - 1) + '}', arguments[i]); return s; }
+
+  function $(id) { return document.getElementById(id); }
+  function h(tag, attrs, kids) {
+    var e = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) {
+      if (k === 'text') e.textContent = attrs[k]; else if (k === 'on') Object.keys(attrs.on).forEach(function (ev) { e.addEventListener(ev, attrs.on[ev]); });
+      else if (k === 'cls') e.className = attrs[k]; else e.setAttribute(k, attrs[k]);
+    });
+    (kids || []).forEach(function (c) { if (c) e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return e;
+  }
+  function toast(m) { var t = h('div', { cls: 'toast', text: m }); document.body.appendChild(t); setTimeout(function () { t.remove(); }, 2600); }
+  function norm(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim(); }
+
+  // dados do Placar (mesma origem): código, lugares recentes, cidade
+  function placar() { try { return JSON.parse(localStorage.getItem('boxscore.placar.v1') || 'null') || {}; } catch (e) { return {}; } }
+  function myCode() { var p = placar(); return (p.sync && p.sync.code) || ''; }
+  function lsGet(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+  var S = { user: null, db: null, auth: null, friends: [], friendsLoaded: false, games: {}, tab: 'find', loading: false, err: false, form: null, armed: '' };
+  var ICONS = {
+    find: '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+    mine: '<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/>',
+    neu: '<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>'
+  };
+
+  // ---------- Firebase ----------
+  function loadFB() {
+    if (window.firebase && firebase.auth && firebase.firestore) return Promise.resolve();
+    return new Promise(function (res, rej) {
+      var i = 0;
+      (function next() {
+        if (i >= FB_LIBS.length) return res();
+        var s = document.createElement('script'); s.src = 'https://www.gstatic.com/firebasejs/' + FB_VER + '/firebase-' + FB_LIBS[i++] + '-compat.js';
+        s.onload = next; s.onerror = function () { rej(new Error('load')); }; document.head.appendChild(s);
+      })();
+    });
+  }
+  function initFB() {
+    return loadFB().then(function () {
+      firebase.initializeApp(FB_CFG);
+      S.auth = firebase.auth(); S.db = firebase.firestore();
+      try { S.db.settings({ experimentalAutoDetectLongPolling: true, merge: true }); } catch (e) {}
+      try { S.auth.getRedirectResult().catch(function () {}); } catch (e) {}
+      S.auth.onAuthStateChanged(function (u) { S.user = u || null; paintGate(); if (u) reload(); });
+    }).catch(function () { $('gate').hidden = false; $('app').hidden = true; $('gateT').textContent = T('err'); $('login').hidden = true; });
+  }
+  function login() {
+    $('gateE').hidden = true;
+    var prov = new firebase.auth.GoogleAuthProvider();
+    S.auth.signInWithPopup(prov).catch(function (e) {
+      var c = (e && e.code) || '';
+      if (/popup-blocked|operation-not-supported/.test(c)) { try { return S.auth.signInWithRedirect(prov); } catch (x) {} }
+      if (/popup-closed|cancelled/.test(c)) return;
+      $('gateE').hidden = false; $('gateE').textContent = T('fail');
+    });
+  }
+  function paintGate() { $('gate').hidden = !!S.user; $('app').hidden = !S.user; $('login').hidden = false; if (!S.user) $('gateT').textContent = T('login_t'); }
+
+  // ---------- dados ----------
+  function fv() { return firebase.firestore.FieldValue; }
+  function reload() {
+    if (!S.user || !S.db) return Promise.resolve();
+    var uid = S.user.uid, g = S.db.collection('games');
+    S.loading = true; S.err = false; paint();
+    return Promise.all([
+      g.where('visibility', '==', 'open').where('status', '==', 'open').get(),
+      g.where('audience', 'array-contains', uid).get(),
+      g.where('accepted', 'array-contains', uid).get(),
+      g.where('asked', 'array-contains', uid).get(),
+      g.where('invited', 'array-contains', uid).get()
+    ]).then(function (rs) {
+      var m = {};
+      rs.forEach(function (s) { s.docs.forEach(function (d) { var x = d.data(); x.id = d.id; m[d.id] = x; }); });
+      S.games = m; S.loading = false; paint();
+    }).catch(function () { S.loading = false; S.err = true; paint(); });
+  }
+  function run(p, okMsg) { return p.then(function () { if (okMsg) toast(okMsg); return reload(); }).catch(function () { toast(T('fail')); }); }
+  function ref(id) { return S.db.collection('games').doc(id); }
+  function me() { return { name: S.user.displayName || S.user.email || '?', code: myCode() }; }
+
+  function ask(g) { var i = me(); var u = { asked: fv().arrayUnion(S.user.uid), updatedAt: Date.now() }; u['askedInfo.' + S.user.uid] = { name: i.name, code: i.code }; return run(ref(g.id).update(u)); }
+  function unask(g) { var u = { asked: fv().arrayRemove(S.user.uid), updatedAt: Date.now() }; u['askedInfo.' + S.user.uid] = fv().delete(); return run(ref(g.id).update(u)); }
+  function accept(g, uid) {
+    var info = (g.askedInfo || {})[uid] || { name: '?', code: '' }, left = Math.max(0, (g.slotsLeft || 0) - 1);
+    var u = { accepted: fv().arrayUnion(uid), asked: fv().arrayRemove(uid), slotsLeft: left, status: left === 0 ? 'full' : 'open', updatedAt: Date.now() };
+    u['players.' + uid] = { name: info.name, code: info.code }; u['askedInfo.' + uid] = fv().delete();
+    return run(ref(g.id).update(u));
+  }
+  function decline(g, uid) { var u = { asked: fv().arrayRemove(uid), declined: fv().arrayUnion(uid), updatedAt: Date.now() }; u['askedInfo.' + uid] = fv().delete(); return run(ref(g.id).update(u)); }
+  function cancelGame(g) { return run(ref(g.id).update({ status: 'cancelled', updatedAt: Date.now() })); }
+  function startGame(g) {
+    var ids = (g.accepted || []).filter(function (u) { return u !== g.hostUid; });
+    if (!ids.length) { toast(T('need_one')); return; }
+    var pl = [{ uid: g.hostUid, name: g.hostName, code: g.hostCode || '' }].concat(ids.map(function (u) { var p = (g.players || {})[u] || {}; return { uid: u, name: p.name || '?', code: p.code || '' }; }));
+    ref(g.id).update({ status: 'started', updatedAt: Date.now() }).catch(function () {}).then(function () {
+      lsSet('boxscore.handoff', JSON.stringify({ gameId: g.id, mode: g.mode, place: g.place, players: pl, at: Date.now() }));
+      BXMods.mark('placar'); location.href = '../placar/';
+    });
+  }
+  function create(f) {
+    var place = f.place.trim(), city = f.city.trim();
+    if (!place) { f.err = T('need_place'); paint(); return; }
+    var at = new Date(f.date + 'T' + f.time).getTime();
+    if (!isFinite(at) || at < Date.now()) { f.err = T('need_when'); paint(); return; }
+    if (f.vis === 'invite' && !f.invited.length) { f.err = T('need_inv'); paint(); return; }
+    var uid = S.user.uid, slots = f.mode === 'singles' ? 1 : f.slots;
+    lsSet('boxscore.rede.city', city); lsSet('boxscore.rede.cur', f.cur);
+    var price = parseFloat(String(f.price).replace(',', '.')), hours = parseFloat(f.hours) || 1;
+    var aud = f.vis === 'friends' ? S.friends.map(function (x) { return x.uid; }) : [];
+    var pl = placar(), mp = pl.players && pl.meId ? pl.players[pl.meId] || {} : {};
+    var i = me(), doc = {
+      kind: 'friendly', hostUid: uid, hostName: i.name, hostCode: i.code, hostLvSys: mp.lvSys || '', hostLvVal: mp.lvVal || '',
+      mode: f.mode, startAt: at, place: place.slice(0, 80), city: city.slice(0, 60), cityKey: norm(city),
+      lvSys: f.lvSys, lvFrom: f.lvSys ? f.lvFrom : '', lvTo: f.lvSys ? f.lvTo : '', band: 'any',
+      slots: slots, slotsLeft: slots, visibility: f.vis, audience: aud.slice(0, 400),
+      invited: f.invited.map(function (x) { return x.uid; }), invitedInfo: {},
+      accepted: [uid], asked: [], askedInfo: {}, declined: [], players: {}, status: 'open', note: f.note.trim().slice(0, 80),
+      cost: isFinite(price) && price > 0 ? { hour: price, hours: hours, cur: f.cur, total: Math.round(price * hours * 100) / 100, per: Math.round(price * hours / nPlayers({ mode: f.mode }) * 100) / 100 } : null,
+      createdAt: Date.now(), updatedAt: Date.now()
+    };
+    f.invited.forEach(function (x) { doc.invitedInfo[x.uid] = { name: x.name, code: x.code }; });
+    doc.players[uid] = { name: i.name, code: i.code };
+    S.db.collection('games').doc().set(doc).then(function () { S.form = null; S.tab = 'mine'; toast(T('created')); return reload(); }).catch(function () { f.err = T('fail'); paint(); });
+  }
+  function loadFriends() {
+    if (S.friendsLoaded || !S.user) return;
+    S.friendsLoaded = true; var uid = S.user.uid;
+    S.db.collection('links').where('members', 'array-contains', uid).get().then(function (r) {
+      var ids = []; r.docs.forEach(function (d) { var l = d.data(); if (l.status === 'accepted') (l.members || []).forEach(function (m) { if (m !== uid && ids.indexOf(m) < 0) ids.push(m); }); });
+      return Promise.all(ids.map(function (u) { return S.db.collection('profiles').doc(u).get().then(function (p) { var x = p.exists ? p.data() : {}; return { uid: u, name: x.name || '?', code: x.code || '' }; }).catch(function () { return { uid: u, name: '?', code: '' }; }); }));
+    }).then(function (list) { S.friends = list; if (S.tab === 'neu') paintForm(); }).catch(function () { S.friendsLoaded = false; });
+  }
+  function searchPlayers(q, done) {
+    var raw = String(q).trim(), code = raw.toUpperCase().replace(/[^A-Z0-9]/g, ''), ql = raw.toLowerCase(), res = {}, jobs = [];
+    if (code.length === 6) jobs.push(S.db.collection('codes').doc(code).get().then(function (c) {
+      if (c.exists) return S.db.collection('profiles').doc(c.data().uid).get().then(function (p) { if (p.exists) { var x = p.data(); res[x.uid || c.data().uid] = { uid: x.uid || c.data().uid, name: x.name || '?', code: x.code || code }; } });
+    }));
+    if (ql.length >= 2) jobs.push(S.db.collection('directory').where('nameLower', '>=', ql).where('nameLower', '<=', ql + '\uf8ff').limit(10).get().then(function (r) {
+      r.docs.forEach(function (d) { var x = d.data(); res[x.uid] = { uid: x.uid, name: x.name || '?', code: x.code || '' }; });
+    }));
+    Promise.all(jobs).then(function () { done(Object.keys(res).map(function (k) { return res[k]; }).filter(function (x) { return x.uid !== S.user.uid; })); }).catch(function () { done(null); });
+  }
+  // ---------- visual ----------
+  function fmtWhen(ms) {
+    var d = new Date(ms), l = LG === 'pt-BR' ? 'pt-BR' : LG;
+    return d.toLocaleDateString(l, { weekday: 'short', day: '2-digit', month: 'short' }) + ' · ' + d.toLocaleTimeString(l, { hour: '2-digit', minute: '2-digit' });
+  }
+  function bandTxt(b) { return T(b === 'beginner' || b === 'intermediate' || b === 'advanced' ? b : 'any'); }
+  function twoTap(key, label, cls, fn) {
+    var armed = S.armed === key;
+    return h('button', { type: 'button', cls: 'btn ' + (cls || ''), text: armed ? T('sure') : label, on: { click: function () { if (S.armed === key) { S.armed = ''; fn(); } else { S.armed = key; paint(); setTimeout(function () { if (S.armed === key) { S.armed = ''; paint(); } }, 3000); } } } });
+  }
+  function head(g) {
+    var st = g.status || 'open', cls = st === 'open' ? 'ok' : st === 'cancelled' ? 'bad' : '';
+    var lv = lvRange(g) || (g.band && g.band !== 'any' ? bandTxt(g.band) : T('lv_any'));
+    var vis = g.visibility === 'open' ? T('open') : g.visibility === 'invite' ? T('vis_i') : T('friends');
+    var out = [
+      h('div', { cls: 'row' }, [h('div', { cls: 'when', text: fmtWhen(g.startAt) }), h('span', { cls: 'chip ' + cls, text: T('st_' + st) })]),
+      h('div', { cls: 'sub', text: g.place + (g.city ? ' · ' + g.city : '') }),
+      h('div', { cls: 'row' }, [h('span', { cls: 'chip', text: T(g.mode === 'doubles' ? 'doubles' : 'singles') }), h('span', { cls: 'chip', text: T('kind_f') }), h('span', { cls: 'chip', text: T('lvl_of') + ': ' + lv }), h('span', { cls: 'chip', text: Tf('slots', g.slotsLeft) }), h('span', { cls: 'chip', text: vis })])
+    ];
+    if (g.cost && g.cost.per) out.push(h('div', { cls: 'sub', text: money(g.cost.hour, g.cost.cur) + ' / h × ' + Tf('hrs', g.cost.hours) + ' = ' + Tf('cost_tot', money(g.cost.total, g.cost.cur)) + ' → ' + Tf('cost_per', money(g.cost.per, g.cost.cur)) }));
+    if (g.note) out.push(h('div', { cls: 'sub', text: '“' + g.note + '”' }));
+    return out;
+  }
+  function hostLine(g) { var lv = g.hostLvSys ? ' · ' + lvL(g.hostLvSys, g.hostLvVal) : ''; return Tf('by', g.hostName + (g.hostCode ? ' · ' + g.hostCode : '') + lv); }
+  function acceptInvite(g) {
+    var left = Math.max(0, (g.slotsLeft || 0) - 1), i = me();
+    var u = { accepted: fv().arrayUnion(S.user.uid), slotsLeft: left, status: left === 0 ? 'full' : 'open', updatedAt: Date.now() };
+    u['players.' + S.user.uid] = { name: i.name, code: i.code };
+    return run(ref(g.id).update(u));
+  }
+  function declineInvite(g) { return run(ref(g.id).update({ declined: fv().arrayUnion(S.user.uid), updatedAt: Date.now() })); }
+  function cardFind(g) {
+    var uid = S.user.uid, kids = head(g);
+    kids.push(h('div', { cls: 'sub', text: hostLine(g) }));
+    var inAsk = (g.asked || []).indexOf(uid) >= 0, inDec = (g.declined || []).indexOf(uid) >= 0, inv = (g.invited || []).indexOf(uid) >= 0;
+    if (inDec) kids.push(h('span', { cls: 'chip bad', text: T('declined') }));
+    else if (inv) kids.push(h('div', { cls: 'row' }, [h('span', { cls: 'chip ok', text: T('invited') }), h('button', { type: 'button', cls: 'btn pri', text: T('accept_inv'), on: { click: function () { acceptInvite(g); } } }), h('button', { type: 'button', cls: 'btn', text: T('decline_inv'), on: { click: function () { declineInvite(g); } } })]));
+    else if (inAsk) kids.push(h('div', { cls: 'row' }, [h('span', { cls: 'chip ok', text: T('asked') }), h('button', { type: 'button', cls: 'btn', text: T('cancel_ask'), on: { click: function () { unask(g); } } })]));
+    else kids.push(h('button', { type: 'button', cls: 'btn pri', text: T('ask'), on: { click: function () { ask(g); } } }));
+    return h('article', { cls: 'card' }, kids);
+  }
+  function cardMine(g) {
+    var uid = S.user.uid, isHost = g.hostUid === uid, kids = head(g), live = g.status === 'open' || g.status === 'full';
+    if (!isHost) kids.push(h('div', { cls: 'sub', text: hostLine(g) }));
+    if (isHost && live) (g.invited || []).filter(function (u) { return (g.accepted || []).indexOf(u) < 0 && (g.declined || []).indexOf(u) < 0; }).forEach(function (u) { var p = (g.invitedInfo || {})[u] || { name: '?' }; kids.push(h('div', { cls: 'who' }, [h('span', { text: p.name + (p.code ? ' · ' + p.code : '') }), h('span', { cls: 'chip', text: T('waiting') })])); });
+    if ((g.accepted || []).length) {
+      kids.push(h('div', { cls: 'sub', text: T('plrs') }));
+      (g.accepted || []).forEach(function (u) { var p = u === g.hostUid ? { name: g.hostName, code: g.hostCode } : (g.players || {})[u] || {}; kids.push(h('div', { cls: 'who' }, [h('span', { text: (p.name || '?') + (p.code ? ' · ' + p.code : '') })])); });
+    }
+    if (isHost) {
+      var asks = g.asked || [];
+      if (asks.length && live) {
+        kids.push(h('div', { cls: 'sub', text: T('reqs') }));
+        asks.forEach(function (u) {
+          var p = (g.askedInfo || {})[u] || { name: '?', code: '' };
+          kids.push(h('div', { cls: 'who' }, [h('span', { text: p.name + (p.code ? ' · ' + p.code : '') }),
+            h('button', { type: 'button', cls: 'btn pri', text: T('accept'), on: { click: function () { accept(g, u); } } }),
+            h('button', { type: 'button', cls: 'btn', text: T('decline'), on: { click: function () { decline(g, u); } } })]));
+        });
+      }
+      if (live || g.status === 'started') {
+        var row = h('div', { cls: 'row' });
+        if (live) { row.appendChild(h('button', { type: 'button', cls: 'btn pri', text: T('start'), on: { click: function () { startGame(g); } } })); }
+        row.appendChild(h('button', { type: 'button', cls: 'btn', text: T('share'), on: { click: function () { shareGame(g); } } }));
+        if (live) row.appendChild(twoTap('c' + g.id, T('cancel_game'), 'bad', function () { cancelGame(g); }));
+        kids.push(row);
+      }
+    } else {
+      if ((g.asked || []).indexOf(uid) >= 0) kids.push(h('div', { cls: 'row' }, [h('span', { cls: 'chip ok', text: T('asked') }), h('button', { type: 'button', cls: 'btn', text: T('cancel_ask'), on: { click: function () { unask(g); } } })]));
+      else if ((g.accepted || []).indexOf(uid) >= 0) kids.push(h('span', { cls: 'chip ok', text: T('in_') }));
+    }
+    return h('article', { cls: 'card' + (live || g.status === 'started' ? '' : ' off') }, kids);
+  }
+  function shareGame(g) {
+    var txt = Tf('share_t', fmtWhen(g.startAt), g.place, g.city || '-', BXMods.base);
+    if (navigator.share) navigator.share({ text: txt }).catch(function () {});
+    else if (navigator.clipboard) navigator.clipboard.writeText(txt).then(function () { toast('✓'); }, function () {});
+  }
+
+  function paintTabs() {
+    var host = $('tabs'); host.textContent = '';
+    var invN = 0; Object.keys(S.games).forEach(function (k) { var g = S.games[k]; if ((g.invited || []).indexOf(S.user.uid) >= 0 && (g.accepted || []).indexOf(S.user.uid) < 0 && (g.declined || []).indexOf(S.user.uid) < 0 && g.status === 'open' && g.startAt > Date.now()) invN++; });
+    var pend = 0; Object.keys(S.games).forEach(function (k) { var g = S.games[k]; if (g.hostUid === (S.user && S.user.uid) && (g.status === 'open' || g.status === 'full')) pend += (g.asked || []).length; });
+    ['find', 'mine', 'neu'].forEach(function (k) {
+      var b = h('button', { type: 'button', role: 'tab', 'aria-selected': String(S.tab === k), on: { click: function () { S.tab = k; paint(); } } });
+      b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS[k] + '</svg>'; b.appendChild(h('span', { text: T(k) }));
+      if (k === 'find' && invN) b.appendChild(h('span', { cls: 'dot', text: String(invN) }));
+      if (k === 'mine' && pend) b.appendChild(h('span', { cls: 'dot', text: String(pend) }));
+      host.appendChild(b);
+    });
+  }
+  function note(host, txt) { host.appendChild(h('div', { cls: 'empty', text: txt })); }
+  function paintForm() {
+    var host = $('pNew'); host.textContent = ''; loadFriends();
+    if (!S.form) {
+      var d = new Date(Date.now() + 86400000), p = function (n) { return (n < 10 ? '0' : '') + n; };
+      S.form = { mode: 'singles', date: d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()), time: '18:00', place: (placar().places || [])[0] || '', city: lsGet('boxscore.rede.city'), slots: 1, lvSys: '', lvFrom: '', lvTo: '', vis: 'invite', invited: [], code: '', res: null, note: '', price: '', hours: '1', cur: lsGet('boxscore.rede.cur') || CUR[LG] || 'BRL', err: '' };
+    }
+    var f = S.form;
+    function seg(key, opts) { return h('div', { cls: 'seg' }, opts.map(function (o) { return h('button', { type: 'button', 'aria-pressed': String(f[key] === o[0]), text: o[1], on: { click: function () { f[key] = o[0]; if (key === 'mode' && o[0] === 'singles') f.slots = 1; if (key === 'mode' && o[0] === 'doubles' && f.slots < 2) f.slots = 3; paintForm(); } } }); })); }
+    function inp(key, type, extra) { var i = h('input', Object.assign({ type: type, value: f[key] || '' }, extra || {})); i.addEventListener('input', function () { f[key] = i.value; if (key === 'price') sum(); }); return i; }
+    function lab(t, c) { return h('label', { cls: 'f' }, [t, c]); }
+    function sel(key, opts, after) { var s = h('select'); opts.forEach(function (o) { var op = h('option', { value: o[0], text: o[1] }); if (String(f[key]) === String(o[0])) op.selected = true; s.appendChild(op); }); s.addEventListener('change', function () { f[key] = s.value; if (after) after(); }); return s; }
+    var dl = h('datalist', { id: 'plList' }, (placar().places || []).map(function (x) { return h('option', { value: x }); }));
+    // convidados
+    var invBox = h('div', { cls: 'card', style: 'background:var(--bg)' });
+    function inv(x) { return f.invited.some(function (y) { return y.uid === x.uid; }); }
+    S.friends.forEach(function (x) { invBox.appendChild(h('div', { cls: 'who' }, [h('span', { text: x.name + (x.code ? ' · ' + x.code : '') }), h('button', { type: 'button', cls: 'btn' + (inv(x) ? ' pri' : ''), 'aria-pressed': String(inv(x)), text: inv(x) ? '✓' : '+', on: { click: function () { if (inv(x)) f.invited = f.invited.filter(function (y) { return y.uid !== x.uid; }); else f.invited.push(x); paintForm(); } } })])); });
+    f.invited.filter(function (x) { return !S.friends.some(function (y) { return y.uid === x.uid; }) && !(f.res || []).some(function (y) { return y.uid === x.uid; }); }).forEach(function (x) { invBox.appendChild(h('div', { cls: 'who' }, [h('span', { text: x.name + ' · ' + x.code }), h('button', { type: 'button', cls: 'btn pri', text: '✓', on: { click: function () { f.invited = f.invited.filter(function (y) { return y.uid !== x.uid; }); paintForm(); } } })])); });
+    var ci = h('input', { type: 'search', placeholder: T('inv_code'), id: 'invQ', autocomplete: 'off', value: f.code || '' });
+    var resBox = h('div', { id: 'invRes', style: 'display:grid;gap:8px' });
+    function drawRes(list) {
+      resBox.textContent = '';
+      if (list === null) { resBox.appendChild(h('div', { cls: 'msg', text: T('fail') })); return; }
+      if (!list) return;
+      if (!list.length) { resBox.appendChild(h('div', { cls: 'sub', text: T('inv_bad') })); return; }
+      list.forEach(function (x) { var on = inv(x); resBox.appendChild(h('div', { cls: 'who' }, [h('span', { text: x.name + (x.code ? ' · ' + x.code : '') }), h('button', { type: 'button', cls: 'btn' + (on ? ' pri' : ''), text: on ? '✓' : T('inv_add'), on: { click: function () { if (on) f.invited = f.invited.filter(function (y) { return y.uid !== x.uid; }); else f.invited.push(x); f.res = list; paintForm(); } } })])); });
+    }
+    var tmr = null, seq = 0;
+    ci.addEventListener('input', function () {
+      f.code = ci.value; clearTimeout(tmr); var q = ci.value.trim();
+      if (q.length < 2) { f.res = null; drawRes(null === f.res ? undefined : f.res); resBox.textContent = ''; return; }
+      var my = ++seq; tmr = setTimeout(function () { searchPlayers(q, function (l) { if (my !== seq) return; f.res = l; drawRes(l); }); }, 350);
+    });
+    invBox.appendChild(ci); invBox.appendChild(resBox); if (f.res) drawRes(f.res);
+    if (!f.invited.length && !S.friends.length) invBox.appendChild(h('div', { cls: 'sub', text: T('inv_none') }));
+    // nível
+    var lvRow = null;
+    if (f.lvSys) { var vs = LV[f.lvSys].map(function (v) { return [v, lvL(f.lvSys, v)]; }); if (!f.lvFrom) f.lvFrom = vs[0][0]; if (!f.lvTo) f.lvTo = vs[vs.length - 1][0]; lvRow = h('div', { cls: 'two' }, [lab(T('lv_from'), sel('lvFrom', vs)), lab(T('lv_to'), sel('lvTo', vs))]); }
+    // custo
+    var sumEl = h('div', { cls: 'sub', id: 'costSum' });
+    function sum() {
+      var pr = parseFloat(String(f.price).replace(',', '.')), hr = parseFloat(f.hours) || 1, n = nPlayers({ mode: f.mode });
+      sumEl.textContent = isFinite(pr) && pr > 0 ? Tf('cost_tot', money(pr * hr, f.cur)) + ' · ' + Tf('cost_per', money(pr * hr / n, f.cur)) + ' ' + Tf('cost_n', n) : T('cost_none');
+    }
+    sum();
+    var card = h('div', { cls: 'card' }, [
+      lab(T('f_mode'), seg('mode', [['singles', T('singles')], ['doubles', T('doubles')]])),
+      lab(T('f_vis'), seg('vis', [['invite', T('vis_i')], ['friends', T('friends')], ['open', T('open')]])),
+      h('div', { cls: 'sub', text: T(f.vis === 'open' ? 'vis_o' : f.vis === 'invite' ? 'vis_i_t' : 'vis_f') }),
+      f.vis === 'invite' ? h('div', { cls: 'f' }, [T('inv_h'), invBox]) : null,
+      h('div', { cls: 'two' }, [lab(T('f_date'), inp('date', 'date')), lab(T('f_time'), inp('time', 'time'))]),
+      lab(T('f_place'), inp('place', 'text', { list: 'plList', maxlength: '80', autocomplete: 'off' })), dl,
+      lab(T('f_city'), inp('city', 'text', { maxlength: '60' })),
+      f.mode === 'doubles' ? lab(T('f_slots'), seg('slots', [[1, '1'], [2, '2'], [3, '3']])) : null,
+      lab(T('f_level'), sel('lvSys', [['', T('lv_any')], ['cls', T('sys_cls')], ['abc', T('sys_abc')], ['ntrp', T('sys_ntrp')]], function () { f.lvFrom = ''; f.lvTo = ''; paintForm(); })), lvRow,
+      h('div', { cls: 'f' }, [T('f_cost'), h('div', { cls: 'card', style: 'background:var(--bg)' }, [
+        h('div', { cls: 'two' }, [lab(T('f_hour'), inp('price', 'text', { inputmode: 'decimal', id: 'fPrice', placeholder: '0,00' })), lab(T('f_cur'), sel('cur', [['BRL', 'R$ BRL'], ['EUR', '€ EUR'], ['USD', '$ USD']], sum))]),
+        lab(T('f_hours'), sel('hours', [['1', Tf('hrs', 1)], ['1.5', Tf('hrs', 1.5)], ['2', Tf('hrs', 2)], ['3', Tf('hrs', 3)]], sum)), sumEl])]),
+      lab(T('f_note'), inp('note', 'text', { maxlength: '80' })),
+      f.err ? h('div', { cls: 'msg', text: f.err }) : null,
+      h('button', { type: 'button', cls: 'btn pri', id: 'bPub', text: T('publish'), on: { click: function () { create(f); } } })
+    ]);
+    host.appendChild(card);
+  }
+  function paint() {
+    if (!S.user) return;
+    paintTabs();
+    $('pFind').hidden = S.tab !== 'find'; $('pMine').hidden = S.tab !== 'mine'; $('pNew').hidden = S.tab !== 'neu';
+    var uid = S.user.uid, now = Date.now(), all = Object.keys(S.games).map(function (k) { return S.games[k]; });
+    var lf = $('lFind'); lf.textContent = '';
+    if (S.tab === 'find') {
+      var q = norm($('fCity').value);
+      var list = all.filter(function (g) { return g.hostUid !== uid && (g.accepted || []).indexOf(uid) < 0 && (g.declined || []).indexOf(uid) < 0 && g.status === 'open' && g.startAt > now - 3 * HOUR && (!q || norm(g.city).indexOf(q) >= 0 || norm(g.place).indexOf(q) >= 0); }).sort(function (a, b) { return a.startAt - b.startAt; });
+      if (S.loading && !all.length) note(lf, T('loading')); else if (S.err) note(lf, T('err')); else if (!list.length) note(lf, T('e_find'));
+      list.forEach(function (g) { lf.appendChild(cardFind(g)); });
+    }
+    var lm = $('lMine'); lm.textContent = '';
+    if (S.tab === 'mine') {
+      var mine = all.filter(function (g) { var inv = g.hostUid === uid || (g.accepted || []).indexOf(uid) >= 0 || (g.asked || []).indexOf(uid) >= 0; return inv && g.startAt > now - 24 * HOUR; }).sort(function (a, b) { return a.startAt - b.startAt; });
+      if (S.loading && !all.length) note(lm, T('loading')); else if (S.err) note(lm, T('err')); else if (!mine.length) note(lm, T('e_mine'));
+      mine.forEach(function (g) { lm.appendChild(cardMine(g)); });
+    }
+    if (S.tab === 'neu') paintForm();
+  }
+
+  // ---------- início ----------
+  $('ttl').textContent = 'BoxScore ' + T('rede'); $('ver').textContent = 'v' + VERSION;
+  var b = $('back'); b.textContent = BXMods.t('back'); b.addEventListener('click', function () { BXMods.mark('placar'); location.href = '../placar/'; });
+  $('login').textContent = T('login'); $('login').addEventListener('click', login);
+  $('fCity').placeholder = T('city_f'); $('fCity').addEventListener('input', paint);
+  $('fCity').value = '';
+  $('gateT').textContent = T('loading'); $('gate').hidden = false;
+  initFB();
+  window.__rede = { S: S, reload: reload, create: create, paint: paint };
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('../sw.js').catch(function () {});
+})();
+</script></body></html>
