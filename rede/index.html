@@ -1,0 +1,23 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BoxScore Rede</title>
+<meta name="theme-color" content="#0A1014"><link rel="manifest" href="../manifest.webmanifest"><link rel="icon" href="../icons/icon-192.png">
+<style>:root{--bg:#0A1014;--panel:#16222b;--ink:#eef3f6;--line:#2a3a44;--muted:#8fa2ad;--ui:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color-scheme:dark}
+@media (prefers-color-scheme:light){:root{--bg:#f3f6f8;--panel:#fff;--ink:#0d1a22;--line:#d3dde3;--muted:#5b6e79;color-scheme:light}}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui)}main{max-width:560px;margin:0 auto;padding:28px 16px;display:grid;gap:16px}
+h1{font:900 30px/1 var(--ui);letter-spacing:.02em;text-transform:uppercase;margin:0}.tag{display:inline-block;font:800 12px/1 var(--ui);letter-spacing:.1em;text-transform:uppercase;padding:6px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted)}
+p{margin:0;line-height:1.5;color:var(--muted)}.btn{justify-self:start;min-height:48px;padding:0 20px;border-radius:999px;border:1px solid var(--line);background:var(--ink);color:var(--bg);font:700 15px var(--ui);cursor:pointer}</style>
+<script src="../shared/modules.js"></script>
+</head><body>
+<main><h1>BoxScore <span id="n"></span></h1><span class="tag" id="tag"></span><p id="txt"></p><button class="btn" id="back" type="button"></button></main>
+<script>
+(function () {
+  BXMods.mark('rede');
+  var VERSION = '0.1.0';
+  document.getElementById('n').textContent = BXMods.t('rede');
+  document.getElementById('tag').textContent = BXMods.t('soon') + ' · ' + BXMods.tf('ver', VERSION);
+  document.getElementById('txt').textContent = BXMods.t('soon_t');
+  var b = document.getElementById('back'); b.textContent = BXMods.t('back');
+  b.addEventListener('click', function () { BXMods.mark('placar'); location.href = '../placar/'; });
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('../sw.js').catch(function () {});
+})();
+</script></body></html>
