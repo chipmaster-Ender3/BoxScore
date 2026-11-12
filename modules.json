@@ -1,0 +1,6 @@
+{"schema":1,"build":"5.15.0","modules":[
+{"id":"shell","name":"Casca","version":"1.0.0","core":true,"hidden":true,"path":"","files":["./","index.html","manifest.webmanifest","icons/icon-192.png","icons/icon-512.png","icons/icon-maskable-512.png"]},
+{"id":"shared","name":"Compartilhado","version":"1.2.1","core":true,"hidden":true,"path":"shared/","files":["shared/modules.js","shared/match-v1.js","shared/profile-view.js"]},
+{"id":"placar","name":"Placar","version":"4.12.1","core":true,"path":"placar/","files":["placar/","placar/index.html"]},
+{"id":"rede","name":"Rede","version":"0.13.0","path":"rede/","files":["rede/","rede/index.html"]}
+]}
