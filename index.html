@@ -1,0 +1,25 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<title>BoxScore</title>
+<meta name="theme-color" content="#0A1014"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="BoxScore">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>:root{--bg:#0A1014;--panel:#16222b;--ink:#eef3f6;--line:#2a3a44;--muted:#8fa2ad;--ui:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color-scheme:dark}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui)}main{max-width:560px;margin:0 auto;padding:28px 16px}h1{font:900 30px/1 var(--ui);letter-spacing:.02em;text-transform:uppercase;margin:0 0 18px}</style>
+<script src="shared/modules.js"></script>
+</head><body>
+<main id="menu" hidden><h1>BoxScore</h1><div id="mods"></div></main>
+<script>
+// Casca: abre o último módulo usado (o Placar, por padrão). Com ?menu mostra a lista de módulos.
+(function () {
+  var menu = /[?&]menu\b/.test(location.search), last = BXMods.last();
+  if (!menu) {
+    var go = function () { BXMods.state().then(function (st) {
+      var ok = st.registry && st.registry.modules.some(function (m) { return m.id === last; }) && (st.installed[last] || st.online);
+      BXMods.open(ok ? last : 'placar', st.registry ? st : null);
+    }).catch(function () { location.replace('placar/'); }); };
+    var nosw = !('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol);
+    if (nosw || !navigator.serviceWorker.controller) location.replace(last === 'rede' ? 'placar/' : (last + '/'));   // 1ª abertura: ainda sem service worker
+    else go();
+  } else { document.getElementById('menu').hidden = false; BXMods.render(document.getElementById('mods'), { current: null }); }
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(function () {});
+})();
+</script></body></html>
