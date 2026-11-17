@@ -1,0 +1,49 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<title>BoxScore</title>
+<meta name="theme-color" content="#0A1014"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="BoxScore">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>:root{--bg:#0A1014;--panel:#16222b;--ink:#eef3f6;--line:#2a3a44;--muted:#8fa2ad;--ui:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color-scheme:dark}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui)}main{max-width:560px;margin:0 auto;padding:28px 16px}h1{font:900 30px/1 var(--ui);letter-spacing:.02em;text-transform:uppercase;margin:0 0 18px}.wq{font:700 18px/1.3 var(--ui);margin:0 0 14px;color:var(--muted)}.wc{display:grid;gap:12px}.wb{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:16px;border-radius:18px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;min-height:76px}.wb:active{transform:scale(.99)}.wi{flex:none;width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:var(--bg);border:1px solid var(--line)}.wi svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.wt{display:grid;gap:3px}.wt b{font:800 18px var(--ui)}.wt small{font:400 14px/1.35 var(--ui);color:var(--muted)}.wn{margin:16px 2px 0;font:400 13px/1.4 var(--ui);color:var(--muted)}</style>
+<script src="shared/modules.js"></script>
+</head><body>
+<main id="menu" hidden><h1>BoxScore</h1><div id="mods"></div></main>
+<main id="welcome" hidden><h1>BoxScore</h1><p class="wq" id="wq"></p><div class="wc" id="wc"></div><p class="wn" id="wn"></p></main>
+<script>
+// Casca: abre o módulo escolhido em "Abrir o app em" (ou o último usado; o Placar por padrão). Com ?menu mostra a lista de módulos.
+// Primeira abertura (aparelho sem nenhum dado do BoxScore): pergunta o que a pessoa quer usar.
+(function () {
+  var menu = /[?&]menu\b/.test(location.search);
+  var W = {
+    'pt-BR': ['O que você quer usar?', 'Placar', 'Marcar os pontos do jogo, com voz e estatísticas.', 'Rede', 'Marcar jogos, grupos, ranking, torneios e feed.', 'Os dois', 'Placar e Rede, abrindo no último que você usou.', 'Dá para mudar depois em Configurações (Placar) ou Ajustes (Rede).'],
+    'pt-PT': ['O que quer usar?', 'Marcador', 'Marcar os pontos do jogo, com voz e estatísticas.', 'Rede', 'Marcar jogos, grupos, ranking, torneios e feed.', 'Os dois', 'Marcador e Rede, a abrir no último que usou.', 'Pode mudar depois em Definições (Marcador) ou Ajustes (Rede).'],
+    en: ['What do you want to use?', 'Scoreboard', 'Score your matches, with voice and stats.', 'Network', 'Set up matches, groups, rankings, tournaments and feed.', 'Both', 'Scoreboard and Network, opening in the last one you used.', 'You can change this later in Settings.'],
+    es: ['¿Qué quieres usar?', 'Marcador', 'Marcar los puntos del partido, con voz y estadísticas.', 'Red', 'Organizar partidos, grupos, ranking, torneos y feed.', 'Los dos', 'Marcador y Red, abriendo en el último que usaste.', 'Puedes cambiarlo después en Ajustes.'],
+    fr: ['Que voulez-vous utiliser ?', 'Tableau', 'Compter les points du match, avec voix et statistiques.', 'Réseau', 'Organiser des matchs, groupes, classements, tournois et fil.', 'Les deux', 'Tableau et Réseau, ouverture sur le dernier utilisé.', 'Modifiable ensuite dans les Réglages.'],
+    de: ['Was möchtest du nutzen?', 'Anzeige', 'Punkte zählen, mit Ansage und Statistik.', 'Netzwerk', 'Spiele, Gruppen, Ranglisten, Turniere und Feed.', 'Beides', 'Anzeige und Netzwerk, öffnet das zuletzt benutzte.', 'Später in den Einstellungen änderbar.']
+  };
+  var IC = { placar: '<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6c3 2.5 3 10.3 0 12.8M18.4 5.6c-3 2.5-3 10.3 0 12.8"/>', rede: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1a4 4 0 0 1 4-4h5a4 4 0 0 1 4 4v1"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M21.5 20v-1a4 4 0 0 0-3-3.9"/>', both: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>' };
+  function has(k) { try { return localStorage.getItem(k) !== null; } catch (e) { return true; } }
+  function firstRun() { return !has('boxscore.startModule') && !has('boxscore.lastModule') && !has('boxscore.placar.v1'); }
+  function goTo(target) {
+    var nosw = !('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol);
+    if (nosw || !navigator.serviceWorker.controller) { location.replace(target + '/'); return; }   // 1ª abertura: ainda sem service worker (carrega pela rede)
+    BXMods.state().then(function (st) {
+      var ok = st.registry && st.registry.modules.some(function (m) { return m.id === target; }) && (st.installed[target] || st.online);
+      BXMods.open(ok ? target : 'placar', st.registry ? st : null);
+    }).catch(function () { location.replace('placar/'); });
+  }
+  if (menu) { document.getElementById('menu').hidden = false; BXMods.render(document.getElementById('mods'), { current: null }); }
+  else if (firstRun()) {
+    var L = W[BXMods.lang()] || W.en, wc = document.getElementById('wc');
+    document.getElementById('welcome').hidden = false; document.getElementById('wq').textContent = L[0]; document.getElementById('wn').textContent = L[7];
+    [['placar', 1, 'placar'], ['rede', 3, 'rede'], ['last', 5, 'both']].forEach(function (o) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'wb';
+      b.innerHTML = '<span class="wi"><svg viewBox="0 0 24 24" aria-hidden="true">' + IC[o[2]] + '</svg></span><span class="wt"><b></b><small></small></span>';
+      b.querySelector('b').textContent = L[o[1]]; b.querySelector('small').textContent = L[o[1] + 1];
+      b.addEventListener('click', function () { BXMods.setStart(o[0]); var t = o[0] === 'last' ? 'placar' : o[0]; BXMods.mark(t); goTo(t); });
+      wc.appendChild(b);
+    });
+  } else goTo(BXMods.target());
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(function () {});
+})();
+</script></body></html>
