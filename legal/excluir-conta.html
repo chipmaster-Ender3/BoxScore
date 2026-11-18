@@ -8,10 +8,11 @@
 <link rel="stylesheet" href="legal.css">
 </head>
 <body>
-<header><a class="back" id="back" href="../placar/">← Voltar</a><span class="t" data-k="app">BoxScore</span></header>
+<header><a class="back" id="back" href="../placar/">← <span id="backTxt">Voltar</span></a><span class="t" data-k="app">BoxScore</span><select id="langSel" aria-label="Idioma / Language"><option value="pt-BR">Português (Brasil)</option><option value="pt-PT">Português (Portugal)</option><option value="en">English</option><option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option></select></header>
 <main>
+<p class="lang" id="prevails" hidden></p>
+<article data-lang="pt-BR" lang="pt-BR">
 <h1>Excluir conta e dados</h1>
-<p class="lang" id="langNote" hidden>To delete your account: open the app → Settings → Account → Delete my account. · Para eliminar tu cuenta: app → Ajustes → Cuenta → Eliminar mi cuenta.</p>
 <p>Você pode excluir sua conta do <span data-k="app">BoxScore</span> e os dados ligados a ela a qualquer momento, sem custo.</p>
 
 <h2>Pelo app ou pelo site</h2>
@@ -46,6 +47,192 @@
 <p>A exclusão não pode ser desfeita.</p>
 
 <p class="meta"><a href="privacidade.html">Política de Privacidade</a> · <a href="termos.html">Termos de Uso</a></p>
+</article>
+<article data-lang="pt-PT" lang="pt-PT" hidden>
+<h1>Eliminar conta e dados</h1>
+<p>Pode eliminar a sua conta do <span data-k="app">BoxScore</span> e os dados ligados a ela a qualquer momento, sem custo.</p>
+
+<h2>Pela app ou pelo site</h2>
+<ol>
+<li>Abra a app (ou o site) e inicie sessão com a sua conta Google.</li>
+<li>Toque em <b>Mais → Definições → separador Conta</b>.</li>
+<li>Toque em <b>Eliminar a minha conta</b> e confirme duas vezes.</li>
+</ol>
+<p><a class="btn" href="../placar/#excluir-conta">Abrir e eliminar a minha conta</a></p>
+
+<h2>Sem acesso à app?</h2>
+<p>Peça a eliminação pelo formulário <a href="../placar/#contato">Contacte-nos</a> (assunto "Eliminar a minha conta"), informando o e-mail da conta Google<span data-if-email>, ou escreva para <span data-email></span></span>. Podemos pedir uma confirmação de que a conta é sua.</p>
+
+<h2>O que é apagado</h2>
+<ul>
+<li>Conta, perfil público, foto, código de jogador e dados pessoais do perfil;</li>
+<li>Partidas, histórico, estatísticas, jogadores e preferências sincronizados na nuvem;</li>
+<li>Amizades, seguidores, jogos que criou, partidas partilhadas por si, publicações, fotos e comentários das suas publicações, mensagens que enviou, pedidos e inscrições;</li>
+<li>Grupos dos quais é o único membro; nos demais grupos, é retirado;</li>
+<li>Estatísticas de uso ligadas à sua conta;</li>
+<li>Os dados guardados no dispositivo em que fizer a eliminação.</li>
+</ul>
+<p>O que a app não conseguir apagar na hora (por exemplo, os seus comentários em publicações de outras pessoas, ou grupos que administra com outros membros) é concluído por nós em até <span data-k="deleteDays">15</span> dias.</p>
+
+<h2>O que pode ser mantido</h2>
+<ul>
+<li>Resultados e classificações de rankings e torneios de grupos, que fazem parte do registo dos outros participantes, sem os seus dados de perfil;</li>
+<li>Nomes que outras pessoas digitaram nos próprios históricos delas;</li>
+<li>Denúncias e registos exigidos por lei ou necessários para defesa de direitos, pelo prazo legal;</li>
+<li>Estatísticas de uso anônimas (sem ligação consigo).</li>
+</ul>
+<p>A eliminação não pode ser desfeita.</p>
+
+<p class="meta"><a href="privacidade.html">Política de Privacidade</a> · <a href="termos.html">Termos de Utilização</a></p>
+</article>
+<article data-lang="en" lang="en" hidden>
+<h1>Delete account and data</h1>
+<p>You can delete your <span data-k="app">BoxScore</span> account and the data linked to it at any time, free of charge.</p>
+
+<h2>In the app or on the website</h2>
+<ol>
+<li>Open the app (or the website) and sign in with your Google account.</li>
+<li>Tap <b>More → Settings → Account tab</b>.</li>
+<li>Tap <b>Delete my account</b> and confirm twice.</li>
+</ol>
+<p><a class="btn" href="../placar/#excluir-conta">Open and delete my account</a></p>
+
+<h2>No access to the app?</h2>
+<p>Request deletion through the <a href="../placar/#contato">Contact us</a> form (subject "Delete my account"), giving the e-mail of your Google account<span data-if-email>, or write to <span data-email></span></span>. We may ask you to confirm that the account is yours.</p>
+
+<h2>What is deleted</h2>
+<ul>
+<li>Account, public profile, photo, player code and personal profile data;</li>
+<li>Matches, history, statistics, players and preferences synced to the cloud;</li>
+<li>Friendships, followers, games you created, matches you shared, your posts, photos and the comments on your posts, messages you sent, requests and registrations;</li>
+<li>Groups where you are the only member; in other groups, you are removed;</li>
+<li>Usage statistics linked to your account;</li>
+<li>Data stored on the device where you delete the account.</li>
+</ul>
+<p>Anything the app cannot delete right away (for example, your comments on other people's posts, or groups you manage with other members) is completed by us within <span data-k="deleteDays">15</span> days.</p>
+
+<h2>What may be kept</h2>
+<ul>
+<li>Results and standings of group rankings and tournaments, which are part of the other participants' records, without your profile data;</li>
+<li>Names other people typed in their own histories;</li>
+<li>Reports and records required by law or needed to defend rights, for the legal period;</li>
+<li>Anonymous usage statistics (not linked to you).</li>
+</ul>
+<p>Deletion cannot be undone.</p>
+
+<p class="meta"><a href="privacidade.html">Privacy Policy</a> · <a href="termos.html">Terms of Use</a></p>
+</article>
+<article data-lang="es" lang="es" hidden>
+<h1>Eliminar cuenta y datos</h1>
+<p>Puedes eliminar tu cuenta de <span data-k="app">BoxScore</span> y los datos vinculados a ella en cualquier momento, sin costo.</p>
+
+<h2>En la app o en el sitio</h2>
+<ol>
+<li>Abre la app (o el sitio) e inicia sesión con tu cuenta de Google.</li>
+<li>Toca <b>Más → Ajustes → pestaña Cuenta</b>.</li>
+<li>Toca <b>Eliminar mi cuenta</b> y confirma dos veces.</li>
+</ol>
+<p><a class="btn" href="../placar/#excluir-conta">Abrir y eliminar mi cuenta</a></p>
+
+<h2>¿Sin acceso a la app?</h2>
+<p>Pide la eliminación por el formulario <a href="../placar/#contato">Contáctanos</a> (asunto «Eliminar mi cuenta»), indicando el e-mail de tu cuenta de Google<span data-if-email>, o escribe a <span data-email></span></span>. Podemos pedirte que confirmes que la cuenta es tuya.</p>
+
+<h2>Qué se elimina</h2>
+<ul>
+<li>Cuenta, perfil público, foto, código de jugador y datos personales del perfil;</li>
+<li>Partidos, historial, estadísticas, jugadores y preferencias sincronizados en la nube;</li>
+<li>Amistades, seguidores, partidos que creaste, partidos compartidos por ti, tus publicaciones, fotos y los comentarios de tus publicaciones, mensajes que enviaste, solicitudes e inscripciones;</li>
+<li>Grupos en los que eres el único miembro; en los demás grupos, se te retira;</li>
+<li>Estadísticas de uso vinculadas a tu cuenta;</li>
+<li>Los datos guardados en el dispositivo donde hagas la eliminación.</li>
+</ul>
+<p>Lo que la app no pueda eliminar al momento (por ejemplo, tus comentarios en publicaciones de otras personas, o grupos que administras con otros miembros) lo completamos en un plazo de <span data-k="deleteDays">15</span> días.</p>
+
+<h2>Qué puede conservarse</h2>
+<ul>
+<li>Resultados y clasificaciones de rankings y torneos de grupos, que forman parte del registro de los demás participantes, sin tus datos de perfil;</li>
+<li>Nombres que otras personas escribieron en sus propios historiales;</li>
+<li>Denuncias y registros exigidos por la ley o necesarios para la defensa de derechos, durante el plazo legal;</li>
+<li>Estadísticas de uso anónimas (sin vínculo contigo).</li>
+</ul>
+<p>La eliminación no se puede deshacer.</p>
+
+<p class="meta"><a href="privacidade.html">Política de Privacidad</a> · <a href="termos.html">Términos de Uso</a></p>
+</article>
+<article data-lang="fr" lang="fr" hidden>
+<h1>Supprimer le compte et les données</h1>
+<p>Vous pouvez supprimer votre compte <span data-k="app">BoxScore</span> et les données qui y sont liées à tout moment, gratuitement.</p>
+
+<h2>Dans l'app ou sur le site</h2>
+<ol>
+<li>Ouvrez l'app (ou le site) et connectez-vous avec votre compte Google.</li>
+<li>Touchez <b>Plus → Réglages → onglet Compte</b>.</li>
+<li>Touchez <b>Supprimer mon compte</b> et confirmez deux fois.</li>
+</ol>
+<p><a class="btn" href="../placar/#excluir-conta">Ouvrir et supprimer mon compte</a></p>
+
+<h2>Pas d'accès à l'app ?</h2>
+<p>Demandez la suppression via le formulaire <a href="../placar/#contato">Nous contacter</a> (sujet « Supprimer mon compte »), en indiquant l'e-mail de votre compte Google<span data-if-email>, ou écrivez à <span data-email></span></span>. Nous pourrons vous demander de confirmer que le compte vous appartient.</p>
+
+<h2>Ce qui est supprimé</h2>
+<ul>
+<li>Compte, profil public, photo, code joueur et données personnelles du profil ;</li>
+<li>Matchs, historique, statistiques, joueurs et préférences synchronisés dans le cloud ;</li>
+<li>Amitiés, abonnés, parties que vous avez créées, matchs que vous avez partagés, vos publications, photos et les commentaires de vos publications, messages envoyés, demandes et inscriptions ;</li>
+<li>Groupes dont vous êtes le seul membre ; dans les autres groupes, vous êtes retiré ;</li>
+<li>Statistiques d'utilisation liées à votre compte ;</li>
+<li>Les données enregistrées sur l'appareil où vous effectuez la suppression.</li>
+</ul>
+<p>Ce que l'app ne peut pas supprimer immédiatement (par exemple vos commentaires sur les publications d'autres personnes, ou des groupes que vous administrez avec d'autres membres) est finalisé par nous sous <span data-k="deleteDays">15</span> jours.</p>
+
+<h2>Ce qui peut être conservé</h2>
+<ul>
+<li>Les résultats et classements des classements et tournois de groupes, qui font partie du registre des autres participants, sans vos données de profil ;</li>
+<li>Les noms que d'autres personnes ont saisis dans leurs propres historiques ;</li>
+<li>Les signalements et registres exigés par la loi ou nécessaires à la défense de droits, pendant la durée légale ;</li>
+<li>Les statistiques d'utilisation anonymes (sans lien avec vous).</li>
+</ul>
+<p>La suppression est irréversible.</p>
+
+<p class="meta"><a href="privacidade.html">Politique de confidentialité</a> · <a href="termos.html">Conditions d'utilisation</a></p>
+</article>
+<article data-lang="de" lang="de" hidden>
+<h1>Konto und Daten löschen</h1>
+<p>Du kannst dein <span data-k="app">BoxScore</span>-Konto und die damit verbundenen Daten jederzeit kostenlos löschen.</p>
+
+<h2>In der App oder auf der Website</h2>
+<ol>
+<li>Öffne die App (oder die Website) und melde dich mit deinem Google-Konto an.</li>
+<li>Tippe auf <b>Mehr → Einstellungen → Reiter Konto</b>.</li>
+<li>Tippe auf <b>Mein Konto löschen</b> und bestätige zweimal.</li>
+</ol>
+<p><a class="btn" href="../placar/#excluir-conta">Öffnen und mein Konto löschen</a></p>
+
+<h2>Kein Zugriff auf die App?</h2>
+<p>Beantrage die Löschung über das Formular <a href="../placar/#contato">Kontakt</a> (Betreff „Mein Konto löschen") mit der E-Mail-Adresse deines Google-Kontos<span data-if-email> oder schreibe an <span data-email></span></span>. Wir können dich bitten zu bestätigen, dass das Konto dir gehört.</p>
+
+<h2>Was gelöscht wird</h2>
+<ul>
+<li>Konto, öffentliches Profil, Foto, Spielercode und persönliche Profildaten;</li>
+<li>In der Cloud synchronisierte Spiele, Verlauf, Statistiken, Spieler und Einstellungen;</li>
+<li>Freundschaften, Follower, von dir erstellte Spiele, von dir geteilte Matches, deine Beiträge, Fotos und die Kommentare zu deinen Beiträgen, gesendete Nachrichten, Anfragen und Anmeldungen;</li>
+<li>Gruppen, in denen du das einzige Mitglied bist; aus anderen Gruppen wirst du entfernt;</li>
+<li>Mit deinem Konto verknüpfte Nutzungsstatistiken;</li>
+<li>Die auf dem Gerät gespeicherten Daten, auf dem du die Löschung durchführst.</li>
+</ul>
+<p>Was die App nicht sofort löschen kann (zum Beispiel deine Kommentare zu Beiträgen anderer oder Gruppen, die du mit anderen Mitgliedern verwaltest), erledigen wir innerhalb von <span data-k="deleteDays">15</span> Tagen.</p>
+
+<h2>Was erhalten bleiben kann</h2>
+<ul>
+<li>Ergebnisse und Platzierungen von Gruppen-Ranglisten und Turnieren, die Teil der Aufzeichnungen der anderen Teilnehmer sind, ohne deine Profildaten;</li>
+<li>Namen, die andere Personen in ihren eigenen Verlauf eingegeben haben;</li>
+<li>Meldungen und Aufzeichnungen, die gesetzlich vorgeschrieben oder zur Verteidigung von Rechten nötig sind, für die gesetzliche Dauer;</li>
+<li>Anonyme Nutzungsstatistiken (ohne Bezug zu dir).</li>
+</ul>
+<p>Die Löschung kann nicht rückgängig gemacht werden.</p>
+
+<p class="meta"><a href="privacidade.html">Datenschutzerklärung</a> · <a href="termos.html">Nutzungsbedingungen</a></p>
+</article>
 </main>
 <script src="config.js"></script>
 <script src="legal.js"></script>

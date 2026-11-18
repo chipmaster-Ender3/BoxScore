@@ -8,11 +8,12 @@
 <link rel="stylesheet" href="legal.css">
 </head>
 <body>
-<header><a class="back" id="back" href="../placar/">← Voltar</a><span class="t" data-k="app">BoxScore</span></header>
+<header><a class="back" id="back" href="../placar/">← <span id="backTxt">Voltar</span></a><span class="t" data-k="app">BoxScore</span><select id="langSel" aria-label="Idioma / Language"><option value="pt-BR">Português (Brasil)</option><option value="pt-PT">Português (Portugal)</option><option value="en">English</option><option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option></select></header>
 <main>
+<p class="lang" id="prevails" hidden></p>
+<article data-lang="pt-BR" lang="pt-BR">
 <h1>Política de Privacidade</h1>
 <p class="meta">Versão <span data-k="version">1.0</span> · atualizada em <span data-k="updated">18 de novembro de 2026</span></p>
-<p class="lang" id="langNote" hidden>This document is available in Portuguese only. · Este documento solo está disponible en portugués. · Ce document n'est disponible qu'en portugais. · Dieses Dokument ist nur auf Portugiesisch verfügbar.</p>
 
 <div class="box">
 <p><b>Resumo:</b> o <span data-k="app">BoxScore</span> usa seus dados para marcar e guardar suas partidas, mostrar suas estatísticas e, se você usar a Rede, para conectar você a outros jogadores. Você escolhe o que fica público. Não vendemos seus dados e não mostramos anúncios. Você pode consultar e corrigir seus dados no próprio app, pedir uma cópia pelo Fale conosco e excluir a conta quando quiser, dentro do app.</p>
@@ -87,6 +88,397 @@
 <p>Podemos atualizar esta política. Mudanças relevantes serão avisadas no app. A data da versão fica no topo.</p>
 
 <p class="meta"><a href="termos.html">Termos de Uso</a> · <a href="excluir-conta.html">Excluir conta</a></p>
+</article>
+<article data-lang="pt-PT" lang="pt-PT" hidden>
+<h1>Política de Privacidade</h1>
+<p class="meta">Versão <span data-k="version">1.0</span> · atualizada a <span data-k="updated">18 de novembro de 2026</span></p>
+
+<div class="box">
+<p><b>Resumo:</b> o <span data-k="app">BoxScore</span> usa os seus dados para marcar e guardar as suas partidas, mostrar as suas estatísticas e, se usar a Rede, para o ligar a outros jogadores. Escolhe o que fica público. Não vendemos os seus dados e não mostramos anúncios. Pode consultar e corrigir os seus dados no próprio app, pedir uma cópia pelo Contacte-nos e eliminar a conta quando quiser, dentro da app.</p>
+</div>
+
+<h2>1. Quem é o responsável pelos seus dados</h2>
+<p>O controlador dos dados pessoais tratados no aplicativo e no site <span data-k="app">BoxScore</span> é <b data-k="controller">[NOME COMPLETO OU RAZÃO SOCIAL]</b> (<span data-k="docId">[CPF OU CNPJ]</span>), <span data-k="city">[CIDADE/UF]</span>.</p>
+<p>Canal de atendimento ao titular de dados (LGPD, art. 41, § 2º): formulário <a href="../placar/#contato">Contacte-nos</a>, dentro da app em Definições → Conta<span data-if-email> ou pelo e-mail <span data-email></span></span>.</p>
+
+<h2>2. Quais dados tratamos</h2>
+<table>
+<tr><th>Categoria</th><th>Dados</th><th>De onde vêm</th></tr>
+<tr><td>Conta</td><td>Nome, e-mail, foto e identificador da conta Google (início de sessão com Google).</td><td>Google, quando entra.</td></tr>
+<tr><td>Perfil de jogador</td><td>Nome de exibição, foto, data de nascimento ou idade, sexo, altura, peso, mão dominante, backhand, raquete, nível de jogo, frequência de prática, data em que começou a jogar, cidade e estado, WhatsApp e e-mail para avisos, código de jogador.</td><td>O utilizador (todos opcionais, exceto o nome).</td></tr>
+<tr><td>Partidas e estatísticas</td><td>Jogadores, placar ponto a ponto, data, duração, local e piso da campo, aces, configurações do jogo, histórico e estatísticas calculadas.</td><td>O utilizador, ao usar o Placar. Partidas contra outro utilizador aparecem também para ele.</td></tr>
+<tr><td>Rede (recursos sociais)</td><td>Amigos, seguidores, convites e jogos marcados, publicações, fotos, comentários, gostos, mensagens diretas, grupos, categorias, rankings, torneios, inscrições, resultados lançados ou confirmados, denúncias e bloqueios.</td><td>O utilizador e os outros utilizadores com quem interage.</td></tr>
+<tr><td>Jogadores sem conta</td><td>Nome (e, se incluir, outras informações) de pessoas que regista como adversário ou parceiro sem que elas tenham conta.</td><td>O utilizador — use apenas com o conhecimento dessas pessoas.</td></tr>
+<tr><td>Pulseira</td><td>Identificador Bluetooth da pulseira, jogador associado, modo de gesto e nível de bateria.</td><td>A sua pulseira; fica guardado no seu dispositivo.</td></tr>
+<tr><td>Estatísticas de uso (telemetria)</td><td>Contagens diárias de uso dos recursos (ex.: quantas partidas, se usou a pulseira), plataforma, versão e idioma, ligadas à sua conta ou, sem login, a um código aleatório do dispositivo. <b>Nunca</b> nomes, placares, mensagens, fotos ou localização.</td><td>A app. Pode ser desligada nas Definições.</td></tr>
+<tr><td>Contacto</td><td>Assunto, mensagem e e-mail de resposta que enviar pelo formulário.</td><td>O utilizador.</td></tr>
+<tr><td>Dados técnicos</td><td>Endereço IP, datas e horários de acesso e informações do dispositivo registrados pelos provedores de infraestrutura (Google/Firebase) para funcionamento e segurança.</td><td>Automaticamente, pelos provedores.</td></tr>
+</table>
+<p>Não recolhemos a sua localização por GPS. Cidade e local do campo são apenas o que escreve. Dados como altura, peso e idade ficam visíveis só para si por predefinição.</p>
+
+<h2>3. Para que usamos e com qual base legal (LGPD, art. 7º)</h2>
+<table>
+<tr><th>Finalidade</th><th>Base legal</th></tr>
+<tr><td>Funcionar o placar, guardar e sincronizar os seus dados entre dispositivos, calcular estatísticas.</td><td>Execução do contrato (Termos de Utilização) — art. 7º, V.</td></tr>
+<tr><td>Recursos da Rede: perfis, amigos, jogos, publicações, mensagens, grupos, rankings e torneios, conforme a visibilidade que escolher.</td><td>Execução do contrato — art. 7º, V.</td></tr>
+<tr><td>Segurança, prevenção de fraude em resultados, moderação de denúncias e bloqueios.</td><td>Legítimo interesse — art. 7º, IX; exercício regular de direitos — art. 7º, VI.</td></tr>
+<tr><td>Estatísticas de uso para melhorar a app (com opção de desligar).</td><td>Legítimo interesse — art. 7º, IX.</td></tr>
+<tr><td>Responder pedidos de contacto e de titulares.</td><td>Execução do contrato e cumprimento de obrigação legal — art. 7º, V e II.</td></tr>
+<tr><td>Guardar registos quando exigido por lei ou ordem de autoridade.</td><td>Cumprimento de obrigação legal — art. 7º, II.</td></tr>
+</table>
+<p>Não usamos seus dados para publicidade nem para decisões automatizadas que afetem seus direitos. A ordem do feed é calculada por regras simples (amizade, quem segue, cidade, gostos e comentários).</p>
+
+<h2>4. Com quem os dados são partilhados</h2>
+<ul>
+<li><b>Outros utilizadores</b>, conforme a privacidade escolhida em cada item do seu perfil (Público, Só amigos ou Só eu) e em cada publicação. Partidas, resultados, rankings e torneios que envolvem outras pessoas ficam visíveis para os participantes e, no caso de grupos públicos, para quem acompanha o grupo.</li>
+<li><b>Google (Firebase)</b> — hospedagem, banco de dados e login, como operador dos dados, sob os termos de proteção de dados do Google.</li>
+<li><b>Lojas de aplicativos</b> (Google Play, App Store), quando descarrega a app ou faz compras nelas, conforme as políticas delas.</li>
+<li><b>Autoridades</b>, quando houver obrigação legal ou ordem judicial.</li>
+</ul>
+<p>Não vendemos nem alugamos dados pessoais.</p>
+
+<h2>5. Transferência internacional</h2>
+<p>Os serviços do Google/Firebase podem armazenar e processar dados em servidores fora do Brasil (por exemplo, nos Estados Unidos). Essas transferências são feitas com as cláusulas-padrão contratuais aprovadas pela ANPD (Resolução CD/ANPD nº 19/2024) incorporadas aos termos do Google, nos termos do art. 33 da LGPD. Pode pedir a íntegra dessas cláusulas pelo canal de atendimento.</p>
+
+<h2>6. Por quanto tempo guardamos</h2>
+<ul>
+<li>Dados da conta, perfil, partidas e Rede: enquanto a conta existir. Ao eliminar a conta, apagamos seus dados em até <span data-k="deleteDays">15</span> dias, exceto o previsto abaixo.</li>
+<li>Registos técnicos dos provedores e denúncias: pelo tempo necessário à segurança e ao exercício de direitos, ou pelo prazo exigido em lei.</li>
+<li>Estatísticas de uso: até 24 meses, de forma agregada por dia.</li>
+<li>Dados que outros utilizadores guardaram nos próprios registos (por exemplo, o nome que alguém digitou no histórico pessoal dele) pertencem ao registo daquele utilizador.</li>
+<li>Dados no seu dispositivo (modo sem conta) ficam só nele, até os apagar em Definições → Geral → Gerir dados guardados → Apagar tudo, ou desinstalar a app.</li>
+</ul>
+
+<h2>7. Os seus direitos (LGPD, art. 18)</h2>
+<p>Pode, a qualquer momento: confirmar se tratamos seus dados; acessá-los; corrigir dados incompletos ou desatualizados (no próprio perfil); pedir anonimização, bloqueio ou eliminação de dados desnecessários; pedir a portabilidade; pedir a eliminação dos dados tratados com consenequipanto; saber com quem partilhamos; revogar consenequipantos; e se opor a tratamentos baseados em legítimo interesse (por exemplo, desligando as estatísticas de uso).</p>
+<p><b>Eliminar a conta:</b> na app, em Definições → Conta → Eliminar a minha conta, ou pela página <a href="excluir-conta.html">Eliminar conta</a>. Para os demais pedidos, use o <a href="../placar/#contato">Contacte-nos</a>. Respondemos em até 15 dias. Também pode reclamar à Autoridade Nacional de Proteção de Dados (ANPD), em gov.br/anpd.</p>
+
+<h2>8. Segurança</h2>
+<p>Usamos ligação criptografada (HTTPS), login pelo Google e regras de acesso no servidor que só permitem a cada pessoa ler e alterar o que lhe cabe. Nenhum sistema é totalmente imune a falhas; se houver um incidente de segurança que possa causar risco ou dano relevante, avisaremos os afetados e a ANPD, como manda a lei.</p>
+
+<h2>9. Crianças e adolescentes</h2>
+<p>A Rede (recursos sociais: perfis públicos, mensagens, publicações, grupos e torneios) é destinada a maiores de <span data-k="minAgeNetwork">18</span> anos. O Placar pode ser usado por menores com autorização e acompanhamento dos pais ou responsáveis, sem necessidade de conta. Se soubermos que uma conta da Rede pertence a menor de idade, ela poderá ser suspensa e os dados eliminados. Pais ou responsáveis podem pedir a eliminação pelo canal de atendimento.</p>
+
+<h2>10. Armazenamento no dispositivo</h2>
+<p>A app guarda dados no seu dispositivo (armazenamento local da app/navegador) para funcionar sem internet: partidas, configurações, preferências, a fila de sincronização e as estatísticas de uso ainda não enviadas. Não usamos cookies de publicidade. As fontes da app ficam dentro da própria app.</p>
+
+<h2>11. Mudanças nesta política</h2>
+<p>Podemos atualizar esta política. Mudanças relevantes serão avisadas na app. A data da versão fica no topo.</p>
+
+<p class="meta"><a href="termos.html">Termos de Utilização</a> · <a href="excluir-conta.html">Eliminar conta</a></p>
+</article>
+<article data-lang="en" lang="en" hidden>
+<h1>Privacy Policy</h1>
+<p class="meta">Version <span data-k="version">1.0</span> · updated on <span data-k="updated">November 18, 2026</span></p>
+
+<div class="box">
+<p><b>Summary:</b> <span data-k="app">BoxScore</span> uses your data to score and save your matches, show your statistics and, if you use the Network, to connect you with other players. You choose what is public. We do not sell your data and we do not show ads. You can view and correct your data in the app, request a copy through Contact us, and delete your account whenever you want, inside the app.</p>
+</div>
+
+<h2>1. Who is responsible for your data</h2>
+<p>The controller of the personal data processed in the <span data-k="app">BoxScore</span> app and website is <b data-k="controller">[FULL NAME OR COMPANY NAME]</b> (<span data-k="docId">[CPF OR CNPJ]</span>), <span data-k="city">[CITY/STATE]</span>, Brazil.</p>
+<p>Data subject service channel (Brazilian General Data Protection Law – LGPD, art. 41, § 2): the <a href="../placar/#contato">Contact us</a> form, inside the app under Settings → Account<span data-if-email> or by e-mail at <span data-email></span></span>.</p>
+
+<h2>2. What data we process</h2>
+<table>
+<tr><th>Category</th><th>Data</th><th>Where it comes from</th></tr>
+<tr><td>Account</td><td>Name, e-mail, photo and Google account identifier (Sign in with Google).</td><td>Google, when you sign in.</td></tr>
+<tr><td>Player profile</td><td>Display name, photo, date of birth or age, sex, height, weight, dominant hand, backhand, racket, playing level, practice frequency, date you started playing, city and state, WhatsApp and e-mail for notices, player code.</td><td>You (all optional except the name).</td></tr>
+<tr><td>Matches and statistics</td><td>Players, point-by-point score, date, duration, court venue and surface, aces, match settings, history and calculated statistics.</td><td>You, when using the Scoreboard. Matches against another user are also shown to that user.</td></tr>
+<tr><td>Network (social features)</td><td>Friends, followers, invitations and scheduled games, posts, photos, comments, likes, direct messages, groups, categories, rankings, tournaments, registrations, results entered or confirmed, reports and blocks.</td><td>You and the other users you interact with.</td></tr>
+<tr><td>Players without an account</td><td>Name (and, if you add it, other information) of people you register as an opponent or partner who do not have an account.</td><td>You — use only with those people's knowledge.</td></tr>
+<tr><td>Wristband</td><td>Bluetooth identifier of the wristband, assigned player, gesture mode and battery level.</td><td>Your wristband; stored on your device.</td></tr>
+<tr><td>Usage statistics (telemetry)</td><td>Daily counts of feature use (e.g. how many matches, whether the wristband was used), platform, version and language, linked to your account or, without sign-in, to a random device code. <b>Never</b> names, scores, messages, photos or location.</td><td>The app. Can be turned off in Settings.</td></tr>
+<tr><td>Contact</td><td>Subject, message and reply e-mail you send through the form.</td><td>You.</td></tr>
+<tr><td>Technical data</td><td>IP address, access dates and times and device information recorded by infrastructure providers (Google/Firebase) for operation and security.</td><td>Automatically, by the providers.</td></tr>
+</table>
+<p>We do not collect your GPS location. City and court venue are only what you type. Data such as height, weight and age are visible only to you by default.</p>
+
+<h2>3. Why we use it and on what legal basis (LGPD, art. 7)</h2>
+<table>
+<tr><th>Purpose</th><th>Legal basis</th></tr>
+<tr><td>Running the scoreboard, saving and syncing your data across devices, calculating statistics.</td><td>Performance of the contract (Terms of Use) — art. 7, V.</td></tr>
+<tr><td>Network features: profiles, friends, games, posts, messages, groups, rankings and tournaments, according to the visibility you choose.</td><td>Performance of the contract — art. 7, V.</td></tr>
+<tr><td>Security, prevention of result fraud, handling of reports and blocks.</td><td>Legitimate interest — art. 7, IX; regular exercise of rights — art. 7, VI.</td></tr>
+<tr><td>Usage statistics to improve the app (can be turned off).</td><td>Legitimate interest — art. 7, IX.</td></tr>
+<tr><td>Answering contact and data subject requests.</td><td>Performance of the contract and compliance with a legal obligation — art. 7, V and II.</td></tr>
+<tr><td>Keeping records when required by law or by an authority.</td><td>Compliance with a legal obligation — art. 7, II.</td></tr>
+</table>
+<p>We do not use your data for advertising or for automated decisions that affect your rights. The feed order is calculated by simple rules (friendship, who you follow, city, likes and comments).</p>
+
+<h2>4. Who we share data with</h2>
+<ul>
+<li><b>Other users</b>, according to the privacy you choose for each item of your profile (Public, Friends only or Only me) and for each post. Matches, results, rankings and tournaments involving other people are visible to the participants and, for public groups, to those who follow the group.</li>
+<li><b>Google (Firebase)</b> — hosting, database and sign-in, as data processor, under Google's data protection terms.</li>
+<li><b>App stores</b> (Google Play, App Store), when you download the app or make purchases there, under their policies.</li>
+<li><b>Authorities</b>, when there is a legal obligation or a court order.</li>
+</ul>
+<p>We do not sell or rent personal data.</p>
+
+<h2>5. International transfer</h2>
+<p>Google/Firebase services may store and process data on servers outside Brazil (for example, in the United States). These transfers rely on the standard contractual clauses approved by the Brazilian Data Protection Authority (ANPD Resolution CD/ANPD No. 19/2024) incorporated into Google's terms, under art. 33 of the LGPD. You may request the full text of these clauses through the service channel.</p>
+
+<h2>6. How long we keep data</h2>
+<ul>
+<li>Account, profile, match and Network data: while the account exists. When you delete your account, we erase your data within <span data-k="deleteDays">15</span> days, except as described below.</li>
+<li>Providers' technical records and reports: for as long as needed for security and the exercise of rights, or for the period required by law.</li>
+<li>Usage statistics: up to 24 months, aggregated by day.</li>
+<li>Data other users saved in their own records (for example, a name someone typed in their personal history) belong to that user's record.</li>
+<li>Data on your device (no-account mode) stays only there, until you delete it in Settings → General → Manage saved data → Delete everything, or uninstall the app.</li>
+</ul>
+
+<h2>7. Your rights (LGPD, art. 18)</h2>
+<p>At any time you may: confirm whether we process your data; access it; correct incomplete or outdated data (in your profile); request anonymization, blocking or deletion of unnecessary data; request portability; request deletion of data processed with consent; know with whom we share it; withdraw consent; and object to processing based on legitimate interest (for example, by turning off usage statistics).</p>
+<p><b>Delete your account:</b> in the app, under Settings → Account → Delete my account, or on the <a href="excluir-conta.html">Delete account</a> page. For other requests, use <a href="../placar/#contato">Contact us</a>. We reply within 15 days. You may also file a complaint with the Brazilian Data Protection Authority (ANPD), at gov.br/anpd.</p>
+
+<h2>8. Security</h2>
+<p>We use encrypted connections (HTTPS), Sign in with Google and server-side access rules that only let each person read and change what belongs to them. No system is completely immune to failures; if a security incident may cause relevant risk or harm, we will notify those affected and the ANPD, as required by law.</p>
+
+<h2>9. Children and teenagers</h2>
+<p>The Network (social features: public profiles, messages, posts, groups and tournaments) is intended for people aged <span data-k="minAgeNetwork">18</span> or over. The Scoreboard may be used by minors with the permission and supervision of their parents or guardians, without an account. If we learn that a Network account belongs to a minor, it may be suspended and its data deleted. Parents or guardians may request deletion through the service channel.</p>
+
+<h2>10. Storage on your device</h2>
+<p>The app stores data on your device (local storage of the app/browser) so it works offline: matches, settings, preferences, the sync queue and usage statistics not yet sent. We do not use advertising cookies. The app's fonts are bundled inside the app.</p>
+
+<h2>11. Changes to this policy</h2>
+<p>We may update this policy. Relevant changes will be announced in the app. The version date is shown at the top.</p>
+
+<p class="meta"><a href="termos.html">Terms of Use</a> · <a href="excluir-conta.html">Delete account</a></p>
+</article>
+<article data-lang="es" lang="es" hidden>
+<h1>Política de Privacidad</h1>
+<p class="meta">Versión <span data-k="version">1.0</span> · actualizada el <span data-k="updated">18 de noviembre de 2026</span></p>
+
+<div class="box">
+<p><b>Resumen:</b> <span data-k="app">BoxScore</span> usa tus datos para marcar y guardar tus partidos, mostrar tus estadísticas y, si usas la Red, conectarte con otros jugadores. Tú eliges qué es público. No vendemos tus datos ni mostramos anuncios. Puedes consultar y corregir tus datos en la app, pedir una copia por Contáctanos y eliminar tu cuenta cuando quieras, dentro de la app.</p>
+</div>
+
+<h2>1. Quién es el responsable de tus datos</h2>
+<p>El responsable del tratamiento de los datos personales en la app y el sitio <span data-k="app">BoxScore</span> es <b data-k="controller">[NOMBRE COMPLETO O RAZÓN SOCIAL]</b> (<span data-k="docId">[CPF O CNPJ]</span>), <span data-k="city">[CIUDAD/ESTADO]</span>, Brasil.</p>
+<p>Canal de atención al titular de los datos (Ley General de Protección de Datos de Brasil – LGPD, art. 41, § 2): formulario <a href="../placar/#contato">Contáctanos</a>, dentro de la app en Ajustes → Cuenta<span data-if-email> o por e-mail a <span data-email></span></span>.</p>
+
+<h2>2. Qué datos tratamos</h2>
+<table>
+<tr><th>Categoría</th><th>Datos</th><th>De dónde vienen</th></tr>
+<tr><td>Cuenta</td><td>Nombre, e-mail, foto e identificador de la cuenta de Google (Entrar con Google).</td><td>Google, cuando inicias sesión.</td></tr>
+<tr><td>Perfil de jugador</td><td>Nombre visible, foto, fecha de nacimiento o edad, sexo, estatura, peso, mano dominante, revés, raqueta, nivel de juego, frecuencia de práctica, fecha en que empezaste a jugar, ciudad y estado, WhatsApp y e-mail para avisos, código de jugador.</td><td>Tú (todos opcionales, salvo el nombre).</td></tr>
+<tr><td>Partidos y estadísticas</td><td>Jugadores, marcador punto a punto, fecha, duración, lugar y superficie de la pista, aces, configuración del partido, historial y estadísticas calculadas.</td><td>Tú, al usar el Marcador. Los partidos contra otro usuario también se le muestran a él.</td></tr>
+<tr><td>Red (funciones sociales)</td><td>Amigos, seguidores, invitaciones y partidos programados, publicaciones, fotos, comentarios, «me gusta», mensajes directos, grupos, categorías, rankings, torneos, inscripciones, resultados registrados o confirmados, denuncias y bloqueos.</td><td>Tú y los demás usuarios con los que interactúas.</td></tr>
+<tr><td>Jugadores sin cuenta</td><td>Nombre (y, si lo añades, otra información) de personas que registras como rival o compañero sin cuenta.</td><td>Tú — úsalo solo con conocimiento de esas personas.</td></tr>
+<tr><td>Pulsera</td><td>Identificador Bluetooth de la pulsera, jugador asociado, modo de gesto y nivel de batería.</td><td>Tu pulsera; se guarda en tu dispositivo.</td></tr>
+<tr><td>Estadísticas de uso (telemetría)</td><td>Recuentos diarios de uso de las funciones (p. ej., cuántos partidos, si usaste la pulsera), plataforma, versión e idioma, vinculados a tu cuenta o, sin sesión, a un código aleatorio del dispositivo. <b>Nunca</b> nombres, marcadores, mensajes, fotos ni ubicación.</td><td>La app. Se puede desactivar en Ajustes.</td></tr>
+<tr><td>Contacto</td><td>Asunto, mensaje y e-mail de respuesta que envíes por el formulario.</td><td>Tú.</td></tr>
+<tr><td>Datos técnicos</td><td>Dirección IP, fechas y horas de acceso e información del dispositivo registrados por los proveedores de infraestructura (Google/Firebase) para el funcionamiento y la seguridad.</td><td>Automáticamente, por los proveedores.</td></tr>
+</table>
+<p>No recogemos tu ubicación por GPS. La ciudad y el lugar de la pista son solo lo que escribes. Datos como estatura, peso y edad son visibles solo para ti por defecto.</p>
+
+<h2>3. Para qué los usamos y con qué base legal (LGPD, art. 7)</h2>
+<table>
+<tr><th>Finalidad</th><th>Base legal</th></tr>
+<tr><td>Hacer funcionar el marcador, guardar y sincronizar tus datos entre dispositivos, calcular estadísticas.</td><td>Ejecución del contrato (Términos de Uso) — art. 7, V.</td></tr>
+<tr><td>Funciones de la Red: perfiles, amigos, partidos, publicaciones, mensajes, grupos, rankings y torneos, según la visibilidad que elijas.</td><td>Ejecución del contrato — art. 7, V.</td></tr>
+<tr><td>Seguridad, prevención de fraude en resultados, moderación de denuncias y bloqueos.</td><td>Interés legítimo — art. 7, IX; ejercicio regular de derechos — art. 7, VI.</td></tr>
+<tr><td>Estadísticas de uso para mejorar la app (se pueden desactivar).</td><td>Interés legítimo — art. 7, IX.</td></tr>
+<tr><td>Responder solicitudes de contacto y de titulares.</td><td>Ejecución del contrato y cumplimiento de obligación legal — art. 7, V y II.</td></tr>
+<tr><td>Conservar registros cuando lo exija la ley o una autoridad.</td><td>Cumplimiento de obligación legal — art. 7, II.</td></tr>
+</table>
+<p>No usamos tus datos para publicidad ni para decisiones automatizadas que afecten tus derechos. El orden del feed se calcula con reglas simples (amistad, a quién sigues, ciudad, «me gusta» y comentarios).</p>
+
+<h2>4. Con quién se comparten los datos</h2>
+<ul>
+<li><b>Otros usuarios</b>, según la privacidad que elijas para cada elemento de tu perfil (Público, Solo amigos o Solo yo) y para cada publicación. Los partidos, resultados, rankings y torneos con otras personas son visibles para los participantes y, en grupos públicos, para quienes siguen el grupo.</li>
+<li><b>Google (Firebase)</b> — alojamiento, base de datos e inicio de sesión, como encargado del tratamiento, bajo los términos de protección de datos de Google.</li>
+<li><b>Tiendas de aplicaciones</b> (Google Play, App Store), cuando descargas la app o compras en ellas, según sus políticas.</li>
+<li><b>Autoridades</b>, cuando exista obligación legal u orden judicial.</li>
+</ul>
+<p>No vendemos ni alquilamos datos personales.</p>
+
+<h2>5. Transferencia internacional</h2>
+<p>Los servicios de Google/Firebase pueden almacenar y procesar datos en servidores fuera de Brasil (por ejemplo, en Estados Unidos). Estas transferencias se basan en las cláusulas contractuales tipo aprobadas por la Autoridad Nacional de Protección de Datos de Brasil (Resolución CD/ANPD n.º 19/2024) incorporadas a los términos de Google, conforme al art. 33 de la LGPD. Puedes pedir el texto completo de esas cláusulas por el canal de atención.</p>
+
+<h2>6. Cuánto tiempo guardamos los datos</h2>
+<ul>
+<li>Datos de cuenta, perfil, partidos y Red: mientras exista la cuenta. Al eliminar la cuenta, borramos tus datos en un plazo de <span data-k="deleteDays">15</span> días, salvo lo previsto abajo.</li>
+<li>Registros técnicos de los proveedores y denuncias: el tiempo necesario para la seguridad y el ejercicio de derechos, o el plazo exigido por la ley.</li>
+<li>Estadísticas de uso: hasta 24 meses, agregadas por día.</li>
+<li>Los datos que otros usuarios guardaron en sus propios registros (por ejemplo, un nombre que alguien escribió en su historial) pertenecen al registro de ese usuario.</li>
+<li>Los datos en tu dispositivo (modo sin cuenta) quedan solo en él, hasta que los borres en Ajustes → General → Gestionar datos guardados → Borrar todo, o desinstales la app.</li>
+</ul>
+
+<h2>7. Tus derechos (LGPD, art. 18)</h2>
+<p>Puedes, en cualquier momento: confirmar si tratamos tus datos; acceder a ellos; corregir datos incompletos o desactualizados (en tu perfil); pedir la anonimización, el bloqueo o la eliminación de datos innecesarios; pedir la portabilidad; pedir la eliminación de datos tratados con consentimiento; saber con quién los compartimos; revocar consentimientos; y oponerte a tratamientos basados en interés legítimo (por ejemplo, desactivando las estadísticas de uso).</p>
+<p><b>Eliminar la cuenta:</b> en la app, en Ajustes → Cuenta → Eliminar mi cuenta, o en la página <a href="excluir-conta.html">Eliminar cuenta</a>. Para las demás solicitudes, usa <a href="../placar/#contato">Contáctanos</a>. Respondemos en un plazo de 15 días. También puedes reclamar ante la Autoridad Nacional de Protección de Datos de Brasil (ANPD), en gov.br/anpd.</p>
+
+<h2>8. Seguridad</h2>
+<p>Usamos conexión cifrada (HTTPS), inicio de sesión con Google y reglas de acceso en el servidor que solo permiten a cada persona leer y modificar lo que le corresponde. Ningún sistema es totalmente inmune a fallos; si ocurre un incidente de seguridad que pueda causar un riesgo o daño relevante, avisaremos a los afectados y a la ANPD, como exige la ley.</p>
+
+<h2>9. Niños y adolescentes</h2>
+<p>La Red (funciones sociales: perfiles públicos, mensajes, publicaciones, grupos y torneos) está destinada a mayores de <span data-k="minAgeNetwork">18</span> años. Los menores pueden usar el Marcador con autorización y supervisión de sus padres o tutores, sin necesidad de cuenta. Si sabemos que una cuenta de la Red pertenece a un menor, podrá suspenderse y sus datos eliminarse. Los padres o tutores pueden pedir la eliminación por el canal de atención.</p>
+
+<h2>10. Almacenamiento en el dispositivo</h2>
+<p>La app guarda datos en tu dispositivo (almacenamiento local de la app/navegador) para funcionar sin internet: partidos, ajustes, preferencias, la cola de sincronización y las estadísticas de uso aún no enviadas. No usamos cookies de publicidad. Las fuentes de la app están dentro de la propia app.</p>
+
+<h2>11. Cambios en esta política</h2>
+<p>Podemos actualizar esta política. Los cambios relevantes se avisarán en la app. La fecha de la versión figura arriba.</p>
+
+<p class="meta"><a href="termos.html">Términos de Uso</a> · <a href="excluir-conta.html">Eliminar cuenta</a></p>
+</article>
+<article data-lang="fr" lang="fr" hidden>
+<h1>Politique de confidentialité</h1>
+<p class="meta">Version <span data-k="version">1.0</span> · mise à jour le <span data-k="updated">18 novembre 2026</span></p>
+
+<div class="box">
+<p><b>En bref :</b> <span data-k="app">BoxScore</span> utilise vos données pour compter et enregistrer vos matchs, afficher vos statistiques et, si vous utilisez le Réseau, vous mettre en relation avec d'autres joueurs. Vous choisissez ce qui est public. Nous ne vendons pas vos données et n'affichons pas de publicité. Vous pouvez consulter et corriger vos données dans l'app, en demander une copie via Nous contacter et supprimer votre compte quand vous le souhaitez, dans l'app.</p>
+</div>
+
+<h2>1. Qui est responsable de vos données</h2>
+<p>Le responsable du traitement des données personnelles dans l'app et le site <span data-k="app">BoxScore</span> est <b data-k="controller">[NOM COMPLET OU RAISON SOCIALE]</b> (<span data-k="docId">[CPF OU CNPJ]</span>), <span data-k="city">[VILLE/ÉTAT]</span>, Brésil.</p>
+<p>Canal d'assistance aux personnes concernées (loi brésilienne sur la protection des données – LGPD, art. 41, § 2) : formulaire <a href="../placar/#contato">Nous contacter</a>, dans l'app sous Réglages → Compte<span data-if-email> ou par e-mail à <span data-email></span></span>.</p>
+
+<h2>2. Quelles données nous traitons</h2>
+<table>
+<tr><th>Catégorie</th><th>Données</th><th>Origine</th></tr>
+<tr><td>Compte</td><td>Nom, e-mail, photo et identifiant du compte Google (Se connecter avec Google).</td><td>Google, lors de la connexion.</td></tr>
+<tr><td>Profil de joueur</td><td>Nom affiché, photo, date de naissance ou âge, sexe, taille, poids, main dominante, revers, raquette, niveau de jeu, fréquence de pratique, date de début de pratique, ville et État, WhatsApp et e-mail pour les notifications, code joueur.</td><td>Vous (tous facultatifs, sauf le nom).</td></tr>
+<tr><td>Matchs et statistiques</td><td>Joueurs, score point par point, date, durée, lieu et surface du court, aces, paramètres du match, historique et statistiques calculées.</td><td>Vous, en utilisant le Tableau de score. Les matchs contre un autre utilisateur lui sont aussi visibles.</td></tr>
+<tr><td>Réseau (fonctions sociales)</td><td>Amis, abonnés, invitations et parties programmées, publications, photos, commentaires, mentions « j'aime », messages privés, groupes, catégories, classements, tournois, inscriptions, résultats saisis ou confirmés, signalements et blocages.</td><td>Vous et les autres utilisateurs avec lesquels vous interagissez.</td></tr>
+<tr><td>Joueurs sans compte</td><td>Nom (et, si vous l'ajoutez, d'autres informations) des personnes que vous enregistrez comme adversaire ou partenaire sans compte.</td><td>Vous — uniquement avec leur accord.</td></tr>
+<tr><td>Bracelet</td><td>Identifiant Bluetooth du bracelet, joueur associé, mode de geste et niveau de batterie.</td><td>Votre bracelet ; conservé sur votre appareil.</td></tr>
+<tr><td>Statistiques d'utilisation (télémétrie)</td><td>Comptages quotidiens d'utilisation des fonctions (ex. : nombre de matchs, utilisation du bracelet), plateforme, version et langue, liés à votre compte ou, sans connexion, à un code aléatoire de l'appareil. <b>Jamais</b> de noms, scores, messages, photos ni localisation.</td><td>L'app. Désactivable dans les Réglages.</td></tr>
+<tr><td>Contact</td><td>Sujet, message et e-mail de réponse envoyés via le formulaire.</td><td>Vous.</td></tr>
+<tr><td>Données techniques</td><td>Adresse IP, dates et heures d'accès et informations sur l'appareil enregistrées par les fournisseurs d'infrastructure (Google/Firebase) pour le fonctionnement et la sécurité.</td><td>Automatiquement, par les fournisseurs.</td></tr>
+</table>
+<p>Nous ne collectons pas votre position GPS. La ville et le lieu du court ne sont que ce que vous saisissez. Les données comme la taille, le poids et l'âge ne sont visibles que par vous par défaut.</p>
+
+<h2>3. Finalités et bases légales (LGPD, art. 7)</h2>
+<table>
+<tr><th>Finalité</th><th>Base légale</th></tr>
+<tr><td>Faire fonctionner le tableau de score, enregistrer et synchroniser vos données entre appareils, calculer les statistiques.</td><td>Exécution du contrat (Conditions d'utilisation) — art. 7, V.</td></tr>
+<tr><td>Fonctions du Réseau : profils, amis, parties, publications, messages, groupes, classements et tournois, selon la visibilité choisie.</td><td>Exécution du contrat — art. 7, V.</td></tr>
+<tr><td>Sécurité, prévention de la fraude sur les résultats, modération des signalements et blocages.</td><td>Intérêt légitime — art. 7, IX ; exercice régulier de droits — art. 7, VI.</td></tr>
+<tr><td>Statistiques d'utilisation pour améliorer l'app (désactivables).</td><td>Intérêt légitime — art. 7, IX.</td></tr>
+<tr><td>Répondre aux demandes de contact et des personnes concernées.</td><td>Exécution du contrat et obligation légale — art. 7, V et II.</td></tr>
+<tr><td>Conserver des registres lorsque la loi ou une autorité l'exige.</td><td>Obligation légale — art. 7, II.</td></tr>
+</table>
+<p>Nous n'utilisons pas vos données à des fins publicitaires ni pour des décisions automatisées affectant vos droits. L'ordre du fil est calculé par des règles simples (amitié, personnes suivies, ville, « j'aime » et commentaires).</p>
+
+<h2>4. Avec qui les données sont partagées</h2>
+<ul>
+<li><b>Les autres utilisateurs</b>, selon la confidentialité choisie pour chaque élément de votre profil (Public, Amis seulement ou Moi seul) et pour chaque publication. Les matchs, résultats, classements et tournois impliquant d'autres personnes sont visibles des participants et, pour les groupes publics, des personnes qui suivent le groupe.</li>
+<li><b>Google (Firebase)</b> — hébergement, base de données et connexion, en tant que sous-traitant, selon les conditions de protection des données de Google.</li>
+<li><b>Boutiques d'applications</b> (Google Play, App Store), lorsque vous téléchargez l'app ou y effectuez des achats, selon leurs politiques.</li>
+<li><b>Les autorités</b>, en cas d'obligation légale ou de décision de justice.</li>
+</ul>
+<p>Nous ne vendons ni ne louons de données personnelles.</p>
+
+<h2>5. Transfert international</h2>
+<p>Les services Google/Firebase peuvent stocker et traiter des données sur des serveurs hors du Brésil (par exemple aux États-Unis). Ces transferts reposent sur les clauses contractuelles types approuvées par l'Autorité brésilienne de protection des données (Résolution CD/ANPD n° 19/2024), intégrées aux conditions de Google, conformément à l'art. 33 de la LGPD. Vous pouvez demander le texte intégral de ces clauses via le canal d'assistance.</p>
+
+<h2>6. Durée de conservation</h2>
+<ul>
+<li>Données de compte, de profil, de matchs et du Réseau : tant que le compte existe. Si vous supprimez votre compte, nous effaçons vos données sous <span data-k="deleteDays">15</span> jours, sauf ce qui est prévu ci-dessous.</li>
+<li>Journaux techniques des fournisseurs et signalements : le temps nécessaire à la sécurité et à l'exercice des droits, ou la durée exigée par la loi.</li>
+<li>Statistiques d'utilisation : jusqu'à 24 mois, agrégées par jour.</li>
+<li>Les données que d'autres utilisateurs ont enregistrées dans leurs propres registres (par exemple, un nom saisi par quelqu'un dans son historique) appartiennent au registre de cet utilisateur.</li>
+<li>Les données sur votre appareil (mode sans compte) y restent, jusqu'à ce que vous les supprimiez dans Réglages → Général → Gérer les données enregistrées → Tout supprimer, ou que vous désinstalliez l'app.</li>
+</ul>
+
+<h2>7. Vos droits (LGPD, art. 18)</h2>
+<p>À tout moment, vous pouvez : confirmer si nous traitons vos données ; y accéder ; corriger des données incomplètes ou inexactes (dans votre profil) ; demander l'anonymisation, le blocage ou la suppression de données inutiles ; demander la portabilité ; demander la suppression des données traitées sur la base du consentement ; savoir avec qui nous les partageons ; retirer votre consentement ; et vous opposer aux traitements fondés sur l'intérêt légitime (par exemple en désactivant les statistiques d'utilisation).</p>
+<p><b>Supprimer le compte :</b> dans l'app, sous Réglages → Compte → Supprimer mon compte, ou sur la page <a href="excluir-conta.html">Supprimer le compte</a>. Pour les autres demandes, utilisez <a href="../placar/#contato">Nous contacter</a>. Nous répondons sous 15 jours. Vous pouvez aussi déposer une réclamation auprès de l'Autorité brésilienne de protection des données (ANPD), sur gov.br/anpd.</p>
+
+<h2>8. Sécurité</h2>
+<p>Nous utilisons une connexion chiffrée (HTTPS), la connexion avec Google et des règles d'accès côté serveur qui ne permettent à chacun de lire et modifier que ce qui le concerne. Aucun système n'est totalement à l'abri des défaillances ; en cas d'incident de sécurité susceptible d'entraîner un risque ou un préjudice important, nous en informerons les personnes concernées et l'ANPD, comme l'exige la loi.</p>
+
+<h2>9. Enfants et adolescents</h2>
+<p>Le Réseau (fonctions sociales : profils publics, messages, publications, groupes et tournois) est destiné aux personnes de <span data-k="minAgeNetwork">18</span> ans et plus. Les mineurs peuvent utiliser le Tableau de score avec l'autorisation et sous la surveillance de leurs parents ou tuteurs, sans compte. Si nous apprenons qu'un compte du Réseau appartient à un mineur, il pourra être suspendu et ses données supprimées. Les parents ou tuteurs peuvent demander la suppression via le canal d'assistance.</p>
+
+<h2>10. Stockage sur l'appareil</h2>
+<p>L'app enregistre des données sur votre appareil (stockage local de l'app/du navigateur) pour fonctionner hors ligne : matchs, réglages, préférences, file de synchronisation et statistiques d'utilisation non encore envoyées. Nous n'utilisons pas de cookies publicitaires. Les polices de l'app sont intégrées à l'app.</p>
+
+<h2>11. Modifications de cette politique</h2>
+<p>Nous pouvons mettre à jour cette politique. Les changements importants seront annoncés dans l'app. La date de version figure en haut.</p>
+
+<p class="meta"><a href="termos.html">Conditions d'utilisation</a> · <a href="excluir-conta.html">Supprimer le compte</a></p>
+</article>
+<article data-lang="de" lang="de" hidden>
+<h1>Datenschutzerklärung</h1>
+<p class="meta">Version <span data-k="version">1.0</span> · aktualisiert am <span data-k="updated">18. November 2026</span></p>
+
+<div class="box">
+<p><b>Kurz gesagt:</b> <span data-k="app">BoxScore</span> nutzt deine Daten, um deine Spiele zu zählen und zu speichern, deine Statistiken anzuzeigen und dich – wenn du das Netzwerk nutzt – mit anderen Spielern zu verbinden. Du entscheidest, was öffentlich ist. Wir verkaufen deine Daten nicht und zeigen keine Werbung. Du kannst deine Daten in der App einsehen und korrigieren, über Kontakt eine Kopie anfordern und dein Konto jederzeit in der App löschen.</p>
+</div>
+
+<h2>1. Wer für deine Daten verantwortlich ist</h2>
+<p>Verantwortlicher für die in der App und auf der Website <span data-k="app">BoxScore</span> verarbeiteten personenbezogenen Daten ist <b data-k="controller">[VOLLSTÄNDIGER NAME ODER FIRMA]</b> (<span data-k="docId">[CPF ODER CNPJ]</span>), <span data-k="city">[STADT/BUNDESSTAAT]</span>, Brasilien.</p>
+<p>Kontaktstelle für Betroffene (brasilianisches Datenschutzgesetz – LGPD, Art. 41, § 2): das Formular <a href="../placar/#contato">Kontakt</a> in der App unter Einstellungen → Konto<span data-if-email> oder per E-Mail an <span data-email></span></span>.</p>
+
+<h2>2. Welche Daten wir verarbeiten</h2>
+<table>
+<tr><th>Kategorie</th><th>Daten</th><th>Herkunft</th></tr>
+<tr><td>Konto</td><td>Name, E-Mail, Foto und Kennung des Google-Kontos (Mit Google anmelden).</td><td>Google, bei der Anmeldung.</td></tr>
+<tr><td>Spielerprofil</td><td>Anzeigename, Foto, Geburtsdatum oder Alter, Geschlecht, Größe, Gewicht, Schlaghand, Rückhand, Schläger, Spielniveau, Trainingshäufigkeit, Datum des Spielbeginns, Stadt und Bundesstaat, WhatsApp und E-Mail für Benachrichtigungen, Spielercode.</td><td>Du (alles freiwillig außer dem Namen).</td></tr>
+<tr><td>Spiele und Statistiken</td><td>Spieler, Punktestand Punkt für Punkt, Datum, Dauer, Ort und Belag des Platzes, Asse, Spieleinstellungen, Verlauf und berechnete Statistiken.</td><td>Du, bei der Nutzung der Anzeigetafel. Spiele gegen einen anderen Nutzer sind auch für ihn sichtbar.</td></tr>
+<tr><td>Netzwerk (soziale Funktionen)</td><td>Freunde, Follower, Einladungen und vereinbarte Spiele, Beiträge, Fotos, Kommentare, Likes, Direktnachrichten, Gruppen, Kategorien, Ranglisten, Turniere, Anmeldungen, eingetragene oder bestätigte Ergebnisse, Meldungen und Blockierungen.</td><td>Du und die Nutzer, mit denen du interagierst.</td></tr>
+<tr><td>Spieler ohne Konto</td><td>Name (und, falls du sie ergänzt, weitere Angaben) von Personen, die du als Gegner oder Partner ohne Konto einträgst.</td><td>Du — nur mit Wissen dieser Personen.</td></tr>
+<tr><td>Armband</td><td>Bluetooth-Kennung des Armbands, zugeordneter Spieler, Gestenmodus und Akkustand.</td><td>Dein Armband; auf deinem Gerät gespeichert.</td></tr>
+<tr><td>Nutzungsstatistiken (Telemetrie)</td><td>Tägliche Zählungen der Funktionsnutzung (z. B. Anzahl der Spiele, ob das Armband genutzt wurde), Plattform, Version und Sprache, verknüpft mit deinem Konto oder, ohne Anmeldung, mit einem zufälligen Gerätecode. <b>Niemals</b> Namen, Spielstände, Nachrichten, Fotos oder Standort.</td><td>Die App. In den Einstellungen abschaltbar.</td></tr>
+<tr><td>Kontakt</td><td>Betreff, Nachricht und Antwort-E-Mail, die du über das Formular sendest.</td><td>Du.</td></tr>
+<tr><td>Technische Daten</td><td>IP-Adresse, Datum und Uhrzeit der Zugriffe und Geräteinformationen, die von Infrastrukturanbietern (Google/Firebase) für Betrieb und Sicherheit erfasst werden.</td><td>Automatisch, durch die Anbieter.</td></tr>
+</table>
+<p>Wir erfassen deinen GPS-Standort nicht. Stadt und Platz sind nur das, was du eingibst. Angaben wie Größe, Gewicht und Alter sind standardmäßig nur für dich sichtbar.</p>
+
+<h2>3. Zwecke und Rechtsgrundlagen (LGPD, Art. 7)</h2>
+<table>
+<tr><th>Zweck</th><th>Rechtsgrundlage</th></tr>
+<tr><td>Betrieb der Anzeigetafel, Speichern und Synchronisieren deiner Daten zwischen Geräten, Berechnung von Statistiken.</td><td>Vertragserfüllung (Nutzungsbedingungen) — Art. 7, V.</td></tr>
+<tr><td>Netzwerkfunktionen: Profile, Freunde, Spiele, Beiträge, Nachrichten, Gruppen, Ranglisten und Turniere, gemäß der von dir gewählten Sichtbarkeit.</td><td>Vertragserfüllung — Art. 7, V.</td></tr>
+<tr><td>Sicherheit, Verhinderung von Ergebnisbetrug, Bearbeitung von Meldungen und Blockierungen.</td><td>Berechtigtes Interesse — Art. 7, IX; Ausübung von Rechten — Art. 7, VI.</td></tr>
+<tr><td>Nutzungsstatistiken zur Verbesserung der App (abschaltbar).</td><td>Berechtigtes Interesse — Art. 7, IX.</td></tr>
+<tr><td>Beantwortung von Kontakt- und Betroffenenanfragen.</td><td>Vertragserfüllung und rechtliche Verpflichtung — Art. 7, V und II.</td></tr>
+<tr><td>Aufbewahrung von Aufzeichnungen, wenn Gesetz oder Behörde es verlangen.</td><td>Rechtliche Verpflichtung — Art. 7, II.</td></tr>
+</table>
+<p>Wir nutzen deine Daten nicht für Werbung oder für automatisierte Entscheidungen, die deine Rechte betreffen. Die Reihenfolge im Feed ergibt sich aus einfachen Regeln (Freundschaft, wem du folgst, Stadt, Likes und Kommentare).</p>
+
+<h2>4. An wen Daten weitergegeben werden</h2>
+<ul>
+<li><b>Andere Nutzer</b>, gemäß der Privatsphäre, die du für jedes Profilelement (Öffentlich, Nur Freunde oder Nur ich) und für jeden Beitrag wählst. Spiele, Ergebnisse, Ranglisten und Turniere mit anderen Personen sind für die Beteiligten und, bei öffentlichen Gruppen, für die Follower der Gruppe sichtbar.</li>
+<li><b>Google (Firebase)</b> — Hosting, Datenbank und Anmeldung, als Auftragsverarbeiter, gemäß den Datenschutzbedingungen von Google.</li>
+<li><b>App-Stores</b> (Google Play, App Store), wenn du die App herunterlädst oder dort einkaufst, gemäß deren Richtlinien.</li>
+<li><b>Behörden</b>, bei gesetzlicher Verpflichtung oder gerichtlicher Anordnung.</li>
+</ul>
+<p>Wir verkaufen oder vermieten keine personenbezogenen Daten.</p>
+
+<h2>5. Internationale Übermittlung</h2>
+<p>Die Dienste von Google/Firebase können Daten auf Servern außerhalb Brasiliens (zum Beispiel in den USA) speichern und verarbeiten. Diese Übermittlungen stützen sich auf die von der brasilianischen Datenschutzbehörde genehmigten Standardvertragsklauseln (Resolution CD/ANPD Nr. 19/2024), die in die Bedingungen von Google aufgenommen sind, gemäß Art. 33 LGPD. Den vollständigen Text dieser Klauseln kannst du über die Kontaktstelle anfordern.</p>
+
+<h2>6. Speicherdauer</h2>
+<ul>
+<li>Konto-, Profil-, Spiel- und Netzwerkdaten: solange das Konto besteht. Wenn du dein Konto löschst, löschen wir deine Daten innerhalb von <span data-k="deleteDays">15</span> Tagen, vorbehaltlich der folgenden Punkte.</li>
+<li>Technische Protokolle der Anbieter und Meldungen: so lange, wie es für Sicherheit und Rechtsausübung nötig ist, oder für die gesetzlich vorgeschriebene Dauer.</li>
+<li>Nutzungsstatistiken: bis zu 24 Monate, tageweise zusammengefasst.</li>
+<li>Daten, die andere Nutzer in ihren eigenen Aufzeichnungen gespeichert haben (z. B. ein Name, den jemand in seinen Verlauf eingegeben hat), gehören zur Aufzeichnung dieses Nutzers.</li>
+<li>Daten auf deinem Gerät (Modus ohne Konto) bleiben nur dort, bis du sie unter Einstellungen → Allgemein → Gespeicherte Daten verwalten → Alles löschen entfernst oder die App deinstallierst.</li>
+</ul>
+
+<h2>7. Deine Rechte (LGPD, Art. 18)</h2>
+<p>Du kannst jederzeit: bestätigen lassen, ob wir deine Daten verarbeiten; darauf zugreifen; unvollständige oder veraltete Daten (in deinem Profil) berichtigen; die Anonymisierung, Sperrung oder Löschung unnötiger Daten verlangen; Datenübertragbarkeit verlangen; die Löschung von auf Einwilligung beruhenden Daten verlangen; erfahren, an wen wir sie weitergeben; Einwilligungen widerrufen; und der Verarbeitung auf Grundlage berechtigter Interessen widersprechen (z. B. durch Abschalten der Nutzungsstatistiken).</p>
+<p><b>Konto löschen:</b> in der App unter Einstellungen → Konto → Mein Konto löschen oder auf der Seite <a href="excluir-conta.html">Konto löschen</a>. Für andere Anfragen nutze <a href="../placar/#contato">Kontakt</a>. Wir antworten innerhalb von 15 Tagen. Du kannst dich auch bei der brasilianischen Datenschutzbehörde (ANPD) unter gov.br/anpd beschweren.</p>
+
+<h2>8. Sicherheit</h2>
+<p>Wir nutzen verschlüsselte Verbindungen (HTTPS), die Anmeldung mit Google und serverseitige Zugriffsregeln, die jeder Person nur das Lesen und Ändern ihrer eigenen Daten erlauben. Kein System ist völlig fehlerfrei; tritt ein Sicherheitsvorfall auf, der ein erhebliches Risiko oder einen Schaden verursachen kann, informieren wir die Betroffenen und die ANPD, wie gesetzlich vorgeschrieben.</p>
+
+<h2>9. Kinder und Jugendliche</h2>
+<p>Das Netzwerk (soziale Funktionen: öffentliche Profile, Nachrichten, Beiträge, Gruppen und Turniere) richtet sich an Personen ab <span data-k="minAgeNetwork">18</span> Jahren. Minderjährige können die Anzeigetafel mit Erlaubnis und unter Aufsicht der Eltern oder Erziehungsberechtigten ohne Konto nutzen. Erfahren wir, dass ein Netzwerkkonto einer minderjährigen Person gehört, kann es gesperrt und seine Daten gelöscht werden. Eltern oder Erziehungsberechtigte können die Löschung über die Kontaktstelle verlangen.</p>
+
+<h2>10. Speicherung auf dem Gerät</h2>
+<p>Die App speichert Daten auf deinem Gerät (lokaler Speicher der App/des Browsers), damit sie offline funktioniert: Spiele, Einstellungen, Präferenzen, die Synchronisierungswarteschlange und noch nicht gesendete Nutzungsstatistiken. Wir verwenden keine Werbe-Cookies. Die Schriftarten sind in der App enthalten.</p>
+
+<h2>11. Änderungen dieser Erklärung</h2>
+<p>Wir können diese Erklärung aktualisieren. Wesentliche Änderungen werden in der App angekündigt. Das Versionsdatum steht oben.</p>
+
+<p class="meta"><a href="termos.html">Nutzungsbedingungen</a> · <a href="excluir-conta.html">Konto löschen</a></p>
+</article>
 </main>
 <script src="config.js"></script>
 <script src="legal.js"></script>

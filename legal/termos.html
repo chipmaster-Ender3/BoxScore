@@ -8,11 +8,12 @@
 <link rel="stylesheet" href="legal.css">
 </head>
 <body>
-<header><a class="back" id="back" href="../placar/">← Voltar</a><span class="t" data-k="app">BoxScore</span></header>
+<header><a class="back" id="back" href="../placar/">← <span id="backTxt">Voltar</span></a><span class="t" data-k="app">BoxScore</span><select id="langSel" aria-label="Idioma / Language"><option value="pt-BR">Português (Brasil)</option><option value="pt-PT">Português (Portugal)</option><option value="en">English</option><option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option></select></header>
 <main>
+<p class="lang" id="prevails" hidden></p>
+<article data-lang="pt-BR" lang="pt-BR">
 <h1>Termos de Uso</h1>
 <p class="meta">Versão <span data-k="version">1.0</span> · atualizados em <span data-k="updated">18 de novembro de 2026</span></p>
-<p class="lang" id="langNote" hidden>This document is available in Portuguese only. · Este documento solo está disponible en portugués. · Ce document n'est disponible qu'en portugais. · Dieses Dokument ist nur auf Portugiesisch verfügbar.</p>
 
 <h2>1. Quem somos e aceitação</h2>
 <p>O <span data-k="app">BoxScore</span> (app, site e pulseira) é oferecido por <b data-k="controller">[NOME COMPLETO OU RAZÃO SOCIAL]</b> (<span data-k="docId">[CPF OU CNPJ]</span>), <span data-k="city">[CIDADE/UF]</span>. Ao usar o serviço, você concorda com estes Termos e com a <a href="privacidade.html">Política de Privacidade</a>. Se não concordar, não use o serviço.</p>
@@ -79,6 +80,357 @@
 <p><a href="../placar/#contato">Fale conosco</a><span data-if-email> · <span data-email></span></span></p>
 
 <p class="meta"><a href="privacidade.html">Política de Privacidade</a> · <a href="excluir-conta.html">Excluir conta</a></p>
+</article>
+<article data-lang="pt-PT" lang="pt-PT" hidden>
+<h1>Termos de Utilização</h1>
+<p class="meta">Versão <span data-k="version">1.0</span> · atualizados a <span data-k="updated">18 de novembro de 2026</span></p>
+
+<h2>1. Quem somos e aceitação</h2>
+<p>O <span data-k="app">BoxScore</span> (app, site e pulseira) é oferecido por <b data-k="controller">[NOME COMPLETO OU RAZÃO SOCIAL]</b> (<span data-k="docId">[CPF OU CNPJ]</span>), <span data-k="city">[CIDADE/UF]</span>. Ao usar o serviço, o utilizador concorda com estes Termos e com a <a href="privacidade.html">Política de Privacidade</a>. Se não concordar, não use o serviço.</p>
+
+<h2>2. O serviço</h2>
+<p>O <b>Placar</b> marca partidas de ténis (pela ecrã ou pela pulseira), narra o placar por voz e guarda histórico e estatísticas. Funciona sem conta. A <b>Rede</b> permite criar perfil, marcar jogos, publicar, conversar, participar de grupos, rankings e torneios. O serviço está em fase de testes (beta): funções podem mudar, ficar indisponíveis ou ter falhas, e é fornecido "no estado em que se encontra".</p>
+
+<h2>3. Conta e idade</h2>
+<ul>
+<li>A conta usa início de sessão com Google. É responsável por manter o seu acesso seguro e pelas ações feitas na sua conta.</li>
+<li>A Rede é destinada a maiores de <span data-k="minAgeNetwork">18</span> anos. Menores podem usar o Placar com autorização e acompanhamento dos pais ou responsáveis.</li>
+<li>Informe dados verdadeiros. Não crie contas em nome de outras pessoas.</li>
+</ul>
+
+<h2>4. Regras de conduta</h2>
+<p>É proibido usar o serviço para:</p>
+<ul>
+<li>publicar ou enviar conteúdo ilegal, ofensivo, discriminatório, violento, sexual, de assédio ou ameaça;</li>
+<li>expor dados pessoais, imagens ou informações de terceiros sem autorização;</li>
+<li>lançar resultados falsos, manipular rankings ou torneios, ou se passar por outra pessoa;</li>
+<li>enviar spam, propaganda não solicitada ou golpes;</li>
+<li>violar direitos autorais, de imagem ou de marca;</li>
+<li>tentar acessar dados de outros utilizadores, burlar as regras de segurança ou prejudicar o funcionamento do serviço.</li>
+</ul>
+
+<h2>5. O seu conteúdo: fotos, logos e textos</h2>
+<ul>
+<li>Continua a ser titular do que publica (fotos, textos, comentários, mensagens, fotos de perfil e de grupos, escudos e logotipos).</li>
+<li><b>Ao enviar qualquer foto, imagem, logotipo ou escudo (por exemplo, o escudo de um clube na foto de um grupo), declara que é o titular dos direitos ou que tem autorização de quem os detém, e que as pessoas que aparecem nas fotos concordam com a publicação.</b></li>
+<li>Concede ao <span data-k="app">BoxScore</span> uma licença gratuita, não exclusiva, mundial e pelo tempo em que o conteúdo estiver no serviço, para armazenar, reproduzir, adaptar o tamanho e exibir esse conteúdo dentro do serviço, apenas para as pessoas permitidas pela visibilidade que escolheu. A licença termina quando o utilizador apaga o conteúdo ou elimina a conta, exceto em cópias já partilhadas por outros utilizadores dentro do serviço e em registos guardados por obrigação legal.</li>
+<li>É responsável pelo conteúdo que publica e responde por eventuais danos a terceiros.</li>
+</ul>
+
+<h2>6. Denúncias e moderação</h2>
+<p>Qualquer pessoa pode denunciar conteúdo ou utilizadores dentro da app ou pelo <a href="../placar/#contato">Contacte-nos</a>. Conteúdo denunciado pode ser ocultado de imediato enquanto é analisado. Podemos remover conteúdo e suspender ou encerrar contas que violem estes Termos ou a lei, e cooperar com autoridades quando exigido. Se discordar de uma remoção, entre em contacto.</p>
+
+<h2>7. Grupos, rankings, torneios e jogos marcados</h2>
+<ul>
+<li>Administradores de grupos definem as regras dos seus rankings e torneios e respondem por elas e pela organização.</li>
+<li>Resultados são informados e confirmados pelos próprios utilizadores. O <span data-k="app">BoxScore</span> não garante a exatidão de placares, rankings ou classificações.</li>
+<li>Valores de inscrição e divisão do custo da campo exibidos na app são apenas informativos: pagamentos combinados entre organizadores e jogadores acontecem fora da app e são de responsabilidade deles. Prêmios, quando houver, são de responsabilidade de quem organiza.</li>
+<li>Encontros para jogar são combinados entre os utilizadores, que respondem pela própria segurança, pelo local e pela atividade física.</li>
+</ul>
+
+<h2>8. Pulseira</h2>
+<p>A pulseira marca pontos por Bluetooth. Use conforme as instruções, carregue apenas com o cabo indicado e não a use se estiver danificada. Funções de hardware podem variar com o dispositivo telemóvel ou tablet.</p>
+
+<h2>9. Planos pagos</h2>
+<p>Se o serviço passar a ter planos pagos, as condições (preço, renovação, cancelamento e direito de arrependimento de 7 dias nas contratações a distância, conforme o Código de Defesa do Consumidor) serão informadas antes da contratação.</p>
+
+<h2>10. Propriedade intelectual da app</h2>
+<p>O software, a marca, o design e os textos do <span data-k="app">BoxScore</span> pertencem ao responsável indicado acima. Recebe uma licença pessoal, não exclusiva e intransferível para usar a app. Não é permitido copiar, modificar, revender ou fazer engenharia reversa, salvo quando a lei permitir.</p>
+
+<h2>11. Responsabilidade</h2>
+<p>Nos limites da lei, não respondemos por: conteúdo publicado por utilizadores; acordos, encontros, pagamentos e prêmios entre utilizadores; indisponibilidades temporárias; perdas causadas por uso indevido da conta ou por falhas de dispositivos, ligação ou serviços de terceiros. Nada nestes Termos limita direitos garantidos pelo Código de Defesa do Consumidor.</p>
+
+<h2>12. Encerramento</h2>
+<p>Pode deixar de usar o serviço e eliminar a sua conta a qualquer momento em Definições → Conta → Eliminar a minha conta (veja <a href="excluir-conta.html">Eliminar conta</a>). Podemos encerrar o serviço avisando com antecedência razoável.</p>
+
+<h2>13. Alterações, lei e foro</h2>
+<p>Podemos atualizar estes Termos; mudanças relevantes serão avisadas na app. Aplica-se a lei brasileira. Fica eleito o foro do domicílio do consumidor.</p>
+
+<h2>14. Contacto</h2>
+<p><a href="../placar/#contato">Contacte-nos</a><span data-if-email> · <span data-email></span></span></p>
+
+<p class="meta"><a href="privacidade.html">Política de Privacidade</a> · <a href="excluir-conta.html">Eliminar conta</a></p>
+</article>
+<article data-lang="en" lang="en" hidden>
+<h1>Terms of Use</h1>
+<p class="meta">Version <span data-k="version">1.0</span> · updated on <span data-k="updated">November 18, 2026</span></p>
+
+<h2>1. Who we are and acceptance</h2>
+<p><span data-k="app">BoxScore</span> (app, website and wristband) is offered by <b data-k="controller">[FULL NAME OR COMPANY NAME]</b> (<span data-k="docId">[CPF OR CNPJ]</span>), <span data-k="city">[CITY/STATE]</span>, Brazil. By using the service, you agree to these Terms and to the <a href="privacidade.html">Privacy Policy</a>. If you do not agree, do not use the service.</p>
+
+<h2>2. The service</h2>
+<p>The <b>Scoreboard</b> scores tennis matches (on screen or with the wristband), announces the score by voice and keeps history and statistics. It works without an account. The <b>Network</b> lets you create a profile, schedule games, post, chat and take part in groups, rankings and tournaments. The service is in a testing phase (beta): features may change, become unavailable or have bugs, and it is provided "as is".</p>
+
+<h2>3. Account and age</h2>
+<ul>
+<li>The account uses Sign in with Google. You are responsible for keeping your access secure and for the actions taken with your account.</li>
+<li>The Network is intended for people aged <span data-k="minAgeNetwork">18</span> or over. Minors may use the Scoreboard with the permission and supervision of their parents or guardians.</li>
+<li>Provide truthful information. Do not create accounts on behalf of other people.</li>
+</ul>
+
+<h2>4. Rules of conduct</h2>
+<p>You may not use the service to:</p>
+<ul>
+<li>post or send illegal, offensive, discriminatory, violent or sexual content, harassment or threats;</li>
+<li>expose other people's personal data, images or information without authorization;</li>
+<li>enter false results, manipulate rankings or tournaments, or impersonate someone else;</li>
+<li>send spam, unsolicited advertising or scams;</li>
+<li>infringe copyright, image or trademark rights;</li>
+<li>try to access other users' data, bypass security rules or harm the operation of the service.</li>
+</ul>
+
+<h2>5. Your content: photos, logos and texts</h2>
+<ul>
+<li>You remain the owner of what you post (photos, texts, comments, messages, profile and group photos, crests and logos).</li>
+<li><b>By uploading any photo, image, logo or crest (for example, a club's crest as a group photo), you declare that you own the rights or are authorized by whoever holds them, and that the people who appear in the photos agree to the publication.</b></li>
+<li>You grant <span data-k="app">BoxScore</span> a free, non-exclusive, worldwide license, for as long as the content is on the service, to store, reproduce, resize and display that content within the service, only to the people allowed by the visibility you chose. The license ends when you delete the content or your account, except for copies already shared by other users within the service and records kept due to a legal obligation.</li>
+<li>You are responsible for the content you post and liable for any damage to third parties.</li>
+</ul>
+
+<h2>6. Reports and moderation</h2>
+<p>Anyone can report content or users within the app or through <a href="../placar/#contato">Contact us</a>. Reported content may be hidden immediately while it is reviewed. We may remove content and suspend or close accounts that violate these Terms or the law, and cooperate with authorities when required. If you disagree with a removal, contact us.</p>
+
+<h2>7. Groups, rankings, tournaments and scheduled games</h2>
+<ul>
+<li>Group administrators set the rules of their rankings and tournaments and are responsible for them and for the organization.</li>
+<li>Results are entered and confirmed by the users themselves. <span data-k="app">BoxScore</span> does not guarantee the accuracy of scores, rankings or standings.</li>
+<li>Entry fees and court-cost splits shown in the app are informative only: payments agreed between organizers and players take place outside the app and are their responsibility. Prizes, when offered, are the organizer's responsibility.</li>
+<li>Meetings to play are arranged between users, who are responsible for their own safety, the venue and the physical activity.</li>
+</ul>
+
+<h2>8. Wristband</h2>
+<p>The wristband scores points via Bluetooth. Use it according to the instructions, charge it only with the indicated cable and do not use it if damaged. Hardware features may vary with the phone or tablet.</p>
+
+<h2>9. Paid plans</h2>
+<p>If the service offers paid plans, the conditions (price, renewal, cancellation and the 7-day right of withdrawal for distance purchases under the Brazilian Consumer Protection Code) will be shown before purchase.</p>
+
+<h2>10. Intellectual property of the app</h2>
+<p>The software, brand, design and texts of <span data-k="app">BoxScore</span> belong to the party indicated above. You receive a personal, non-exclusive, non-transferable license to use the app. Copying, modifying, reselling or reverse engineering is not allowed, except where permitted by law.</p>
+
+<h2>11. Liability</h2>
+<p>Within the limits of the law, we are not liable for: content posted by users; agreements, meetings, payments and prizes between users; temporary unavailability; losses caused by misuse of the account or by failures of devices, connections or third-party services. Nothing in these Terms limits rights guaranteed by the Brazilian Consumer Protection Code.</p>
+
+<h2>12. Termination</h2>
+<p>You may stop using the service and delete your account at any time under Settings → Account → Delete my account (see <a href="excluir-conta.html">Delete account</a>). We may discontinue the service with reasonable prior notice.</p>
+
+<h2>13. Changes, governing law and venue</h2>
+<p>We may update these Terms; relevant changes will be announced in the app. Brazilian law applies. The courts of the consumer's domicile have jurisdiction.</p>
+
+<h2>14. Contact</h2>
+<p><a href="../placar/#contato">Contact us</a><span data-if-email> · <span data-email></span></span></p>
+
+<p class="meta"><a href="privacidade.html">Privacy Policy</a> · <a href="excluir-conta.html">Delete account</a></p>
+</article>
+<article data-lang="es" lang="es" hidden>
+<h1>Términos de Uso</h1>
+<p class="meta">Versión <span data-k="version">1.0</span> · actualizados el <span data-k="updated">18 de noviembre de 2026</span></p>
+
+<h2>1. Quiénes somos y aceptación</h2>
+<p><span data-k="app">BoxScore</span> (app, sitio y pulsera) es ofrecido por <b data-k="controller">[NOMBRE COMPLETO O RAZÓN SOCIAL]</b> (<span data-k="docId">[CPF O CNPJ]</span>), <span data-k="city">[CIUDAD/ESTADO]</span>, Brasil. Al usar el servicio, aceptas estos Términos y la <a href="privacidade.html">Política de Privacidad</a>. Si no estás de acuerdo, no uses el servicio.</p>
+
+<h2>2. El servicio</h2>
+<p>El <b>Marcador</b> lleva el tanteo de partidos de tenis (en la pantalla o con la pulsera), canta el marcador por voz y guarda historial y estadísticas. Funciona sin cuenta. La <b>Red</b> permite crear un perfil, programar partidos, publicar, conversar y participar en grupos, rankings y torneos. El servicio está en fase de pruebas (beta): las funciones pueden cambiar, no estar disponibles o tener fallos, y se ofrece «tal cual».</p>
+
+<h2>3. Cuenta y edad</h2>
+<ul>
+<li>La cuenta usa Entrar con Google. Eres responsable de mantener seguro tu acceso y de las acciones realizadas con tu cuenta.</li>
+<li>La Red está destinada a mayores de <span data-k="minAgeNetwork">18</span> años. Los menores pueden usar el Marcador con autorización y supervisión de sus padres o tutores.</li>
+<li>Proporciona datos verdaderos. No crees cuentas en nombre de otras personas.</li>
+</ul>
+
+<h2>4. Normas de conducta</h2>
+<p>Está prohibido usar el servicio para:</p>
+<ul>
+<li>publicar o enviar contenido ilegal, ofensivo, discriminatorio, violento, sexual, de acoso o amenaza;</li>
+<li>exponer datos personales, imágenes o información de terceros sin autorización;</li>
+<li>registrar resultados falsos, manipular rankings o torneos, o hacerse pasar por otra persona;</li>
+<li>enviar spam, publicidad no solicitada o estafas;</li>
+<li>infringir derechos de autor, de imagen o de marca;</li>
+<li>intentar acceder a datos de otros usuarios, eludir las reglas de seguridad o perjudicar el funcionamiento del servicio.</li>
+</ul>
+
+<h2>5. Tu contenido: fotos, logotipos y textos</h2>
+<ul>
+<li>Sigues siendo el titular de lo que publicas (fotos, textos, comentarios, mensajes, fotos de perfil y de grupos, escudos y logotipos).</li>
+<li><b>Al subir cualquier foto, imagen, logotipo o escudo (por ejemplo, el escudo de un club como foto de un grupo), declaras que eres el titular de los derechos o que tienes autorización de quien los posee, y que las personas que aparecen en las fotos están de acuerdo con la publicación.</b></li>
+<li>Concedes a <span data-k="app">BoxScore</span> una licencia gratuita, no exclusiva, mundial y por el tiempo en que el contenido esté en el servicio, para almacenar, reproducir, ajustar el tamaño y mostrar ese contenido dentro del servicio, solo a las personas permitidas por la visibilidad que elegiste. La licencia termina cuando borras el contenido o eliminas la cuenta, salvo en copias ya compartidas por otros usuarios dentro del servicio y en registros conservados por obligación legal.</li>
+<li>Eres responsable del contenido que publicas y respondes por los daños que cause a terceros.</li>
+</ul>
+
+<h2>6. Denuncias y moderación</h2>
+<p>Cualquier persona puede denunciar contenido o usuarios dentro de la app o por <a href="../placar/#contato">Contáctanos</a>. El contenido denunciado puede ocultarse de inmediato mientras se analiza. Podemos retirar contenido y suspender o cerrar cuentas que infrinjan estos Términos o la ley, y colaborar con las autoridades cuando se exija. Si no estás de acuerdo con una retirada, contáctanos.</p>
+
+<h2>7. Grupos, rankings, torneos y partidos programados</h2>
+<ul>
+<li>Los administradores de grupos definen las reglas de sus rankings y torneos y responden por ellas y por la organización.</li>
+<li>Los resultados los registran y confirman los propios usuarios. <span data-k="app">BoxScore</span> no garantiza la exactitud de marcadores, rankings ni clasificaciones.</li>
+<li>Los importes de inscripción y el reparto del costo de la pista que muestra la app son solo informativos: los pagos acordados entre organizadores y jugadores se realizan fuera de la app y son responsabilidad de ellos. Los premios, cuando existan, son responsabilidad de quien organiza.</li>
+<li>Los encuentros para jugar se acuerdan entre los usuarios, que responden por su propia seguridad, el lugar y la actividad física.</li>
+</ul>
+
+<h2>8. Pulsera</h2>
+<p>La pulsera marca puntos por Bluetooth. Úsala según las instrucciones, cárgala solo con el cable indicado y no la uses si está dañada. Las funciones de hardware pueden variar según el teléfono o la tableta.</p>
+
+<h2>9. Planes de pago</h2>
+<p>Si el servicio ofrece planes de pago, las condiciones (precio, renovación, cancelación y derecho de desistimiento de 7 días en las contrataciones a distancia, conforme al Código de Defensa del Consumidor de Brasil) se informarán antes de la contratación.</p>
+
+<h2>10. Propiedad intelectual de la app</h2>
+<p>El software, la marca, el diseño y los textos de <span data-k="app">BoxScore</span> pertenecen al responsable indicado arriba. Recibes una licencia personal, no exclusiva e intransferible para usar la app. No se permite copiar, modificar, revender ni hacer ingeniería inversa, salvo cuando la ley lo permita.</p>
+
+<h2>11. Responsabilidad</h2>
+<p>Dentro de los límites de la ley, no respondemos por: contenido publicado por usuarios; acuerdos, encuentros, pagos y premios entre usuarios; indisponibilidades temporales; pérdidas causadas por uso indebido de la cuenta o por fallos de dispositivos, conexión o servicios de terceros. Nada en estos Términos limita los derechos garantizados por el Código de Defensa del Consumidor de Brasil.</p>
+
+<h2>12. Terminación</h2>
+<p>Puedes dejar de usar el servicio y eliminar tu cuenta en cualquier momento en Ajustes → Cuenta → Eliminar mi cuenta (consulta <a href="excluir-conta.html">Eliminar cuenta</a>). Podemos cerrar el servicio con un aviso previo razonable.</p>
+
+<h2>13. Cambios, ley y jurisdicción</h2>
+<p>Podemos actualizar estos Términos; los cambios relevantes se avisarán en la app. Se aplica la ley brasileña. Es competente el foro del domicilio del consumidor.</p>
+
+<h2>14. Contacto</h2>
+<p><a href="../placar/#contato">Contáctanos</a><span data-if-email> · <span data-email></span></span></p>
+
+<p class="meta"><a href="privacidade.html">Política de Privacidad</a> · <a href="excluir-conta.html">Eliminar cuenta</a></p>
+</article>
+<article data-lang="fr" lang="fr" hidden>
+<h1>Conditions d'utilisation</h1>
+<p class="meta">Version <span data-k="version">1.0</span> · mises à jour le <span data-k="updated">18 novembre 2026</span></p>
+
+<h2>1. Qui sommes-nous et acceptation</h2>
+<p><span data-k="app">BoxScore</span> (app, site et bracelet) est proposé par <b data-k="controller">[NOM COMPLET OU RAISON SOCIALE]</b> (<span data-k="docId">[CPF OU CNPJ]</span>), <span data-k="city">[VILLE/ÉTAT]</span>, Brésil. En utilisant le service, vous acceptez ces Conditions et la <a href="privacidade.html">Politique de confidentialité</a>. Si vous n'êtes pas d'accord, n'utilisez pas le service.</p>
+
+<h2>2. Le service</h2>
+<p>Le <b>Tableau de score</b> compte les matchs de tennis (à l'écran ou avec le bracelet), annonce le score à voix haute et conserve historique et statistiques. Il fonctionne sans compte. Le <b>Réseau</b> permet de créer un profil, programmer des parties, publier, discuter et participer à des groupes, classements et tournois. Le service est en phase de test (bêta) : les fonctions peuvent changer, être indisponibles ou présenter des défauts, et il est fourni « en l'état ».</p>
+
+<h2>3. Compte et âge</h2>
+<ul>
+<li>Le compte utilise la connexion avec Google. Vous êtes responsable de la sécurité de votre accès et des actions effectuées avec votre compte.</li>
+<li>Le Réseau est destiné aux personnes de <span data-k="minAgeNetwork">18</span> ans et plus. Les mineurs peuvent utiliser le Tableau de score avec l'autorisation et sous la surveillance de leurs parents ou tuteurs.</li>
+<li>Fournissez des informations exactes. Ne créez pas de comptes au nom d'autres personnes.</li>
+</ul>
+
+<h2>4. Règles de conduite</h2>
+<p>Il est interdit d'utiliser le service pour :</p>
+<ul>
+<li>publier ou envoyer des contenus illégaux, offensants, discriminatoires, violents, sexuels, de harcèlement ou de menace ;</li>
+<li>exposer des données personnelles, des images ou des informations de tiers sans autorisation ;</li>
+<li>saisir de faux résultats, manipuler des classements ou des tournois, ou usurper l'identité d'autrui ;</li>
+<li>envoyer du spam, de la publicité non sollicitée ou des arnaques ;</li>
+<li>porter atteinte aux droits d'auteur, au droit à l'image ou aux marques ;</li>
+<li>tenter d'accéder aux données d'autres utilisateurs, contourner les règles de sécurité ou nuire au fonctionnement du service.</li>
+</ul>
+
+<h2>5. Votre contenu : photos, logos et textes</h2>
+<ul>
+<li>Vous restez propriétaire de ce que vous publiez (photos, textes, commentaires, messages, photos de profil et de groupe, écussons et logos).</li>
+<li><b>En envoyant une photo, une image, un logo ou un écusson (par exemple l'écusson d'un club comme photo de groupe), vous déclarez être titulaire des droits ou disposer de l'autorisation de leur titulaire, et que les personnes figurant sur les photos consentent à la publication.</b></li>
+<li>Vous accordez à <span data-k="app">BoxScore</span> une licence gratuite, non exclusive, mondiale et valable tant que le contenu est sur le service, pour stocker, reproduire, redimensionner et afficher ce contenu au sein du service, uniquement aux personnes autorisées par la visibilité choisie. La licence prend fin lorsque vous supprimez le contenu ou votre compte, sauf pour les copies déjà partagées par d'autres utilisateurs dans le service et les registres conservés au titre d'une obligation légale.</li>
+<li>Vous êtes responsable du contenu que vous publiez et répondez des dommages causés à des tiers.</li>
+</ul>
+
+<h2>6. Signalements et modération</h2>
+<p>Chacun peut signaler un contenu ou un utilisateur dans l'app ou via <a href="../placar/#contato">Nous contacter</a>. Un contenu signalé peut être masqué immédiatement pendant son examen. Nous pouvons retirer des contenus et suspendre ou fermer des comptes qui enfreignent ces Conditions ou la loi, et coopérer avec les autorités lorsque cela est exigé. En cas de désaccord avec un retrait, contactez-nous.</p>
+
+<h2>7. Groupes, classements, tournois et parties programmées</h2>
+<ul>
+<li>Les administrateurs de groupes fixent les règles de leurs classements et tournois et en sont responsables, ainsi que de l'organisation.</li>
+<li>Les résultats sont saisis et confirmés par les utilisateurs eux-mêmes. <span data-k="app">BoxScore</span> ne garantit pas l'exactitude des scores, classements ou résultats.</li>
+<li>Les frais d'inscription et le partage du coût du court affichés dans l'app sont purement informatifs : les paiements convenus entre organisateurs et joueurs ont lieu en dehors de l'app et relèvent de leur responsabilité. Les prix éventuels relèvent de l'organisateur.</li>
+<li>Les rencontres pour jouer sont organisées entre utilisateurs, qui répondent de leur propre sécurité, du lieu et de l'activité physique.</li>
+</ul>
+
+<h2>8. Bracelet</h2>
+<p>Le bracelet marque les points via Bluetooth. Utilisez-le selon les instructions, rechargez-le uniquement avec le câble indiqué et ne l'utilisez pas s'il est endommagé. Les fonctions matérielles peuvent varier selon le téléphone ou la tablette.</p>
+
+<h2>9. Offres payantes</h2>
+<p>Si le service propose des offres payantes, les conditions (prix, renouvellement, résiliation et droit de rétractation de 7 jours pour les achats à distance, conformément au Code brésilien de défense du consommateur) seront indiquées avant l'achat.</p>
+
+<h2>10. Propriété intellectuelle de l'app</h2>
+<p>Le logiciel, la marque, le design et les textes de <span data-k="app">BoxScore</span> appartiennent au responsable indiqué ci-dessus. Vous bénéficiez d'une licence personnelle, non exclusive et non transférable pour utiliser l'app. La copie, la modification, la revente ou l'ingénierie inverse ne sont pas autorisées, sauf lorsque la loi le permet.</p>
+
+<h2>11. Responsabilité</h2>
+<p>Dans les limites de la loi, nous ne sommes pas responsables : des contenus publiés par les utilisateurs ; des accords, rencontres, paiements et prix entre utilisateurs ; des indisponibilités temporaires ; des pertes dues à une mauvaise utilisation du compte ou à des défaillances d'appareils, de connexion ou de services tiers. Rien dans ces Conditions ne limite les droits garantis par le Code brésilien de défense du consommateur.</p>
+
+<h2>12. Résiliation</h2>
+<p>Vous pouvez cesser d'utiliser le service et supprimer votre compte à tout moment sous Réglages → Compte → Supprimer mon compte (voir <a href="excluir-conta.html">Supprimer le compte</a>). Nous pouvons mettre fin au service moyennant un préavis raisonnable.</p>
+
+<h2>13. Modifications, droit applicable et juridiction</h2>
+<p>Nous pouvons mettre à jour ces Conditions ; les changements importants seront annoncés dans l'app. Le droit brésilien s'applique. Le tribunal compétent est celui du domicile du consommateur.</p>
+
+<h2>14. Contact</h2>
+<p><a href="../placar/#contato">Nous contacter</a><span data-if-email> · <span data-email></span></span></p>
+
+<p class="meta"><a href="privacidade.html">Politique de confidentialité</a> · <a href="excluir-conta.html">Supprimer le compte</a></p>
+</article>
+<article data-lang="de" lang="de" hidden>
+<h1>Nutzungsbedingungen</h1>
+<p class="meta">Version <span data-k="version">1.0</span> · aktualisiert am <span data-k="updated">18. November 2026</span></p>
+
+<h2>1. Wer wir sind und Zustimmung</h2>
+<p><span data-k="app">BoxScore</span> (App, Website und Armband) wird angeboten von <b data-k="controller">[VOLLSTÄNDIGER NAME ODER FIRMA]</b> (<span data-k="docId">[CPF ODER CNPJ]</span>), <span data-k="city">[STADT/BUNDESSTAAT]</span>, Brasilien. Mit der Nutzung des Dienstes stimmst du diesen Bedingungen und der <a href="privacidade.html">Datenschutzerklärung</a> zu. Wenn du nicht einverstanden bist, nutze den Dienst nicht.</p>
+
+<h2>2. Der Dienst</h2>
+<p>Die <b>Anzeigetafel</b> zählt Tennisspiele (auf dem Bildschirm oder mit dem Armband), sagt den Spielstand an und speichert Verlauf und Statistiken. Sie funktioniert ohne Konto. Das <b>Netzwerk</b> ermöglicht es, ein Profil anzulegen, Spiele zu vereinbaren, Beiträge zu posten, zu chatten und an Gruppen, Ranglisten und Turnieren teilzunehmen. Der Dienst befindet sich in der Testphase (Beta): Funktionen können sich ändern, nicht verfügbar sein oder Fehler haben, und er wird „wie besehen" bereitgestellt.</p>
+
+<h2>3. Konto und Alter</h2>
+<ul>
+<li>Das Konto nutzt die Anmeldung mit Google. Du bist für die Sicherheit deines Zugangs und für die mit deinem Konto ausgeführten Handlungen verantwortlich.</li>
+<li>Das Netzwerk richtet sich an Personen ab <span data-k="minAgeNetwork">18</span> Jahren. Minderjährige können die Anzeigetafel mit Erlaubnis und unter Aufsicht der Eltern oder Erziehungsberechtigten nutzen.</li>
+<li>Mache wahrheitsgemäße Angaben. Erstelle keine Konten im Namen anderer Personen.</li>
+</ul>
+
+<h2>4. Verhaltensregeln</h2>
+<p>Es ist verboten, den Dienst zu nutzen, um:</p>
+<ul>
+<li>rechtswidrige, beleidigende, diskriminierende, gewalttätige oder sexuelle Inhalte, Belästigungen oder Drohungen zu veröffentlichen oder zu senden;</li>
+<li>personenbezogene Daten, Bilder oder Informationen Dritter ohne Erlaubnis offenzulegen;</li>
+<li>falsche Ergebnisse einzutragen, Ranglisten oder Turniere zu manipulieren oder sich als jemand anderes auszugeben;</li>
+<li>Spam, unerwünschte Werbung oder Betrug zu versenden;</li>
+<li>Urheber-, Bild- oder Markenrechte zu verletzen;</li>
+<li>zu versuchen, auf Daten anderer Nutzer zuzugreifen, Sicherheitsregeln zu umgehen oder den Betrieb des Dienstes zu stören.</li>
+</ul>
+
+<h2>5. Deine Inhalte: Fotos, Logos und Texte</h2>
+<ul>
+<li>Du bleibst Inhaber dessen, was du veröffentlichst (Fotos, Texte, Kommentare, Nachrichten, Profil- und Gruppenfotos, Wappen und Logos).</li>
+<li><b>Mit dem Hochladen eines Fotos, Bildes, Logos oder Wappens (zum Beispiel das Wappen eines Vereins als Gruppenfoto) erklärst du, dass du Inhaber der Rechte bist oder die Erlaubnis des Rechteinhabers hast und dass die abgebildeten Personen mit der Veröffentlichung einverstanden sind.</b></li>
+<li>Du räumst <span data-k="app">BoxScore</span> eine kostenlose, nicht exklusive, weltweite Lizenz für die Dauer ein, in der der Inhalt im Dienst ist, um diesen Inhalt innerhalb des Dienstes zu speichern, zu vervielfältigen, in der Größe anzupassen und anzuzeigen – nur für die Personen, die die von dir gewählte Sichtbarkeit erlaubt. Die Lizenz endet, wenn du den Inhalt oder dein Konto löschst, außer bei Kopien, die andere Nutzer im Dienst bereits geteilt haben, und bei Aufzeichnungen, die aufgrund gesetzlicher Pflichten aufbewahrt werden.</li>
+<li>Du bist für deine Inhalte verantwortlich und haftest für Schäden gegenüber Dritten.</li>
+</ul>
+
+<h2>6. Meldungen und Moderation</h2>
+<p>Jeder kann Inhalte oder Nutzer in der App oder über <a href="../placar/#contato">Kontakt</a> melden. Gemeldete Inhalte können während der Prüfung sofort ausgeblendet werden. Wir können Inhalte entfernen und Konten sperren oder schließen, die gegen diese Bedingungen oder das Gesetz verstoßen, und mit Behörden zusammenarbeiten, wenn dies verlangt wird. Wenn du mit einer Entfernung nicht einverstanden bist, kontaktiere uns.</p>
+
+<h2>7. Gruppen, Ranglisten, Turniere und vereinbarte Spiele</h2>
+<ul>
+<li>Gruppenadministratoren legen die Regeln ihrer Ranglisten und Turniere fest und sind für diese und die Organisation verantwortlich.</li>
+<li>Ergebnisse werden von den Nutzern selbst eingetragen und bestätigt. <span data-k="app">BoxScore</span> garantiert nicht die Richtigkeit von Spielständen, Ranglisten oder Platzierungen.</li>
+<li>In der App angezeigte Startgelder und Platzkostenaufteilungen dienen nur der Information: Zahlungen zwischen Veranstaltern und Spielern erfolgen außerhalb der App und liegen in deren Verantwortung. Preise, falls vorhanden, liegen in der Verantwortung des Veranstalters.</li>
+<li>Treffen zum Spielen werden zwischen den Nutzern vereinbart, die für ihre eigene Sicherheit, den Ort und die körperliche Aktivität verantwortlich sind.</li>
+</ul>
+
+<h2>8. Armband</h2>
+<p>Das Armband zählt Punkte per Bluetooth. Verwende es gemäß der Anleitung, lade es nur mit dem angegebenen Kabel und nutze es nicht, wenn es beschädigt ist. Hardwarefunktionen können je nach Smartphone oder Tablet variieren.</p>
+
+<h2>9. Kostenpflichtige Tarife</h2>
+<p>Falls der Dienst kostenpflichtige Tarife anbietet, werden die Bedingungen (Preis, Verlängerung, Kündigung und das 7-tägige Widerrufsrecht bei Fernabsatzverträgen nach dem brasilianischen Verbraucherschutzgesetz) vor dem Abschluss angezeigt.</p>
+
+<h2>10. Geistiges Eigentum der App</h2>
+<p>Software, Marke, Design und Texte von <span data-k="app">BoxScore</span> gehören dem oben genannten Verantwortlichen. Du erhältst eine persönliche, nicht exklusive und nicht übertragbare Lizenz zur Nutzung der App. Kopieren, Ändern, Weiterverkaufen oder Reverse Engineering ist nicht erlaubt, außer soweit gesetzlich zulässig.</p>
+
+<h2>11. Haftung</h2>
+<p>Im gesetzlich zulässigen Rahmen haften wir nicht für: von Nutzern veröffentlichte Inhalte; Absprachen, Treffen, Zahlungen und Preise zwischen Nutzern; vorübergehende Nichtverfügbarkeit; Verluste durch missbräuchliche Kontonutzung oder durch Fehler von Geräten, Verbindungen oder Diensten Dritter. Nichts in diesen Bedingungen schränkt die durch das brasilianische Verbraucherschutzgesetz garantierten Rechte ein.</p>
+
+<h2>12. Beendigung</h2>
+<p>Du kannst die Nutzung jederzeit beenden und dein Konto unter Einstellungen → Konto → Mein Konto löschen entfernen (siehe <a href="excluir-conta.html">Konto löschen</a>). Wir können den Dienst mit angemessener Vorankündigung einstellen.</p>
+
+<h2>13. Änderungen, anwendbares Recht und Gerichtsstand</h2>
+<p>Wir können diese Bedingungen aktualisieren; wesentliche Änderungen werden in der App angekündigt. Es gilt brasilianisches Recht. Zuständig ist das Gericht am Wohnsitz des Verbrauchers.</p>
+
+<h2>14. Kontakt</h2>
+<p><a href="../placar/#contato">Kontakt</a><span data-if-email> · <span data-email></span></span></p>
+
+<p class="meta"><a href="privacidade.html">Datenschutzerklärung</a> · <a href="excluir-conta.html">Konto löschen</a></p>
+</article>
 </main>
 <script src="config.js"></script>
 <script src="legal.js"></script>
