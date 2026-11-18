@@ -93,7 +93,7 @@ main .ph{width:100%;border-radius:12px;display:block;background:var(--bg);max-he
 (function () {
   'use strict';
   BXMods.mark('rede');
-  var VERSION = '0.34.0';
+  var VERSION = '0.34.1';
   var FB_CFG = { apiKey: 'AIzaSyD_L90YxJAVRuTfPqwNbETJlbV9BYdnuYI', authDomain: 'boxsocore.firebaseapp.com', projectId: 'boxsocore', storageBucket: 'boxsocore.firebasestorage.app', messagingSenderId: '639383913161', appId: '1:639383913161:web:a9bb75fcf99f4b03378318' };
   var FB_VER = '10.12.2', FB_LIBS = ['app', 'auth', 'firestore'];
   var HOUR = 3600000;
@@ -898,9 +898,10 @@ main .ph{width:100%;border-radius:12px;display:block;background:var(--bg);max-he
   }
   function cardPost(p) {
     var uid = S.user.uid, mine = p.authorUid === uid, liked = (p.likes || []).indexOf(uid) >= 0, kids = [];
-    kids.push(h('div', { cls: 'row' }, [memAv(p.authorUid, p.authorName), h('b', { text: p.authorName || '?', style: 'flex:1;font:800 15px var(--ui)' }), h('span', { cls: 'sub', text: dayL(p.playedAt) })]));
+    kids.push(h('div', { cls: 'row' }, [memAv(p.authorUid, p.authorName), h('b', { text: p.authorName || '?', style: 'flex:1;font:800 15px var(--ui)' }), h('span', { cls: 'sub', 'data-ts': String(p.createdAt || p.playedAt || 0), title: fmtWhen(p.createdAt || p.playedAt || 0), text: postWhen(p.createdAt || p.playedAt) })]));
     if (p.result) kids.push(h('div', { cls: 'when', style: 'font-size:20px', text: p.result }));
-    if (p.place) kids.push(h('div', { cls: 'sub', text: p.place + (p.city ? ' · ' + p.city : '') }));
+    var pDay = p.gameId && p.playedAt && dayL(p.playedAt) !== dayL(p.createdAt || p.playedAt) ? dayL(p.playedAt) : '';  // partida de outro dia: mostra quando foi jogada
+    if (p.place || pDay) kids.push(h('div', { cls: 'sub', text: [pDay, p.place ? p.place + (p.city ? ' · ' + p.city : '') : ''].filter(Boolean).join(' · ') }));
     var tg = (p.tags || []).map(function (u) { return (p.tagNames || {})[u]; }).filter(Boolean); if (tg.length) kids.push(h('div', { cls: 'tg', text: Tf('tg_with', tg.join(', ')) }));
     if (p.hasPhoto) { var im = h('img', { cls: 'ph', alt: '', loading: 'lazy' }); kids.push(im); if ('IntersectionObserver' in window) { var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { io.disconnect(); loadPhoto(p, im); } }); setTimeout(function () { io.observe(im); }, 0); } else loadPhoto(p, im); }
     if (p.caption) kids.push(h('div', { cls: 'pc', text: p.caption }));
@@ -967,6 +968,19 @@ main .ph{width:100%;border-radius:12px;display:block;background:var(--bg);max-he
   function isUnread(c) { var me0 = S.user.uid; return !!c.lastFrom && c.lastFrom !== me0 && (c.lastAt || 0) > ((c.reads || {})[me0] || 0); }
   function unreadN() { return S.chats.filter(isUnread).length; }
   function clock(ms) { try { return new Date(ms).toLocaleTimeString(LG, { hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; } }
+  // 0.34.1: tempo desde a publicação ("há 5 min") nas primeiras 24 h; depois, a data da publicação
+  function postWhen(ms) {
+    var d = Date.now() - (ms || 0);
+    if (!(ms > 0)) return '';
+    if (d >= 24 * 36e5) return dayL(ms);
+    try {
+      var rf = new Intl.RelativeTimeFormat(LG, { numeric: 'auto', style: 'long' });
+      if (d < 60e3) return rf.format(0, 'second');
+      if (d < 36e5) return rf.format(-Math.floor(d / 60e3), 'minute');
+      return rf.format(-Math.floor(d / 36e5), 'hour');
+    } catch (e) { return dayL(ms); }
+  }
+  setInterval(function () { [].forEach.call(document.querySelectorAll('[data-ts]'), function (el) { var t = postWhen(+el.getAttribute('data-ts')); if (el.textContent !== t) el.textContent = t; }); }, 60e3);
   function dayL(ms) { try { return new Date(ms).toLocaleDateString(LG, { weekday: 'short', day: 'numeric', month: 'short' }); } catch (e) { return ''; } }
   function msgBtn(uid, name, g) { return h('button', { type: 'button', cls: 'btn', text: T('msg'), on: { click: function () { openChat(uid, name, g); } } }); }
   function closeChat() {
