@@ -1,5 +1,6 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}.h-tour{display:flex;align-items:center;gap:6px;font:700 13px/1.3 var(--ui,inherit);color:var(--muted,#888);margin-top:4px}.h-tour .ico{width:16px;height:16px;flex:none}
-.acebtn{position:absolute;top:10px;right:10px;z-index:5;display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:999px;border:2px solid currentColor;background:var(--ball,#c8e02a);color:#20290a;font:800 16px/1 var(--ui,system-ui);box-shadow:0 4px 14px rgba(0,0,0,.25);animation:acein .18s ease-out}.acebtn .ico{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2}@keyframes acein{from{transform:scale(.8);opacity:0}to{transform:none;opacity:1}}
+.acebtn{position:absolute;top:10px;right:10px;z-index:5;display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:999px;border:2px solid currentColor;background:var(--ball,#c8e02a);color:#20290a;font:800 16px/1 var(--ui,system-ui);box-shadow:0 4px 14px rgba(0,0,0,.25);animation:acein .18s ease-out}.acebtn .ico{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2}
+.acemark{pointer-events:none;font-size:20px;padding:12px 20px}.acemark .ico{width:24px;height:24px}@keyframes acein{from{transform:scale(.8);opacity:0}to{transform:none;opacity:1}}
 .ssec{display:flex;align-items:center;gap:10px;margin:18px 0 6px;font:800 13px var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.ssec .ico{width:18px;height:18px}.spane>.ssec:first-child{margin-top:4px}.srow{gap:12px;padding:6px 0;border-bottom:1px solid var(--line);min-height:56px}.srow input[type=checkbox]{order:3;margin-left:auto;width:24px;height:24px;flex:none}.sic{display:inline-grid;place-items:center;width:38px;height:38px;flex:none;border-radius:12px;background:var(--bg);color:var(--ink)}.sic .ico{width:20px;height:20px}.field.srowf{display:flex;flex-direction:row;align-items:center;gap:12px;padding:6px 0;margin:0;border-bottom:1px solid var(--line)}.srowf .sgrow{flex:1;min-width:0;display:grid;gap:4px}.srowf .sgrow label{font:400 16px/1.25 var(--ui);letter-spacing:0;text-transform:none;color:var(--ink)}.srowf select{width:100%}#sTest .ico{width:18px;height:18px;vertical-align:-3px}
 #profBackRede{display:inline-flex;align-items:center;gap:6px;margin:0 0 10px;align-self:flex-start}#profBackRede .ico{width:18px;height:18px}
 </style>
@@ -856,7 +857,7 @@ html.nfy .bar { padding-right: max(230px, env(safe-area-inset-right, 0px)); }
       <div class="field" style="margin:14px 0 0" id="fMods"><h3 class="ssec"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span id="modTitle">Módulos</span></h3><div id="modList"></div></div>
       <h3 class="ssec"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span>Dados salvos</span></h3>
       <div class="actions"><button class="btn" type="button" id="sManage">Gerenciar dados salvos</button></div>
-      <p class="note" id="verNote">BoxScore Beta 7.6 · Placar 4.25.0</p>
+      <p class="note" id="verNote">BoxScore Beta 7.6.2 · Placar 4.25.1</p>
     </div>
     <div class="actions"><button class="btn primary" type="button" data-close>Pronto</button></div>
   </div>
@@ -1920,7 +1921,7 @@ try { I18N.applyDom(); } catch (e) {}
     var el = $('side' + w); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
     var parts = E.announce(G.state, r.events, speakNames(), { nameOnPoint: P.settings.nameOnPoint, stakes: P.settings.stakes });
     if (ace && P.settings.aceSay !== false) parts.unshift(T("Ace!"));
-    hideAce(); if (!ace && P.settings.aceOn && prev.server === w && G.state.winner === null) showAce(w, prev.pointsPlayed);
+    hideAce(); if (ace) flashAce(w); else if (P.settings.aceOn && prev.server === w && G.state.winner === null) showAce(w, prev.pointsPlayed);
     var sc = P.settings.serveCall || 'game';
     if (G.state.winner === null && (sc === 'point' || (sc === 'game' && (prev.server !== G.state.server || prev.serverPlayer !== G.state.serverPlayer)))) parts.push(serveLine(G.state));
     var at = alertText(G.state); if (at) parts.push(at);
@@ -1943,9 +1944,17 @@ try { I18N.applyDom(); } catch (e) {}
     ['pointerdown', 'touchstart', 'mousedown'].forEach(function (t) { b.addEventListener(t, function (ev) { ev.stopPropagation(); }, { passive: true }); });
     side.appendChild(b); aceT = setTimeout(hideAce, 3000);
   }
+  // 7.6.2: selo "Ace!" no lado de quem fez o ace (pulseira com ace, ou depois de tocar em Foi ace). Não recebe toques.
+  function flashAce(w) {
+    hideAce(); var side = $('side' + w); if (!side) return;
+    var b = document.createElement('div'); b.id = 'aceBtn'; b.className = 'acebtn acemark'; b.setAttribute('role', 'status');
+    b.innerHTML = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6c3 2.5 3 10.3 0 12.8M18.4 5.6c-3 2.5-3 10.3 0 12.8"/></svg>';
+    b.appendChild(document.createTextNode(' ' + T("Ace!")));
+    side.appendChild(b); aceT = setTimeout(hideAce, 2500);
+  }
   function markAce(n) {
     hideAce(); var L = G.meta.plog; if (!L || !L[n]) return;
-    L[n][11] = 1; if (P.settings.aceSay !== false) speak([T("Ace!")]); showToast(T("Ace registrado.")); persist();
+    L[n][11] = 1; if (P.settings.aceSay !== false) speak([T("Ace!")]); flashAce(L[n][0]); persist();
   }
   function undo() {
     if (!G.past.length) return;
