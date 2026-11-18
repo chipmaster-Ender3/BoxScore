@@ -857,7 +857,7 @@ html.nfy .bar { padding-right: max(230px, env(safe-area-inset-right, 0px)); }
       <div class="field" style="margin:14px 0 0" id="fMods"><h3 class="ssec"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span id="modTitle">Módulos</span></h3><div id="modList"></div></div>
       <h3 class="ssec"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span>Dados salvos</span></h3>
       <div class="actions"><button class="btn" type="button" id="sManage">Gerenciar dados salvos</button></div>
-      <p class="note" id="verNote">BoxScore Beta 7.6.2 · Placar 4.25.1</p>
+      <p class="note" id="verNote">BoxScore Beta 7.6.3 · Placar 4.25.2</p>
     </div>
     <div class="actions"><button class="btn primary" type="button" data-close>Pronto</button></div>
   </div>
@@ -1888,7 +1888,8 @@ try { I18N.applyDom(); } catch (e) {}
     if (!who) return d.serveSide === 'right' ? T('Saque pela direita') + '.' : T('Saque pela esquerda') + '.';
     return (d.serveSide === 'right' ? Tf('{0} saca pela direita', who) : Tf('{0} saca pela esquerda', who)) + '.';
   }
-  function point(w, ace) {
+  // noAceBtn (7.6.3): ponto vindo da pulseira no modo Com ace — o ace já tem gesto próprio, então não mostra "Foi ace"
+  function point(w, ace, noAceBtn) {
     if (anySheetOpen() || G.state.winner !== null || warmActive() || restActive()) return;
     var now = Date.now();
     if (now < ui.lockUntil) return;      // evita ponto duplo por toque repetido
@@ -1921,7 +1922,7 @@ try { I18N.applyDom(); } catch (e) {}
     var el = $('side' + w); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
     var parts = E.announce(G.state, r.events, speakNames(), { nameOnPoint: P.settings.nameOnPoint, stakes: P.settings.stakes });
     if (ace && P.settings.aceSay !== false) parts.unshift(T("Ace!"));
-    hideAce(); if (ace) flashAce(w); else if (P.settings.aceOn && prev.server === w && G.state.winner === null) showAce(w, prev.pointsPlayed);
+    hideAce(); if (ace) flashAce(w); else if (!noAceBtn && P.settings.aceOn && prev.server === w && G.state.winner === null) showAce(w, prev.pointsPlayed);
     var sc = P.settings.serveCall || 'game';
     if (G.state.winner === null && (sc === 'point' || (sc === 'game' && (prev.server !== G.state.server || prev.serverPlayer !== G.state.serverPlayer)))) parts.push(serveLine(G.state));
     var at = alertText(G.state); if (at) parts.push(at);
@@ -3799,7 +3800,7 @@ try { I18N.applyDom(); } catch (e) {}
       if (warmActive()) { if (act === 'point' || act === 'ace') advanceWarm(); return; }
       if (restActive()) { if (act === 'point' || act === 'ace') endRest('skip'); else undo(); return; }
       if (anySheetOpen()) return;
-      if (act === 'point') point(team); else if (act === 'ace') point(team, true); else undo();
+      if (act === 'point') point(team, false, !!MODES[cfg().mode].ace); else if (act === 'ace') point(team, true); else undo();
     }
     function assign(team, c) {
       var b = cfg(); b.list = b.list.filter(function (e) { return e.team !== team && e.id !== c.hw; });
