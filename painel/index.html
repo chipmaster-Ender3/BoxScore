@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Uso do app · BoxScore</title>
+<link rel="icon" href="../icons/icon-192.png">
+<link rel="stylesheet" href="../fonts/fonts.css">
+<style>
+/* BoxScore — Painel "Uso do app" (painel 1.0.0, Beta 7.10). Só para a equipe: lê a coleção telemetry. */
+:root { --bg: #f4f6f7; --card: #fcfcfb; --ink: #0b0b0b; --ink2: #52514e; --muted: #6b6a66; --line: #e2e1dc; --grid: #ecebe6;
+  --s1: #2a78d6; --s2: #eb6834; --chip: #0a1014; --chipInk: #fff; color-scheme: light dark; }
+@media (prefers-color-scheme: dark) { :root { --bg: #0f0f0e; --card: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --muted: #9a998f; --line: #2e2e2b; --grid: #262624;
+  --s1: #3987e5; --s2: #d95926; --chip: #f0efec; --chipInk: #0a1014; } }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15px/1.5 "Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+header { position: sticky; top: 0; z-index: 3; display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: var(--bg); border-bottom: 1px solid var(--line); }
+header .t { font: 800 20px/1.1 "Big Shoulders Display", "Public Sans", system-ui, sans-serif; text-transform: uppercase; letter-spacing: .02em; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+header .who { color: var(--muted); font-size: 13px; max-width: 40vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 520px) { header .who { display: none; } }
+main { max-width: 1080px; margin: 0 auto; padding: 16px 16px 56px; }
+h1 { font: 800 30px/1.1 "Big Shoulders Display", "Public Sans", system-ui, sans-serif; text-transform: uppercase; margin: 6px 0 2px; }
+h2 { font-size: 17px; margin: 0 0 10px; }
+.sub { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
+button, .btn { font: 700 14px/1 "Public Sans", system-ui, sans-serif; min-height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+button.pri { background: var(--chip); color: var(--chipInk); border-color: var(--chip); }
+button:disabled { opacity: .5; cursor: default; }
+.bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 16px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; background: var(--card); }
+.seg button { border: 0; min-height: 34px; padding: 0 14px; background: transparent; }
+.seg button[aria-pressed="true"] { background: var(--chip); color: var(--chipInk); }
+.bar .sp { flex: 1; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; margin: 0 0 14px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(136px, 1fr)); gap: 10px; margin: 0 0 14px; }
+.tile { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; }
+.tile .l { color: var(--ink2); font-size: 13px; }
+.tile .v { font: 800 32px/1.1 "Big Shoulders Display", "Public Sans", system-ui, sans-serif; margin: 4px 0 2px; font-variant-numeric: tabular-nums; }
+.tile .n { color: var(--muted); font-size: 12px; }
+.grid2 { display: grid; grid-template-columns: 1fr; gap: 14px; }
+@media (min-width: 860px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+.grid2 > .card { margin: 0; min-width: 0; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--ink2); margin: -4px 0 8px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.chart { position: relative; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { fill: var(--muted); font: 400 11px "Public Sans", system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+.tip { position: absolute; pointer-events: none; background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px; font-size: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.14); white-space: nowrap; transform: translate(-50%, -100%); z-index: 2; }
+.tip b { font-variant-numeric: tabular-nums; }
+.tip i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 5px; }
+details { margin-top: 8px; font-size: 13px; }
+summary { cursor: pointer; color: var(--ink2); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 7px 6px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+th { color: var(--ink2); font-weight: 600; font-size: 12px; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr.zero td { color: var(--muted); }
+.pbar { display: block; height: 4px; border-radius: 2px; background: var(--s1); margin-top: 4px; }
+.unused { color: var(--muted); font-size: 13px; margin: 6px 0 0; }
+.msg { max-width: 560px; margin: 40px auto; text-align: center; }
+.msg p { color: var(--ink2); }
+.code { display: inline-block; font: 600 14px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; word-break: break-all; user-select: all; }
+ol.steps { text-align: left; color: var(--ink2); }
+.foot { color: var(--muted); font-size: 12px; margin-top: 18px; }
+.err { color: #d03b3b; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header><span class="t">BoxScore · Uso do app</span><span class="who" id="who"></span><button id="out" hidden>Sair</button></header>
+<main>
+  <section id="vLoad" class="msg"><p>Carregando…</p></section>
+
+  <section id="vLogin" class="msg" hidden>
+    <h1>Uso do app</h1>
+    <p>Painel interno do BoxScore. Entre com a conta Google da equipe.</p>
+    <button class="pri" id="login">Entrar com Google</button>
+    <p class="err" id="loginErr"></p>
+  </section>
+
+  <section id="vDenied" class="msg" hidden>
+    <h1>Acesso restrito</h1>
+    <p>Esta conta ainda não tem acesso ao painel. Para liberar (uma vez só):</p>
+    <ol class="steps">
+      <li>Abra o <b>Firebase Console</b> → Firestore Database.</li>
+      <li>Crie a coleção <b>staff</b> (se ainda não existir).</li>
+      <li>Crie um documento com o ID abaixo e um campo qualquer (ex.: <b>nome</b> = seu nome).</li>
+      <li>Volte aqui e toque em <b>Tentar de novo</b>.</li>
+    </ol>
+    <p>ID desta conta:<br><span class="code" id="myUid"></span></p>
+    <p><button id="copyUid">Copiar ID</button> <button class="pri" id="retry">Tentar de novo</button></p>
+  </section>
+
+  <section id="vData" hidden>
+    <h1>Uso do app</h1>
+    <p class="sub" id="range"></p>
+    <div class="bar">
+      <div class="seg" id="per" role="group" aria-label="Período">
+        <button data-d="1">Hoje</button><button data-d="7" aria-pressed="true">7 dias</button><button data-d="30">30 dias</button><button data-d="90">90 dias</button>
+      </div>
+      <span class="sp"></span>
+      <button id="reload">Atualizar</button>
+      <button id="csv">Exportar CSV</button>
+    </div>
+    <p class="err" id="dataErr"></p>
+
+    <div class="tiles" id="tiles"></div>
+
+    <div class="grid2">
+      <div class="card">
+        <h2>Pessoas ativas por dia</h2>
+        <div class="legend"><span><i style="background:var(--s1)"></i>Com conta</span><span><i style="background:var(--s2)"></i>Sem conta</span></div>
+        <div class="chart" id="chPeople"></div>
+        <details><summary>Ver como tabela</summary><div id="tbPeople"></div></details>
+      </div>
+      <div class="card">
+        <h2>Jogos iniciados por dia</h2>
+        <div class="chart" id="chGames"></div>
+        <details><summary>Ver como tabela</summary><div id="tbGames"></div></details>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:14px">
+      <div class="card"><h2>Placar · recursos usados</h2><div id="tbPlacar"></div></div>
+      <div class="card"><h2>Rede · recursos usados</h2><div id="tbRede"></div></div>
+    </div>
+
+    <div class="grid2" style="margin-top:14px">
+      <div class="card"><h2>Onde usam</h2><div id="tbPlat"></div></div>
+      <div class="card"><h2>Versão e idioma</h2><div id="tbBuild"></div><div id="tbLang" style="margin-top:12px"></div></div>
+    </div>
+
+    <p class="foot" id="foot"></p>
+  </section>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+(function () {
+  'use strict';
+  var FB_CFG = { apiKey: 'AIzaSyD_L90YxJAVRuTfPqwNbETJlbV9BYdnuYI', authDomain: 'boxsocore.firebaseapp.com', projectId: 'boxsocore', storageBucket: 'boxsocore.firebasestorage.app', messagingSenderId: '639383913161', appId: '1:639383913161:web:a9bb75fcf99f4b03378318' };
+  var LBL = {
+    p_open: 'Abriu o Placar', p_start: 'Jogo iniciado', p_doubles: 'Jogo de duplas', p_warm: 'Com aquecimento', p_rest: 'Com descanso',
+    p_limit: 'Com limite de tempo', p_voice: 'Com voz ligada', p_preset: 'Usou configuração salva', p_from_game: 'Jogo vindo da Rede',
+    p_end: 'Jogo terminado', p_end_tb: 'Terminado no modo rápido', p_end_now: 'Encerrado antes do fim', p_later: 'Deixado para depois',
+    p_abandon: 'Abandonado', p_resume: 'Retomado', p_pt_screen: 'Ponto pela tela', p_pt_band: 'Ponto pela pulseira',
+    p_ace_screen: 'Ace pela tela', p_ace_band: 'Ace pela pulseira', p_undo: 'Desfazer ponto', p_hist: 'Abriu o histórico',
+    p_hist_filter: 'Usou filtro do histórico', p_sum: 'Abriu resumo da partida', p_prof: 'Abriu perfis', p_stats: 'Viu estatísticas',
+    p_share: 'Compartilhou', p_band_conn: 'Conectou a pulseira', p_settings: 'Abriu Ajustes', p_login: 'Fez login',
+    r_open: 'Abriu a Rede', r_tab_feed: 'Aba Feed', r_tab_find: 'Aba Buscar', r_tab_neu: 'Botão +', r_tab_groups: 'Aba Grupos',
+    r_tab_notif: 'Aba Início/Avisos', r_game_new: 'Criou jogo', r_game_accept: 'Aceitou jogo', r_post: 'Publicou', r_post_photo: 'Publicou com foto',
+    r_like: 'Curtiu', r_comment: 'Comentou', r_msg: 'Enviou mensagem', r_follow: 'Seguiu alguém', r_group_new: 'Criou grupo',
+    r_group_join: 'Entrou em grupo', r_result: 'Lançou resultado', r_tour_new: 'Criou torneio (chaves)', r_tour_join: 'Entrou em torneio', r_settings: 'Abriu Ajustes da Rede'
+  };
+  var PLAT = { android: 'App Android', ios: 'App iPhone', pwa: 'Instalado (PWA)', web: 'Navegador', '': 'Não informado' };
+  var $ = function (id) { return document.getElementById(id); };
+  var S = { days: 7, rows: null, agg: null, user: null, db: null, busy: false };
+
+  function show(v) { ['vLoad', 'vLogin', 'vDenied', 'vData'].forEach(function (k) { $(k).hidden = k !== v; }); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function fmt(n) { return Math.round(n).toLocaleString('pt-BR'); }
+  function pct(a, b) { return b ? Math.round(100 * a / b) + '%' : '—'; }
+  function dkey(t) { var d = new Date(t); return '' + d.getFullYear() + ('0' + (d.getMonth() + 1)).slice(-2) + ('0' + d.getDate()).slice(-2); }
+  function dlabel(k, long) { var d = new Date(+k.slice(0, 4), +k.slice(4, 6) - 1, +k.slice(6, 8)); return d.toLocaleDateString('pt-BR', long ? { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' } : { day: '2-digit', month: '2-digit' }); }
+  function dayList(n) { var out = [], t = new Date(); t.setHours(12, 0, 0, 0); for (var i = n - 1; i >= 0; i--) out.push(dkey(t.getTime() - i * 864e5)); return out; }
+
+  // ---------- login e acesso ----------
+  firebase.initializeApp(FB_CFG);
+  var auth = firebase.auth(); S.db = firebase.firestore();
+  auth.onAuthStateChanged(function (u) {
+    S.user = u; $('who').textContent = u ? (u.email || u.displayName || '') : ''; $('out').hidden = !u;
+    if (!u) { show('vLogin'); return; }
+    checkStaff();
+  });
+  $('login').addEventListener('click', function () {
+    $('loginErr').textContent = '';
+    var prov = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(prov).catch(function (e) {
+      var c = (e && e.code) || '';
+      if (/popup-blocked|operation-not-supported/.test(c)) { try { return auth.signInWithRedirect(prov); } catch (x) {} }
+      if (!/popup-closed|cancelled-popup/.test(c)) $('loginErr').textContent = 'Não foi possível entrar (' + c + ').';
+    });
+  });
+  $('out').addEventListener('click', function () { auth.signOut(); });
+  $('retry').addEventListener('click', function () { show('vLoad'); checkStaff(); });
+  $('copyUid').addEventListener('click', function () { try { navigator.clipboard.writeText(S.user.uid); $('copyUid').textContent = 'Copiado'; } catch (e) {} });
+
+  function checkStaff() {
+    show('vLoad');
+    S.db.collection('staff').doc(S.user.uid).get().then(function (s) {
+      if (!s.exists) return denied();
+      show('vData'); load();
+    }, denied);
+  }
+  function denied() { $('myUid').textContent = S.user ? S.user.uid : ''; show('vDenied'); }
+
+  // ---------- dados ----------
+  [].forEach.call($('per').children, function (b) {
+    b.addEventListener('click', function () {
+      if (S.busy) return;
+      [].forEach.call($('per').children, function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      S.days = +b.getAttribute('data-d'); load();
+    });
+  });
+  $('reload').addEventListener('click', function () { load(); });
+  $('csv').addEventListener('click', exportCsv);
+
+  function load() {
+    if (S.busy) return; S.busy = true; $('dataErr').textContent = ''; $('reload').disabled = true; $('reload').textContent = 'Carregando…';
+    var days = dayList(S.days);
+    S.db.collection('telemetry').where('d', '>=', days[0]).get().then(function (snap) {
+      var rows = [];
+      snap.docs.forEach(function (doc) {
+        var x = doc.data() || {}; if (!x.d || x.d < days[0] || x.d > days[days.length - 1]) return;
+        rows.push({ who: doc.id.slice(0, doc.id.length - 9), d: x.d, anon: !!x.anon, plat: x.plat || '', build: x.build || '', lang: x.lang || '', c: x.c || {} });
+      });
+      S.rows = rows; S.agg = aggregate(rows, days); render();
+    }, function (e) {
+      var c = (e && e.code) || '';
+      $('dataErr').textContent = /permission/.test(c) ? 'Sem permissão para ler a telemetria. Confira se as regras novas (Beta 7.10) foram publicadas e se esta conta está em "staff".' : 'Não foi possível carregar (' + (c || 'erro') + '). Tente Atualizar.';
+    }).then(function () { S.busy = false; $('reload').disabled = false; $('reload').textContent = 'Atualizar'; });
+  }
+
+  function aggregate(rows, days) {
+    var A = { days: days, per: {}, tot: {}, users: {}, people: {}, docs: rows.length };
+    days.forEach(function (d) { A.per[d] = { logged: {}, anon: {}, c: {} }; });
+    Object.keys(LBL).forEach(function (k) { A.tot[k] = 0; A.users[k] = {}; });
+    A.tot.p_min = 0;
+    rows.forEach(function (r) {
+      var P = A.per[r.d]; if (!P) return;
+      (r.anon ? P.anon : P.logged)[r.who] = 1;
+      var p = A.people[r.who] || (A.people[r.who] = { days: {}, anon: r.anon, last: '', plat: '', build: '', lang: '' });
+      p.days[r.d] = 1;
+      if (r.d >= p.last) { p.last = r.d; p.plat = r.plat; p.build = r.build; p.lang = r.lang; }
+      Object.keys(r.c).forEach(function (k) {
+        var v = +r.c[k] || 0; if (!(v > 0)) return;
+        P.c[k] = (P.c[k] || 0) + v;
+        if (k === 'p_min') { A.tot.p_min += v; return; }
+        if (!(k in A.tot)) return;
+        A.tot[k] += v; A.users[k][r.who] = 1;
+      });
+    });
+    return A;
+  }
+
+  // ---------- tela ----------
+  function n(o) { return Object.keys(o).length; }
+  function render() {
+    var A = S.agg, T = A.tot, d0 = A.days[0], d1 = A.days[A.days.length - 1];
+    $('range').textContent = (S.days === 1 ? 'Hoje, ' + dlabel(d1, true) : dlabel(d0, true) + ' a ' + dlabel(d1, true)) + ' · horário de cada aparelho';
+    var ids = Object.keys(A.people), N = ids.length;
+    var logged = ids.filter(function (w) { return !A.people[w].anon; }).length;
+    var back = ids.filter(function (w) { return n(A.people[w].days) >= 2; }).length;
+    var avg = A.days.reduce(function (s, d) { return s + n(A.per[d].logged) + n(A.per[d].anon); }, 0) / A.days.length;
+    var pts = T.p_pt_screen + T.p_pt_band + T.p_ace_screen + T.p_ace_band, band = T.p_pt_band + T.p_ace_band;
+    var tiles = [
+      ['Pessoas ativas', fmt(N), fmt(logged) + ' com conta · ' + fmt(N - logged) + ' sem conta'],
+      ['Média por dia', avg >= 10 || avg === 0 ? fmt(avg) : avg.toFixed(1).replace('.', ','), 'pessoas ativas por dia'],
+      ['Voltaram', S.days === 1 ? '—' : pct(back, N), S.days === 1 ? 'escolha 7 dias ou mais' : fmt(back) + ' usaram em 2 dias ou mais'],
+      ['Jogos iniciados', fmt(T.p_start), fmt(T.p_end) + ' terminados (' + pct(T.p_end, T.p_start) + ')'],
+      ['Duração média', T.p_end ? fmt(T.p_min / T.p_end) + ' min' : '—', 'por jogo terminado'],
+      ['Pontos pela pulseira', pct(band, pts), fmt(pts) + ' pontos marcados'],
+      ['Usaram a Rede', fmt(n(A.users.r_open)), pct(n(A.users.r_open), N) + ' das pessoas ativas']
+    ];
+    $('tiles').innerHTML = tiles.map(function (t) { return '<div class="tile"><div class="l">' + esc(t[0]) + '</div><div class="v">' + esc(t[1]) + '</div><div class="n">' + esc(t[2]) + '</div></div>'; }).join('');
+
+    var ser = A.days.map(function (d) { return { d: d, a: n(A.per[d].logged), b: n(A.per[d].anon) }; });
+    bars($('chPeople'), ser, true);
+    $('tbPeople').innerHTML = table(['Dia', 'Com conta', 'Sem conta', 'Total'], ser.slice().reverse().map(function (r) { return [dlabel(r.d, true), fmt(r.a), fmt(r.b), fmt(r.a + r.b)]; }), [0, 1, 1, 1]);
+    var g = A.days.map(function (d) { return { d: d, a: A.per[d].c.p_start || 0, b: 0 }; });
+    bars($('chGames'), g, false);
+    $('tbGames').innerHTML = table(['Dia', 'Iniciados', 'Terminados'], A.days.slice().reverse().map(function (d) { return [dlabel(d, true), fmt(A.per[d].c.p_start || 0), fmt(A.per[d].c.p_end || 0)]; }), [0, 1, 1]);
+
+    $('tbPlacar').innerHTML = feat('p_', N);
+    $('tbRede').innerHTML = feat('r_', N);
+    $('tbPlat').innerHTML = dist('plat', 'Plataforma', function (v) { return PLAT[v] || v; });
+    $('tbBuild').innerHTML = dist('build', 'Versão', function (v) { return v || 'Não informada'; });
+    $('tbLang').innerHTML = dist('lang', 'Idioma', function (v) { return v || 'Não informado'; });
+    $('foot').textContent = fmt(A.docs) + ' registros lidos (1 por pessoa por dia). Cada abertura do painel conta essas leituras no Firestore. ' +
+      'Quem usou sem conta e depois entrou pode aparecer duas vezes (sem conta e com conta). Números aparecem com até 10 minutos de atraso.';
+  }
+
+  function table(head, rows, num) {
+    return '<table><thead><tr>' + head.map(function (h, i) { return '<th' + (num[i] ? ' class="num"' : '') + '>' + esc(h) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+      rows.map(function (r) { return '<tr' + (r.zero ? ' class="zero"' : '') + '>' + r.map(function (c, i) { return '<td' + (num[i] ? ' class="num"' : '') + '>' + (i === 0 && r.html ? c : esc(c)) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table>';
+  }
+  function feat(pre, N) {
+    var A = S.agg, keys = Object.keys(LBL).filter(function (k) { return k.indexOf(pre) === 0; });
+    var max = Math.max.apply(null, keys.map(function (k) { return n(A.users[k]); }).concat([1]));
+    keys.sort(function (a, b) { return n(A.users[b]) - n(A.users[a]) || A.tot[b] - A.tot[a]; });
+    var used = keys.filter(function (k) { return A.tot[k] > 0; }), idle = keys.filter(function (k) { return !(A.tot[k] > 0); });
+    var rows = used.map(function (k) {
+      var u = n(A.users[k]), r = [esc(LBL[k]) + '<span class="pbar" style="width:' + Math.max(1, 100 * u / max) + '%"></span>', fmt(A.tot[k]), fmt(u), pct(u, N)];
+      r.html = 1; return r;
+    });
+    var out = used.length ? table(['Recurso', 'Vezes', 'Pessoas', '% ativas'], rows, [0, 1, 1, 1]) : '<p class="sub">Nada usado no período.</p>';
+    if (idle.length) out += '<details class="unused"><summary>Não usados no período (' + idle.length + ')</summary><p>' + idle.map(function (k) { return esc(LBL[k]); }).join(' · ') + '</p></details>';
+    return out;
+  }
+  function dist(f, title, name) {
+    var c = {}, ids = Object.keys(S.agg.people);
+    ids.forEach(function (w) { var v = S.agg.people[w][f] || ''; c[v] = (c[v] || 0) + 1; });
+    var ks = Object.keys(c).sort(function (a, b) { return c[b] - c[a]; });
+    if (!ks.length) return '<p class="sub">Sem dados no período.</p>';
+    return table([title, 'Pessoas', '%'], ks.map(function (k) { return [name(k), fmt(c[k]), pct(c[k], ids.length)]; }), [0, 1, 1]);
+  }
+
+  // Barras por dia (empilhadas quando há 2 séries). Cantos de cima arredondados, 2px entre segmentos, dica ao passar/tocar.
+  function bars(el, ser, two) {
+    var W = Math.max(280, el.clientWidth || 480), H = 190, L = 34, R = 6, Tp = 10, B = 24, iw = W - L - R, ih = H - Tp - B;
+    var max = Math.max.apply(null, ser.map(function (r) { return r.a + r.b; }).concat([1]));
+    var step = niceStep(max), top = Math.ceil(max / step) * step; if (!top) top = step;
+    var bw = iw / ser.length, gap = Math.min(6, bw * 0.25), w = Math.max(1, bw - gap), y = function (v) { return Tp + ih - ih * v / top; };
+    var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + (two ? 'Pessoas ativas por dia' : 'Jogos iniciados por dia') + '">';
+    for (var v = 0; v <= top + 1e-9; v += step) s += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="var(--grid)" stroke-width="1"/><text x="' + (L - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + fmt(v) + '</text>';
+    var every = Math.ceil(ser.length / Math.max(1, Math.floor(iw / 44)));
+    ser.forEach(function (r, i) {
+      var x = L + i * bw + gap / 2, ya = y(r.a), yb = y(r.a + r.b), rr = Math.min(4, w / 2);
+      if (r.a > 0) s += path(x, ya, w, y(0) - ya, r.b > 0 ? 0 : rr, 'var(--s1)');
+      if (r.b > 0) s += path(x, yb, w, Math.max(0, ya - yb - (r.a > 0 ? 2 : 0)), rr, 'var(--s2)');
+      if (i % every === 0 || i === ser.length - 1) s += '<text x="' + (x + w / 2) + '" y="' + (H - 6) + '" text-anchor="middle">' + (ser.length === 1 ? 'hoje' : dlabel(r.d)) + '</text>';
+      s += '<rect class="hit" data-i="' + i + '" x="' + (L + i * bw) + '" y="' + Tp + '" width="' + bw + '" height="' + ih + '" fill="transparent"/>';
+    });
+    s += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(0) + '" y2="' + y(0) + '" stroke="var(--line)" stroke-width="1"/></svg><div class="tip" hidden></div>';
+    el.innerHTML = s;
+    var tip = el.querySelector('.tip'), svg = el.querySelector('svg');
+    function hover(e) {
+      var t = e.target.closest ? e.target.closest('.hit') : null; if (!t) { tip.hidden = true; return; }
+      var r = ser[+t.getAttribute('data-i')], k = svg.getBoundingClientRect().width / W;
+      tip.innerHTML = '<div>' + esc(dlabel(r.d, true)) + '</div>' + (two
+        ? '<div><i style="background:var(--s1)"></i>Com conta <b>' + fmt(r.a) + '</b></div><div><i style="background:var(--s2)"></i>Sem conta <b>' + fmt(r.b) + '</b></div><div>Total <b>' + fmt(r.a + r.b) + '</b></div>'
+        : '<div>Jogos iniciados <b>' + fmt(r.a) + '</b></div>');
+      tip.hidden = false;
+      var cx = (L + (+t.getAttribute('data-i') + .5) * bw) * k, cy = y(r.a + r.b) * k - 6;
+      tip.style.left = Math.min(Math.max(cx, 70), el.clientWidth - 70) + 'px'; tip.style.top = Math.max(cy, 40) + 'px';
+    }
+    svg.addEventListener('pointermove', hover); svg.addEventListener('pointerdown', hover);
+    svg.addEventListener('pointerleave', function () { tip.hidden = true; });
+  }
+  function path(x, y, w, h, r, fill) {
+    if (h <= 0) return '';
+    r = Math.min(r, h, w / 2);
+    return '<path d="M' + x + ',' + (y + h) + 'V' + (y + r) + 'Q' + x + ',' + y + ' ' + (x + r) + ',' + y + 'H' + (x + w - r) + 'Q' + (x + w) + ',' + y + ' ' + (x + w) + ',' + (y + r) + 'V' + (y + h) + 'Z" fill="' + fill + '"/>';
+  }
+  function niceStep(max) { var raw = max / 4, p = Math.pow(10, Math.floor(Math.log10(Math.max(raw, 1)))), m = raw / p; return Math.max(1, (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p); }
+  var rt = null; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { if (S.agg && !$('vData').hidden) render(); }, 150); });
+
+  // ---------- CSV (um dia por linha) ----------
+  function exportCsv() {
+    if (!S.agg) return;
+    var A = S.agg, keys = Object.keys(LBL).concat(['p_min']);
+    var head = ['dia', 'pessoas', 'com_conta', 'sem_conta'].concat(keys);
+    var lines = [head.join(';')].concat(A.days.map(function (d) {
+      var P = A.per[d], a = n(P.logged), b = n(P.anon);
+      return [d.slice(0, 4) + '-' + d.slice(4, 6) + '-' + d.slice(6), a + b, a, b].concat(keys.map(function (k) { return Math.round(P.c[k] || 0); })).join(';');
+    }));
+    var blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'boxscore-uso-' + A.days[0] + '-' + A.days[A.days.length - 1] + '.csv';
+    document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
+})();
+</script>
+</body>
+</html>
