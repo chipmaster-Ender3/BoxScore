@@ -263,7 +263,13 @@ input[type=range] { width: 100%; min-height: 40px; accent-color: var(--p2); }
 .hist summary { display: grid; gap: 4px; padding: 12px 14px; cursor: pointer; list-style: none; min-height: 48px; }
 .hist summary::-webkit-details-marker { display: none; }
 .hist .h-top { display: flex; justify-content: space-between; gap: 10px; font: 700 16px/1.25 var(--ui); }
-.hist .h-top span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.hist .h-top { align-items: center; }
+.hist .h-vs { display: grid; gap: 6px; min-width: 0; }
+.hist .h-p { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.hist .h-n { min-width: 0; overflow-wrap: anywhere; }
+.hist .h-x { display: none; }
+.hist .h-sc { flex: none; }
+.hist .av { --avs: 32px; background: var(--line); border-color: var(--line); color: var(--muted); }
 .hist .h-sub { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .hist .h-body { padding: 0 14px 14px; display: grid; gap: 10px; }
 .hist .h-actions { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -834,7 +840,7 @@ html.nfy .bar { padding-right: max(230px, env(safe-area-inset-right, 0px)); }
       <div class="field" style="margin:14px 0 0" id="fMods"><h3 class="ssec"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span id="modTitle">Módulos</span></h3><div id="modList"></div></div>
       <h3 class="ssec"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span>Dados salvos</span></h3>
       <div class="actions"><button class="btn" type="button" id="sManage">Gerenciar dados salvos</button></div>
-      <p class="note" id="verNote">BoxScore Beta 7.4 · Placar 4.23.0</p>
+      <p class="note" id="verNote">BoxScore Beta 7.5.1 · Placar 4.24.0</p>
     </div>
     <div class="actions"><button class="btn primary" type="button" data-close>Pronto</button></div>
   </div>
@@ -1598,6 +1604,13 @@ try { I18N.applyDom(); } catch (e) {}
     function z(n) { return (n < 10 ? '0' : '') + n; }
     return h ? h + ':' + z(m) + ':' + z(sec) : z(m) + ':' + z(sec);
   }
+  // Beta 7.5.1: duração real. Inacabada: até o último ponto (plog), não até a hora em que foi guardada.
+  function durOf(e) {
+    if (!e || !e.playStart) return 0;
+    if (e.finished) return e.endedAt ? Math.max(0, e.endedAt - e.playStart) : 0;
+    var l = e.plog && e.plog.length ? e.plog[e.plog.length - 1] : null;
+    return l && l[9] > 0 ? l[9] * 1000 : 0;
+  }
   function fmtDurText(ms) {
     var m = Math.round(ms / 60000), h = Math.floor(m / 60);
     return h ? Tf("{0} h {1} min", h, (m % 60)) : Tf("{0} min", Math.max(m, 1));
@@ -2166,7 +2179,7 @@ try { I18N.applyDom(); } catch (e) {}
     var line = fmtDateFull(e.playStart || e.startedAt) + (e.place ? ' · ' + e.place : '') + (e.surface ? ' · ' + SURF[e.surface] : '') + ' · ' + e.names[0] + ' ' + e.setsWon[0] + ' x ' + e.setsWon[1] + ' ' + e.names[1];
     var sets = setsLine(e);
     if (sets) line += ' (' + sets + ')';
-    if (e.endedAt && e.playStart) line += ' · ' + fmtDurText(e.endedAt - e.playStart);
+    if (durOf(e)) line += ' · ' + fmtDurText(durOf(e));
     if (!e.finished && e.current) line += Tf(" · inacabada, games {0}-{1}", e.current.games[0], e.current.games[1]);
     if (e.sharedFrom) line += Tf(" · registrada por {0}", (e.sharedFromName || T("um amigo")));
     if (e.finished && e.ended === 'quick') line += T(" · decidida em desempate rápido");
@@ -2199,11 +2212,20 @@ try { I18N.applyDom(); } catch (e) {}
       var det = document.createElement('details'); det.setAttribute('data-id', e.id);
       var sum = document.createElement('summary');
       var top = document.createElement('div'); top.className = 'h-top';
-      var a = document.createElement('span'); a.textContent = e.names[0] + ' x ' + e.names[1];
-      var b = document.createElement('span'); b.textContent = e.setsWon[0] + ' x ' + e.setsWon[1];
+      var a = document.createElement('div'); a.className = 'h-vs';
+      [0, 1].forEach(function (t) {
+        if (t) { var x = document.createElement('span'); x.className = 'h-x'; x.textContent = 'x'; a.appendChild(x); }
+        var side = document.createElement('span'); side.className = 'h-p';
+        var avs = document.createElement('span'); avs.className = 'avs';
+        var names = (e.players && e.players[t]) || [e.names[t]], ids = (e.pids && e.pids[t]) || [];
+        names.forEach(function (n, i) { var pl = (ids[i] && P.players[ids[i]]) || findByName(n); var av = document.createElement('span'); av.className = 'av'; fillAv(av, pl || { name: n }); avs.appendChild(av); });
+        var nm = document.createElement('span'); nm.className = 'h-n'; nm.textContent = e.names[t];
+        side.appendChild(avs); side.appendChild(nm); a.appendChild(side);
+      });
+      var b = document.createElement('span'); b.className = 'h-sc'; b.textContent = e.setsWon[0] + ' x ' + e.setsWon[1];
       top.appendChild(a); top.appendChild(b);
       var sub = document.createElement('div'); sub.className = 'h-sub';
-      sub.textContent = [fmtDateFull(e.playStart || e.startedAt), [e.place, e.surface ? SURF[e.surface] : ''].filter(Boolean).join(' · '), setsLine(e), e.endedAt && e.playStart ? fmtDurText(e.endedAt - e.playStart) : '', e.finished ? (e.ended === 'quick' ? T("desempate rápido") : e.ended === 'manual' ? 'encerrada' : '') : T("inacabada")].filter(Boolean).join(' · ');
+      sub.textContent = [fmtDateFull(e.playStart || e.startedAt), [e.place, e.surface ? SURF[e.surface] : ''].filter(Boolean).join(' · '), setsLine(e), durOf(e) ? fmtDurText(durOf(e)) : '', e.finished ? (e.ended === 'quick' ? T("desempate rápido") : e.ended === 'manual' ? 'encerrada' : '') : T("inacabada")].filter(Boolean).join(' · ');
       sum.appendChild(top); sum.appendChild(sub);
       if (e.tour && e.tour.name) { var tb = document.createElement('div'); tb.className = 'h-tour'; tb.innerHTML = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>'; var tt = document.createElement('span'); tt.textContent = e.tour.name + (e.tour.phase ? ' · ' + e.tour.phase : ''); tb.appendChild(tt); sum.appendChild(tb); }
       var body = document.createElement('div'); body.className = 'h-body';
@@ -3461,7 +3483,7 @@ try { I18N.applyDom(); } catch (e) {}
     $('sumTop').innerHTML = '';
     $('sumTop').appendChild(mk('b', '', e.names[0] + ' ' + e.setsWon[0] + ' x ' + e.setsWon[1] + ' ' + e.names[1]));
     $('sumTop').appendChild(document.createTextNode([fmtDateFull(e.playStart || e.startedAt), e.place, e.surface ? SURF[e.surface] : '', (e.sets || []).map(setText).join(' '),
-      e.endedAt && e.playStart ? fmtDurText(e.endedAt - e.playStart) : '', e.finished ? '' : T("inacabada")].filter(Boolean).join(' · ')));
+      durOf(e) ? fmtDurText(durOf(e)) : '', e.finished ? '' : T("inacabada")].filter(Boolean).join(' · ')));
     Array.prototype.forEach.call($('sumTabs').children, function (t) { t.setAttribute('aria-selected', t.getAttribute('data-t') === sumTab ? 'true' : 'false'); });
     var host = $('sumBody'); host.innerHTML = '';
     if (sumTab === 'num') sumNumbers(e, host); else if (sumTab === 'mom') sumMomentum(e, host); else sumTimeline(e, host);
@@ -3540,7 +3562,7 @@ try { I18N.applyDom(); } catch (e) {}
       // informações
       var info = [];
       if (e.place || e.surface) info.push([e.place, e.surface ? SURF[e.surface] : ''].filter(Boolean).join(' · '));
-      if (e.endedAt && e.playStart) info.push(Tf("Duração {0}", fmtDurText(e.endedAt - e.playStart)));
+      if (durOf(e)) info.push(Tf("Duração {0}", fmtDurText(durOf(e))));
       if (!e.finished) info.push(T("Partida inacabada"));
       c.fillStyle = '#C9D6DD'; c.textAlign = 'center';
       info.forEach(function (t, i) { fitFont(c, t, 600, UF, W - 140, 40, 24); c.fillText(t, W / 2, 1100 + i * 62); });
