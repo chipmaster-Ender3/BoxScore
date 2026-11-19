@@ -88,13 +88,26 @@ main .ph{display:block;width:auto;height:auto;max-width:100%;max-height:min(78vh
 .st-blk{display:grid;gap:8px}.st-blk .who{display:flex;align-items:center;gap:10px}
 .st-foot{margin:18px 4px 8px;font-size:12px}
 @media (min-width:720px){.st-row:not(.st-link){grid-template-columns:40px minmax(0,1fr) minmax(280px,48%)}.st-ctl{grid-column:3}}
+
+/* 7.17: topo de cada aba com imagem de tênis (shared/heroes.js) */
+header.hero{position:relative;align-items:flex-end;min-height:clamp(92px,15vh,120px);padding:12px 14px;border-radius:16px;color:#fff;background:linear-gradient(90deg,rgba(5,9,13,.86) 0%,rgba(5,9,13,.6) 42%,rgba(5,9,13,.12) 78%,rgba(5,9,13,0) 100%),var(--hero,linear-gradient(120deg,#2F7351,#2D63AD)) 100% 50%/cover no-repeat}
+header.hero .htx{flex:1;min-width:0;display:grid;gap:2px}
+header.hero h1{color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.55);flex:none;font-size:clamp(24px,7vw,34px)}
+header.hero #kick{font:800 11px/1 var(--ui);letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.78);display:block}
+header.hero #ver{color:rgba(255,255,255,.65);align-self:flex-start}
+header.hero .btn{color:#fff;background:rgba(0,0,0,.38);border-color:transparent;align-self:flex-start}
+header.hero #setB[aria-pressed="true"],header.hero .btn.on{background:#fff;color:#111}
+.chat .ct.hero{min-height:clamp(88px,14vh,112px);align-items:flex-end;color:#fff;border-bottom:0;background:linear-gradient(90deg,rgba(5,9,13,.86) 0%,rgba(5,9,13,.6) 42%,rgba(5,9,13,.12) 78%,rgba(5,9,13,0) 100%),var(--hero,linear-gradient(120deg,#2F7351,#2D63AD)) 100% 50%/cover no-repeat}
+.chat .ct.hero b{font:900 26px/1 var(--display);text-transform:uppercase;letter-spacing:.02em;text-shadow:0 2px 12px rgba(0,0,0,.55);color:#fff}
+.chat .ct.hero .btn{color:#fff;background:rgba(0,0,0,.38);border-color:transparent;align-self:flex-start}
 </style>
 <script src="../shared/modules.js"></script>
 <script src="../shared/profile-view.js"></script>
 <script src="../shared/telemetry.js"></script>
+<script src="../shared/heroes.js"></script>
 </head><body>
 <main>
-<header><h1 id="ttl"></h1><small id="ver"></small><button class="btn" id="chatB" type="button" hidden></button><button class="btn" id="setB" type="button" hidden></button><button class="btn" id="back" type="button"></button></header>
+<header id="hdr" class="hero"><div class="htx"><small id="kick">BoxScore</small><h1 id="ttl"></h1></div><small id="ver"></small><button class="btn" id="chatB" type="button" hidden></button><button class="btn" id="setB" type="button" hidden></button><button class="btn" id="back" type="button"></button></header>
 <div id="gate" class="card" hidden><div class="sub" id="gateT"></div><button class="btn pri" id="login" type="button"></button><div class="msg" id="gateE" hidden></div></div>
 <div id="app" hidden>
 <nav class="tabs" id="tabs"></nav>
@@ -114,7 +127,7 @@ main .ph{display:block;width:auto;height:auto;max-width:100%;max-height:min(78vh
 (function () {
   'use strict';
   BXMods.mark('rede');
-  var VERSION = '0.38.0';
+  var VERSION = '0.39.0';
   var FB_CFG = { apiKey: 'AIzaSyD_L90YxJAVRuTfPqwNbETJlbV9BYdnuYI', authDomain: 'boxsocore.firebaseapp.com', projectId: 'boxsocore', storageBucket: 'boxsocore.firebasestorage.app', messagingSenderId: '639383913161', appId: '1:639383913161:web:a9bb75fcf99f4b03378318' };
   var FB_VER = '10.12.2', FB_LIBS = ['app', 'auth', 'firestore'];
   var HOUR = 3600000;
@@ -510,7 +523,7 @@ main .ph{display:block;width:auto;height:auto;max-width:100%;max-height:min(78vh
     return loadFB().then(function () {
       firebase.initializeApp(FB_CFG);
       S.auth = firebase.auth(); S.db = firebase.firestore();
-      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.16.1', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
+      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.17', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
       try { S.db.settings({ experimentalAutoDetectLongPolling: true, merge: true }); } catch (e) {}
       try { S.auth.getRedirectResult().catch(function () {}); } catch (e) {}
       S.auth.onAuthStateChanged(function (u) { S.user = u || null; paintGate(); if (u) { loadFriends(); loadFollows(); loadBlocks().then(reload); ensureProfile(); } });
@@ -887,7 +900,7 @@ main .ph{display:block;width:auto;height:auto;max-width:100%;max-height:min(78vh
         .then(function () { tel('r_post'); if (photo) tel('r_post_photo'); close(); toast(T('pub_ok')); S.tab = 'feed'; S.pubAt = 0; if (vis === 'public') { S.pub[pr.id] = Object.assign({ id: pr.id }, doc); } return reload(); }).catch(function () { pubB.disabled = false; toast(T('fail')); });
     });
     root.appendChild(h('div', { cls: 'w' }, [
-      h('div', { cls: 'ct' }, [h('button', { type: 'button', cls: 'btn', text: '←', 'aria-label': T('close'), on: { click: close } }), h('b', { text: free ? T('np_t') : T('pub_t') })]),
+      heroCt(h('div', { cls: 'ct' }, [h('button', { type: 'button', cls: 'btn', text: '←', 'aria-label': T('close'), on: { click: close } }), h('b', { text: free ? T('np_t') : T('pub_t') })]), 'publicar'),
       list, h('div', { cls: 'cf' }, [pubB])]));
     document.body.appendChild(root);
   }
@@ -1174,7 +1187,7 @@ main .ph{display:block;width:auto;height:auto;max-width:100%;max-height:min(78vh
       send.disabled = true;
       ref(g.id).update({ manual: m, updatedAt: Date.now() }).then(function () { tel('r_result'); close(); toast(T('rs_sent')); return reload(); }).catch(function () { send.disabled = false; toast(T('fail')); });
     });
-    root.appendChild(h('div', { cls: 'w' }, [h('div', { cls: 'ct' }, [h('button', { type: 'button', cls: 'btn', text: '←', 'aria-label': T('close'), on: { click: close } }), h('span', { cls: 'sico' }, [ic('check')]), h('b', { text: T('rs_title') })]), list, h('div', { cls: 'cf' }, [send])]));
+    root.appendChild(h('div', { cls: 'w' }, [heroCt(h('div', { cls: 'ct' }, [h('button', { type: 'button', cls: 'btn', text: '←', 'aria-label': T('close'), on: { click: close } }), h('span', { cls: 'sico' }, [ic('check')]), h('b', { text: T('rs_title') })]), 'trofeu'), list, h('div', { cls: 'cf' }, [send])]));
     document.body.appendChild(root);
   }
   function answerResult(g, yes) {
@@ -1332,8 +1345,19 @@ main .ph{display:block;width:auto;height:auto;max-width:100%;max-height:min(78vh
     else if (navigator.clipboard) navigator.clipboard.writeText(txt).then(function () { toast('✓'); }, function () {});
   }
 
+
+  // 7.17: topo com imagem e o nome da aba
+  var TAB_HERO = { home: ['avisos', 'tab_av'], feed: ['feed', 'feed'], find: ['jogos', 'find'], mine: ['jogos', 'find'], neu: ['marcar', 'plus_game'], groups: ['grupos', 'groups'], set: ['ajustes', 'set_aria'], chat: ['conversas', 'chat'] };
+  function heroTop() {
+    var hd = $('hdr'); if (!hd) return;
+    var on = S.user && !$('app').hidden, m = on ? (TAB_HERO[S.tab] || TAB_HERO.feed) : ['feed', null];
+    $('ttl').textContent = m[1] ? T(m[1]) : 'BoxScore';
+    $('kick').textContent = m[1] ? 'BoxScore' : T('rede');
+    if (window.BXHero) BXHero.apply(hd, m[0]);
+  }
+  function heroCt(el, key) { el.classList.add('hero'); if (window.BXHero) BXHero.apply(el, key); return el; }
   function paintTabs() {
-    var host = $('tabs'); host.textContent = '';
+    var host = $('tabs'); host.textContent = ''; heroTop();
     var invN = 0; Object.keys(S.games).forEach(function (k) { var g = S.games[k]; if ((g.invited || []).indexOf(S.user.uid) >= 0 && (g.accepted || []).indexOf(S.user.uid) < 0 && (g.declined || []).indexOf(S.user.uid) < 0 && g.status === 'open' && g.startAt > Date.now()) invN++; });
     var pend = 0; Object.keys(S.games).forEach(function (k) { var g = S.games[k]; if (g.hostUid === (S.user && S.user.uid) && (g.status === 'open' || g.status === 'full')) pend += (g.asked || []).length; });
     var gpend = 0; Object.keys(S.gReqs).forEach(function (k) { gpend += (S.gReqs[k] || []).length; }); Object.keys(CX.cr).forEach(function (k) { gpend += (CX.cr[k] || []).length; });
@@ -1574,7 +1598,7 @@ main .ph{display:block;width:auto;height:auto;max-width:100%;max-height:min(78vh
       createGroup(w).then(function (g) { close(); toast(T('grp_created')); S.gid = g.id; S.gtab = 'sum'; S.gf = 'mine'; S.tab = 'groups'; return loadGroups(); }).catch(function () { nxt.disabled = false; failT(); });
     });
     foot.appendChild(back); foot.appendChild(nxt);
-    root = h('div', { cls: 'chat', role: 'dialog' }, [h('div', { cls: 'w' }, [h('div', { cls: 'ct' }, [h('button', { type: 'button', cls: 'btn', text: '←', 'aria-label': T('close'), on: { click: close } }), ttl, dots]), h('div', { cls: 'cl' }, [body]), foot])]);
+    root = h('div', { cls: 'chat', role: 'dialog' }, [h('div', { cls: 'w' }, [heroCt(h('div', { cls: 'ct' }, [h('button', { type: 'button', cls: 'btn', text: '←', 'aria-label': T('close'), on: { click: close } }), ttl, dots]), 'grupos'), h('div', { cls: 'cl' }, [body]), foot])]);
     document.body.appendChild(root); draw();
   }
   function createGroup(w) {
@@ -3060,7 +3084,7 @@ main .ph{display:block;width:auto;height:auto;max-width:100%;max-height:min(78vh
   }
 
   // ---------- início ----------
-  $('ttl').textContent = 'BoxScore'; $('ver').textContent = 'v' + VERSION;
+  $('ttl').textContent = 'BoxScore'; $('ver').textContent = 'v' + VERSION; heroTop();
   var b = $('back'); b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS.ball + '</svg>'; b.appendChild(h('span', { text: BXMods.t('placar') })); b.setAttribute('aria-label', BXMods.t('back')); b.addEventListener('click', function () { BXMods.mark('placar'); location.href = '../placar/'; });
   window.addEventListener('hashchange', function () { S.hashDone = false; S.draftDone = false; if (S.user) { openHashCode(); openDraft(); } });
   $('chatB').addEventListener('click', function () { S.tab = 'chat'; paint(); reload(); });

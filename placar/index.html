@@ -48,6 +48,13 @@ html[data-board="night"] .side .pts { text-shadow: 0 0 30px rgba(140,180,255,.35
 .bth .mini.night i.l, .bth .mini.night i.r { background: radial-gradient(circle at 20% 0, rgba(255,250,215,.45), transparent 60%), linear-gradient(#163A6B, #163A6B) 50% 50% / 80% 72% no-repeat, #0D1B2E; }
 .bth span:last-child { max-width: 100%; overflow-wrap: anywhere; }
 @media (max-width: 420px) { .bthemes { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* 7.17: cabeçalho das janelas com imagem de tênis (shared/heroes.js) — mais baixo que o da Vitória */
+.card-head.hero { position: relative; margin: -16px calc(var(--px) * -1) 14px; padding: 14px var(--px) 14px; min-height: clamp(84px, 14vh, 112px); align-items: flex-end; border-radius: 13px 13px 0 0; color: #fff;
+  background: linear-gradient(90deg, rgba(5,9,13,.86) 0%, rgba(5,9,13,.62) 40%, rgba(5,9,13,.14) 76%, rgba(5,9,13,0) 100%), var(--hero, linear-gradient(120deg, #2F7351, #2D63AD)) 100% 50% / cover no-repeat; }
+.card-head.hero h2 { color: #fff; text-shadow: 0 2px 12px rgba(0,0,0,.55); }
+.card-head.hero > .btn { align-self: flex-start; color: #fff; background: rgba(0,0,0,.38); border-color: transparent; width: 44px; height: 44px; min-height: 44px; padding: 0; border-radius: 50%; display: grid; place-items: center; }
+@media (max-height: 520px) and (orientation: landscape) { .card-head.hero { min-height: 72px; } }
 </style>
 <title>BoxScore</title>
 <meta name="theme-color" content="#0A1014">
@@ -60,6 +67,7 @@ html[data-board="night"] .side .pts { text-shadow: 0 0 30px rgba(140,180,255,.35
 <script src="../shared/match-v1.js"></script>
 <script src="../shared/modules.js"></script>
 <script src="../shared/telemetry.js"></script>
+<script src="../shared/heroes.js"></script>
 <script src="../legal/config.js"></script>
 </head><body>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -999,7 +1007,7 @@ html.nfy .bar { padding-right: max(230px, env(safe-area-inset-right, 0px)); }
       <div class="actions"><button class="btn" type="button" id="sManage">Gerenciar dados salvos</button></div>
       <label class="check srow"><span class="sic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><input type="checkbox" id="sTel"> Enviar estatísticas de uso</label>
       <span class="hint" id="sTelHint">Só contagens anônimas de uso dos recursos (ex.: quantas partidas, se usou a pulseira), para melhorar o app. Nunca nomes, placares, mensagens, fotos ou local.</span>
-      <p class="note" id="verNote">BoxScore Beta 7.16.1 · Placar 4.33.1</p>
+      <p class="note" id="verNote">BoxScore Beta 7.17 · Placar 4.34.0</p>
     </div>
     <div class="actions"><button class="btn primary" type="button" data-close>Pronto</button></div>
   </div>
@@ -2665,6 +2673,18 @@ try { I18N.applyDom(); } catch (e) {}
   Array.prototype.forEach.call(document.querySelectorAll('[data-close]'), function (b) { b.addEventListener('click', closeSheets); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSheets(); });
 
+
+  // 7.17: imagem no cabeçalho de cada janela (aparece ao abrir; gerada 1x)
+  var HERO_OF = { shNew: 'new', shProf: 'prof', shSet: 'set', shMore: 'more', shBand: 'band', shContact: 'contact', shShare: 'share', shDel: 'del', shData: 'data', shHist: 'hist', shSum: 'sum', shPriv: 'priv', shUser: 'user', shFr: 'fr', shClose: 'close' };
+  (function () {
+    Object.keys(HERO_OF).forEach(function (id) {
+      var sh = $(id), head = sh && sh.querySelector('.card > .card-head'); if (!head) return;
+      head.classList.add('hero'); head.setAttribute('data-hero', HERO_OF[id]);
+      function on() { if (!sh.hidden && window.BXHero) BXHero.apply(head, HERO_OF[id]); }
+      try { new MutationObserver(on).observe(sh, { attributes: true, attributeFilter: ['hidden'] }); } catch (x) {}
+      on();
+    });
+  })();
   // 7.15: linha "Leandro 2 x 0 Thelio" com as fotos (fim de jogo e Estatísticas do jogo)
   function vsRow(host, e, mid) {
     host.innerHTML = ''; var w = e.finished && e.winner != null ? e.winner : -1;
@@ -4971,7 +4991,7 @@ try { I18N.applyDom(); } catch (e) {}
     b.disabled = true; err.textContent = '';
     var doc = { topic: $('ctTopic').value, msg: msg.slice(0, 2000), email: em.slice(0, 120), uid: sy.user ? sy.user.uid : null,
       name: String((P.sync.acct && P.sync.acct.name) || '').slice(0, 80), lang: String(P.settings.lang || 'pt-BR').slice(0, 8),
-      build: '7.16.1', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
+      build: '7.17', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
     sy.db.collection('contact').add(doc).then(function () {
       b.disabled = false; $('ctMsg').value = ''; closeSheets(); showToast(T("Mensagem enviada. Obrigado! Responderemos pelo e-mail informado."));
     }, function (e) { b.disabled = false; err.textContent = Tf("Não foi possível enviar ({0}). Tente de novo.", (e && e.code) || T("erro")); });
@@ -5746,7 +5766,7 @@ try { I18N.applyDom(); } catch (e) {}
   // Beta 7.8: telemetria de uso (shared/telemetry.js) e versão da ponte do app nativo na linha de versão
   try {
     if (window.BXTel) {
-      BXTel.init({ module: 'placar', build: '7.16.1', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
+      BXTel.init({ module: 'placar', build: '7.17', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
       tel('p_open');
       $('sTel').checked = BXTel.isOn();
       $('sTel').addEventListener('change', function () { BXTel.setOn(this.checked); showToast(this.checked ? T("Estatísticas de uso ligadas. Obrigado!") : T("Estatísticas de uso desligadas.")); });
