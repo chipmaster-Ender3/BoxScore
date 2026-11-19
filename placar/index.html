@@ -1007,7 +1007,7 @@ html.nfy .bar { padding-right: max(230px, env(safe-area-inset-right, 0px)); }
       <div class="actions"><button class="btn" type="button" id="sManage">Gerenciar dados salvos</button></div>
       <label class="check srow"><span class="sic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><input type="checkbox" id="sTel"> Enviar estatísticas de uso</label>
       <span class="hint" id="sTelHint">Só contagens anônimas de uso dos recursos (ex.: quantas partidas, se usou a pulseira), para melhorar o app. Nunca nomes, placares, mensagens, fotos ou local.</span>
-      <p class="note" id="verNote">BoxScore Beta 7.17 · Placar 4.34.0</p>
+      <p class="note" id="verNote">BoxScore Beta 7.18 · Placar 4.35.0</p>
     </div>
     <div class="actions"><button class="btn primary" type="button" data-close>Pronto</button></div>
   </div>
@@ -2671,7 +2671,37 @@ try { I18N.applyDom(); } catch (e) {}
     s.addEventListener('click', function (e) { if (e.target === s && !s.hasAttribute('data-sticky')) closeSheets(); });
   });
   Array.prototype.forEach.call(document.querySelectorAll('[data-close]'), function (b) { b.addEventListener('click', closeSheets); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSheets(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeTopSheet(); });
+  // 7.18: voltar do Android/navegador (e Esc) fecha só a janela de cima; com nenhuma aberta, o placar fica onde está
+  var SHNAV = { armed: false, ignore: 0, t: 0 };
+  function topSheet() {
+    var l = [].filter.call(document.querySelectorAll('.sheet'), function (x) { return !x.hidden; }); if (!l.length) return null;
+    l.sort(function (a, b) { return (parseInt(getComputedStyle(a).zIndex, 10) || 0) - (parseInt(getComputedStyle(b).zIndex, 10) || 0); });
+    return l[l.length - 1];
+  }
+  function closeTopSheet() {
+    var sh = topSheet(); if (!sh) return;
+    if (sh.id === 'shShare') { closeShare(); return; }
+    if (sh.id === 'shCrop') { $('cropCancel').click(); return; }
+    var b = sh.querySelector('.card-head [data-close], .card-head .btn, .end-x, [data-close]');
+    if (b) b.click(); else sh.hidden = true;
+  }
+  function sheetGuard() {
+    var deep = !!topSheet();
+    try {
+      if (deep && !SHNAV.armed) { history.pushState({ bxsheet: 1 }, ''); SHNAV.armed = true; }
+      else if (!deep && SHNAV.armed) { SHNAV.armed = false; SHNAV.ignore++; history.back(); }
+    } catch (x) {}
+  }
+  window.addEventListener('popstate', function () {
+    if (SHNAV.ignore) { SHNAV.ignore--; return; }
+    if (!SHNAV.armed) return;
+    SHNAV.armed = false; closeTopSheet(); setTimeout(sheetGuard, 0);
+  });
+  try {
+    var shObs = new MutationObserver(function () { clearTimeout(SHNAV.t); SHNAV.t = setTimeout(sheetGuard, 0); });
+    [].forEach.call(document.querySelectorAll('.sheet'), function (x) { shObs.observe(x, { attributes: true, attributeFilter: ['hidden'] }); });
+  } catch (x) {}
 
 
   // 7.17: imagem no cabeçalho de cada janela (aparece ao abrir; gerada 1x)
@@ -4991,7 +5021,7 @@ try { I18N.applyDom(); } catch (e) {}
     b.disabled = true; err.textContent = '';
     var doc = { topic: $('ctTopic').value, msg: msg.slice(0, 2000), email: em.slice(0, 120), uid: sy.user ? sy.user.uid : null,
       name: String((P.sync.acct && P.sync.acct.name) || '').slice(0, 80), lang: String(P.settings.lang || 'pt-BR').slice(0, 8),
-      build: '7.17', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
+      build: '7.18', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
     sy.db.collection('contact').add(doc).then(function () {
       b.disabled = false; $('ctMsg').value = ''; closeSheets(); showToast(T("Mensagem enviada. Obrigado! Responderemos pelo e-mail informado."));
     }, function (e) { b.disabled = false; err.textContent = Tf("Não foi possível enviar ({0}). Tente de novo.", (e && e.code) || T("erro")); });
@@ -5766,7 +5796,7 @@ try { I18N.applyDom(); } catch (e) {}
   // Beta 7.8: telemetria de uso (shared/telemetry.js) e versão da ponte do app nativo na linha de versão
   try {
     if (window.BXTel) {
-      BXTel.init({ module: 'placar', build: '7.17', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
+      BXTel.init({ module: 'placar', build: '7.18', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
       tel('p_open');
       $('sTel').checked = BXTel.isOn();
       $('sTel').addEventListener('change', function () { BXTel.setOn(this.checked); showToast(this.checked ? T("Estatísticas de uso ligadas. Obrigado!") : T("Estatísticas de uso desligadas.")); });
