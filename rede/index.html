@@ -68,6 +68,26 @@ main .ph{display:block;width:auto;height:auto;max-width:100%;max-height:min(78vh
 @media (max-width:400px){header h1{font-size:20px}header .btn{padding:0 10px}#chatB,#setB{width:44px;padding:0}#back{padding:0 10px}}
 .tmb{display:grid;gap:8px}.rdp .avs .mav{width:30px;height:30px;font-size:13px}.rkr .avs .mav{width:30px;height:30px;font-size:13px}.rkr .avs .mav+.mav{margin-left:-12px}
 .pod{display:flex;align-items:center;gap:10px;padding:6px 0}.pod .pl{min-width:76px;font:800 12px var(--ui);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}.pod b{font:800 16px var(--ui);min-width:0;overflow:hidden;text-overflow:ellipsis}
+.st-sec{margin:22px 4px 8px;font:800 12px/1 var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.card.st-box{padding:0;gap:0;overflow:hidden}
+.st-row{display:grid;grid-template-columns:40px minmax(0,1fr);align-items:center;gap:10px 12px;padding:14px;border:0;border-top:1px solid var(--line);border-radius:0;min-width:0}
+.st-box>.st-row:first-child{border-top:0}
+.st-ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;border:1px solid var(--line);background:var(--bg);color:var(--ink);flex:none}
+.st-ic .ic svg{width:20px;height:20px}
+.st-t{min-width:0;display:grid;gap:3px}.st-t b{font:700 15px/1.25 var(--ui);color:var(--ink)}.st-t .sub{font-size:13px}
+.st-ctl{grid-column:1/-1;min-width:0}.st-ctl select,.st-ctl input{width:100%}
+.st-ctl .seg button{min-width:0;padding:0 6px}
+.st-ctl .seg.st-w1 button:first-child{flex:2.2 1 0}.st-ctl .seg button{line-height:1.15}
+.st-link{grid-template-columns:40px minmax(0,1fr) 20px;min-height:60px;width:100%;text-align:left;background:transparent;color:var(--ink);text-decoration:none;font:inherit;cursor:pointer}
+.st-link:hover{background:color-mix(in srgb,var(--ink) 5%,transparent)}
+.st-link:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+.st-chev{color:var(--muted);display:grid;place-items:center}.st-chev .ic svg{width:18px;height:18px}
+.st-bad .st-t b,.st-bad .st-ic{color:var(--bad)}.st-bad .st-ic{border-color:color-mix(in srgb,var(--bad) 45%,var(--line))}
+.st-av{border:0;background:transparent}.st-av .mav{width:40px;height:40px}
+.st-prof .st-t b{font-size:16px}
+.st-blk{display:grid;gap:8px}.st-blk .who{display:flex;align-items:center;gap:10px}
+.st-foot{margin:18px 4px 8px;font-size:12px}
+@media (min-width:720px){.st-row:not(.st-link){grid-template-columns:40px minmax(0,1fr) minmax(280px,48%)}.st-ctl{grid-column:3}}
 </style>
 <script src="../shared/modules.js"></script>
 <script src="../shared/profile-view.js"></script>
@@ -94,7 +114,7 @@ main .ph{display:block;width:auto;height:auto;max-width:100%;max-height:min(78vh
 (function () {
   'use strict';
   BXMods.mark('rede');
-  var VERSION = '0.37.1';
+  var VERSION = '0.38.0';
   var FB_CFG = { apiKey: 'AIzaSyD_L90YxJAVRuTfPqwNbETJlbV9BYdnuYI', authDomain: 'boxsocore.firebaseapp.com', projectId: 'boxsocore', storageBucket: 'boxsocore.firebasestorage.app', messagingSenderId: '639383913161', appId: '1:639383913161:web:a9bb75fcf99f4b03378318' };
   var FB_VER = '10.12.2', FB_LIBS = ['app', 'auth', 'firestore'];
   var HOUR = 3600000;
@@ -208,12 +228,12 @@ main .ph{display:block;width:auto;height:auto;max-width:100%;max-height:min(78vh
   };
   Object.keys(K7).forEach(function (l) { Object.assign(D[l], K7[l]); });
   var K8 = {
-    'pt-BR': {s_legal: 'Privacidade e ajuda', s_priv: 'Política de privacidade', s_terms: 'Termos de uso', s_contact: 'Fale conosco', s_delacc: 'Excluir minha conta', s_tel: 'Enviar estatísticas de uso', s_tel_h: 'Só contagens anônimas de uso dos recursos, para melhorar o app. Nunca nomes, placares, mensagens, fotos ou local.', set_t: 'Ajustes da Rede', s_notif: 'Avisos', s_games: 'Jogos', s_feed: 'Feed', s_priv: 'Privacidade', s_inv: 'Convite em tela cheia', s_inv_h: 'Ligado: a tela de convite abre sozinha. Desligado: os convites ficam esperando em Jogos.', s_on: 'Ligado', s_off: 'Desligado', s_snz: 'Mostrar de novo os convites adiados', s_snz_ok: 'Pronto: os convites adiados voltam a aparecer.', s_cur: 'Moeda padrão', s_auto: 'Automática', s_city: 'Cidade padrão', s_city_h: 'Vazio: usa a cidade do seu perfil.', s_days: 'Jogos abertos mostram', s_all: 'Todos', s_nd: '{0} dias', s_fstart: 'Abrir o Feed em', s_ph: 'Fotos do feed', s_ph_on: 'Carregar', s_ph_off: 'Tocar para ver', ph_show: 'Ver foto', s_pvis: 'Ao publicar, começar com', s_blk: 'Bloqueados', s_noblk: 'Ninguém bloqueado.', s_note: 'Os ajustes ficam salvos na sua conta e valem em todos os aparelhos.', set_aria: 'Ajustes'},
-    'pt-PT': {s_legal: 'Privacidade e ajuda', s_priv: 'Política de privacidade', s_terms: 'Termos de utilização', s_contact: 'Contacte-nos', s_delacc: 'Eliminar a minha conta', s_tel: 'Enviar estatísticas de utilização', s_tel_h: 'Só contagens anónimas de utilização dos recursos, para melhorar a app. Nunca nomes, resultados, mensagens, fotos ou local.', set_t: 'Definições da Rede', s_notif: 'Avisos', s_games: 'Jogos', s_feed: 'Feed', s_priv: 'Privacidade', s_inv: 'Convite em ecrã inteiro', s_inv_h: 'Ligado: o ecrã de convite abre sozinho. Desligado: os convites ficam à espera em Jogos.', s_on: 'Ligado', s_off: 'Desligado', s_snz: 'Mostrar de novo os convites adiados', s_snz_ok: 'Pronto: os convites adiados voltam a aparecer.', s_cur: 'Moeda predefinida', s_auto: 'Automática', s_city: 'Cidade predefinida', s_city_h: 'Vazio: usa a cidade do seu perfil.', s_days: 'Jogos abertos mostram', s_all: 'Todos', s_nd: '{0} dias', s_fstart: 'Abrir o Feed em', s_ph: 'Fotos do feed', s_ph_on: 'Carregar', s_ph_off: 'Tocar para ver', ph_show: 'Ver foto', s_pvis: 'Ao publicar, começar com', s_blk: 'Bloqueados', s_noblk: 'Ninguém bloqueado.', s_note: 'As definições ficam guardadas na sua conta e valem em todos os dispositivos.', set_aria: 'Definições'},
-    'en': {s_legal: 'Privacy and help', s_priv: 'Privacy policy', s_terms: 'Terms of use', s_contact: 'Contact us', s_delacc: 'Delete my account', s_tel: 'Send usage statistics', s_tel_h: 'Only anonymous counts of feature use, to improve the app. Never names, scores, messages, photos or location.', set_t: 'Network settings', s_notif: 'Alerts', s_games: 'Games', s_feed: 'Feed', s_priv: 'Privacy', s_inv: 'Full-screen invitation', s_inv_h: 'On: the invitation screen opens by itself. Off: invitations wait in Games.', s_on: 'On', s_off: 'Off', s_snz: 'Show postponed invitations again', s_snz_ok: 'Done: postponed invitations will show again.', s_cur: 'Default currency', s_auto: 'Automatic', s_city: 'Default city', s_city_h: 'Empty: uses the city from your profile.', s_days: 'Open games show', s_all: 'All', s_nd: '{0} days', s_fstart: 'Open the Feed on', s_ph: 'Feed photos', s_ph_on: 'Load', s_ph_off: 'Tap to view', ph_show: 'Show photo', s_pvis: 'When posting, start with', s_blk: 'Blocked', s_noblk: 'Nobody blocked.', s_note: 'Settings are saved to your account and apply on all your devices.', set_aria: 'Settings'},
-    'es': {s_legal: 'Privacidad y ayuda', s_priv: 'Política de privacidad', s_terms: 'Términos de uso', s_contact: 'Contáctanos', s_delacc: 'Eliminar mi cuenta', s_tel: 'Enviar estadísticas de uso', s_tel_h: 'Solo recuentos anónimos de uso de las funciones, para mejorar la app. Nunca nombres, marcadores, mensajes, fotos ni ubicación.', set_t: 'Ajustes de la Red', s_notif: 'Avisos', s_games: 'Partidos', s_feed: 'Feed', s_priv: 'Privacidad', s_inv: 'Invitación a pantalla completa', s_inv_h: 'Activado: la pantalla de invitación se abre sola. Desactivado: las invitaciones esperan en Partidos.', s_on: 'Activado', s_off: 'Desactivado', s_snz: 'Mostrar de nuevo las invitaciones aplazadas', s_snz_ok: 'Listo: las invitaciones aplazadas vuelven a aparecer.', s_cur: 'Moneda predeterminada', s_auto: 'Automática', s_city: 'Ciudad predeterminada', s_city_h: 'Vacío: usa la ciudad de tu perfil.', s_days: 'Los partidos abiertos muestran', s_all: 'Todos', s_nd: '{0} días', s_fstart: 'Abrir el Feed en', s_ph: 'Fotos del feed', s_ph_on: 'Cargar', s_ph_off: 'Tocar para ver', ph_show: 'Ver foto', s_pvis: 'Al publicar, empezar con', s_blk: 'Bloqueados', s_noblk: 'Nadie bloqueado.', s_note: 'Los ajustes se guardan en tu cuenta y valen en todos tus dispositivos.', set_aria: 'Ajustes'},
-    'fr': {s_legal: 'Confidentialité et aide', s_priv: 'Politique de confidentialité', s_terms: 'Conditions d\'utilisation', s_contact: 'Nous contacter', s_delacc: 'Supprimer mon compte', s_tel: 'Envoyer des statistiques d\'utilisation', s_tel_h: 'Uniquement des comptages anonymes d\'utilisation des fonctions, pour améliorer l\'app. Jamais de noms, scores, messages, photos ni lieu.', set_t: 'Réglages du Réseau', s_notif: 'Alertes', s_games: 'Matchs', s_feed: 'Fil', s_priv: 'Confidentialité', s_inv: 'Invitation en plein écran', s_inv_h: "Activé : l'écran d'invitation s'ouvre seul. Désactivé : les invitations attendent dans Matchs.", s_on: 'Activé', s_off: 'Désactivé', s_snz: 'Réafficher les invitations reportées', s_snz_ok: 'Fait : les invitations reportées réapparaîtront.', s_cur: 'Devise par défaut', s_auto: 'Automatique', s_city: 'Ville par défaut', s_city_h: 'Vide : utilise la ville de votre profil.', s_days: 'Matchs ouverts affichés', s_all: 'Tous', s_nd: '{0} jours', s_fstart: 'Ouvrir le Fil sur', s_ph: 'Photos du fil', s_ph_on: 'Charger', s_ph_off: 'Toucher pour voir', ph_show: 'Voir la photo', s_pvis: 'À la publication, commencer par', s_blk: 'Bloqués', s_noblk: 'Personne de bloqué.', s_note: 'Les réglages sont enregistrés sur votre compte et valent sur tous vos appareils.', set_aria: 'Réglages'},
-    'de': {s_legal: 'Datenschutz und Hilfe', s_priv: 'Datenschutzerklärung', s_terms: 'Nutzungsbedingungen', s_contact: 'Kontakt', s_delacc: 'Mein Konto löschen', s_tel: 'Nutzungsstatistiken senden', s_tel_h: 'Nur anonyme Zählungen der Funktionsnutzung, um die App zu verbessern. Niemals Namen, Spielstände, Nachrichten, Fotos oder Orte.', set_t: 'Netzwerk-Einstellungen', s_notif: 'Hinweise', s_games: 'Spiele', s_feed: 'Feed', s_priv: 'Datenschutz', s_inv: 'Einladung im Vollbild', s_inv_h: 'An: Der Einladungsbildschirm öffnet sich selbst. Aus: Einladungen warten unter Spiele.', s_on: 'An', s_off: 'Aus', s_snz: 'Verschobene Einladungen wieder anzeigen', s_snz_ok: 'Erledigt: Verschobene Einladungen erscheinen wieder.', s_cur: 'Standardwährung', s_auto: 'Automatisch', s_city: 'Standardstadt', s_city_h: 'Leer: nimmt die Stadt aus deinem Profil.', s_days: 'Offene Spiele zeigen', s_all: 'Alle', s_nd: '{0} Tage', s_fstart: 'Feed öffnen mit', s_ph: 'Feed-Fotos', s_ph_on: 'Laden', s_ph_off: 'Zum Ansehen tippen', ph_show: 'Foto anzeigen', s_pvis: 'Beim Posten starten mit', s_blk: 'Blockiert', s_noblk: 'Niemand blockiert.', s_note: 'Einstellungen werden in deinem Konto gespeichert und gelten auf allen Geräten.', set_aria: 'Einstellungen'}
+    'pt-BR': {sx_privsec: 'Privacidade e segurança', sx_help: 'Ajuda e conta', sx_policy: 'Política de privacidade', s_legal: 'Privacidade e ajuda', s_priv: 'Política de privacidade', s_terms: 'Termos de uso', s_contact: 'Fale conosco', s_delacc: 'Excluir minha conta', s_tel: 'Enviar estatísticas de uso', s_tel_h: 'Só contagens anônimas de uso dos recursos, para melhorar o app. Nunca nomes, placares, mensagens, fotos ou local.', set_t: 'Ajustes da Rede', s_notif: 'Avisos', s_games: 'Jogos', s_feed: 'Feed', s_priv: 'Privacidade', s_inv: 'Convite em tela cheia', s_inv_h: 'Ligado: a tela de convite abre sozinha. Desligado: os convites ficam esperando em Jogos.', s_on: 'Ligado', s_off: 'Desligado', s_snz: 'Mostrar de novo os convites adiados', s_snz_ok: 'Pronto: os convites adiados voltam a aparecer.', s_cur: 'Moeda padrão', s_auto: 'Automática', s_city: 'Cidade padrão', s_city_h: 'Vazio: usa a cidade do seu perfil.', s_days: 'Jogos abertos mostram', s_all: 'Todos', s_nd: '{0} dias', s_fstart: 'Abrir o Feed em', s_ph: 'Fotos do feed', s_ph_on: 'Carregar', s_ph_off: 'Tocar para ver', ph_show: 'Ver foto', s_pvis: 'Ao publicar, começar com', s_blk: 'Bloqueados', s_noblk: 'Ninguém bloqueado.', s_note: 'Os ajustes ficam salvos na sua conta e valem em todos os aparelhos.', set_aria: 'Ajustes'},
+    'pt-PT': {sx_privsec: 'Privacidade e segurança', sx_help: 'Ajuda e conta', sx_policy: 'Política de privacidade', s_legal: 'Privacidade e ajuda', s_priv: 'Política de privacidade', s_terms: 'Termos de utilização', s_contact: 'Contacte-nos', s_delacc: 'Eliminar a minha conta', s_tel: 'Enviar estatísticas de utilização', s_tel_h: 'Só contagens anónimas de utilização dos recursos, para melhorar a app. Nunca nomes, resultados, mensagens, fotos ou local.', set_t: 'Definições da Rede', s_notif: 'Avisos', s_games: 'Jogos', s_feed: 'Feed', s_priv: 'Privacidade', s_inv: 'Convite em ecrã inteiro', s_inv_h: 'Ligado: o ecrã de convite abre sozinho. Desligado: os convites ficam à espera em Jogos.', s_on: 'Ligado', s_off: 'Desligado', s_snz: 'Mostrar de novo os convites adiados', s_snz_ok: 'Pronto: os convites adiados voltam a aparecer.', s_cur: 'Moeda predefinida', s_auto: 'Automática', s_city: 'Cidade predefinida', s_city_h: 'Vazio: usa a cidade do seu perfil.', s_days: 'Jogos abertos mostram', s_all: 'Todos', s_nd: '{0} dias', s_fstart: 'Abrir o Feed em', s_ph: 'Fotos do feed', s_ph_on: 'Carregar', s_ph_off: 'Tocar para ver', ph_show: 'Ver foto', s_pvis: 'Ao publicar, começar com', s_blk: 'Bloqueados', s_noblk: 'Ninguém bloqueado.', s_note: 'As definições ficam guardadas na sua conta e valem em todos os dispositivos.', set_aria: 'Definições'},
+    'en': {sx_privsec: 'Privacy and security', sx_help: 'Help and account', sx_policy: 'Privacy policy', s_legal: 'Privacy and help', s_priv: 'Privacy policy', s_terms: 'Terms of use', s_contact: 'Contact us', s_delacc: 'Delete my account', s_tel: 'Send usage statistics', s_tel_h: 'Only anonymous counts of feature use, to improve the app. Never names, scores, messages, photos or location.', set_t: 'Network settings', s_notif: 'Alerts', s_games: 'Games', s_feed: 'Feed', s_priv: 'Privacy', s_inv: 'Full-screen invitation', s_inv_h: 'On: the invitation screen opens by itself. Off: invitations wait in Games.', s_on: 'On', s_off: 'Off', s_snz: 'Show postponed invitations again', s_snz_ok: 'Done: postponed invitations will show again.', s_cur: 'Default currency', s_auto: 'Automatic', s_city: 'Default city', s_city_h: 'Empty: uses the city from your profile.', s_days: 'Open games show', s_all: 'All', s_nd: '{0} days', s_fstart: 'Open the Feed on', s_ph: 'Feed photos', s_ph_on: 'Load', s_ph_off: 'Tap to view', ph_show: 'Show photo', s_pvis: 'When posting, start with', s_blk: 'Blocked', s_noblk: 'Nobody blocked.', s_note: 'Settings are saved to your account and apply on all your devices.', set_aria: 'Settings'},
+    'es': {sx_privsec: 'Privacidad y seguridad', sx_help: 'Ayuda y cuenta', sx_policy: 'Política de privacidad', s_legal: 'Privacidad y ayuda', s_priv: 'Política de privacidad', s_terms: 'Términos de uso', s_contact: 'Contáctanos', s_delacc: 'Eliminar mi cuenta', s_tel: 'Enviar estadísticas de uso', s_tel_h: 'Solo recuentos anónimos de uso de las funciones, para mejorar la app. Nunca nombres, marcadores, mensajes, fotos ni ubicación.', set_t: 'Ajustes de la Red', s_notif: 'Avisos', s_games: 'Partidos', s_feed: 'Feed', s_priv: 'Privacidad', s_inv: 'Invitación a pantalla completa', s_inv_h: 'Activado: la pantalla de invitación se abre sola. Desactivado: las invitaciones esperan en Partidos.', s_on: 'Activado', s_off: 'Desactivado', s_snz: 'Mostrar de nuevo las invitaciones aplazadas', s_snz_ok: 'Listo: las invitaciones aplazadas vuelven a aparecer.', s_cur: 'Moneda predeterminada', s_auto: 'Automática', s_city: 'Ciudad predeterminada', s_city_h: 'Vacío: usa la ciudad de tu perfil.', s_days: 'Los partidos abiertos muestran', s_all: 'Todos', s_nd: '{0} días', s_fstart: 'Abrir el Feed en', s_ph: 'Fotos del feed', s_ph_on: 'Cargar', s_ph_off: 'Tocar para ver', ph_show: 'Ver foto', s_pvis: 'Al publicar, empezar con', s_blk: 'Bloqueados', s_noblk: 'Nadie bloqueado.', s_note: 'Los ajustes se guardan en tu cuenta y valen en todos tus dispositivos.', set_aria: 'Ajustes'},
+    'fr': {sx_privsec: 'Confidentialité et sécurité', sx_help: 'Aide et compte', sx_policy: 'Politique de confidentialité', s_legal: 'Confidentialité et aide', s_priv: 'Politique de confidentialité', s_terms: 'Conditions d\'utilisation', s_contact: 'Nous contacter', s_delacc: 'Supprimer mon compte', s_tel: 'Envoyer des statistiques d\'utilisation', s_tel_h: 'Uniquement des comptages anonymes d\'utilisation des fonctions, pour améliorer l\'app. Jamais de noms, scores, messages, photos ni lieu.', set_t: 'Réglages du Réseau', s_notif: 'Alertes', s_games: 'Matchs', s_feed: 'Fil', s_priv: 'Confidentialité', s_inv: 'Invitation en plein écran', s_inv_h: "Activé : l'écran d'invitation s'ouvre seul. Désactivé : les invitations attendent dans Matchs.", s_on: 'Activé', s_off: 'Désactivé', s_snz: 'Réafficher les invitations reportées', s_snz_ok: 'Fait : les invitations reportées réapparaîtront.', s_cur: 'Devise par défaut', s_auto: 'Automatique', s_city: 'Ville par défaut', s_city_h: 'Vide : utilise la ville de votre profil.', s_days: 'Matchs ouverts affichés', s_all: 'Tous', s_nd: '{0} jours', s_fstart: 'Ouvrir le Fil sur', s_ph: 'Photos du fil', s_ph_on: 'Charger', s_ph_off: 'Toucher pour voir', ph_show: 'Voir la photo', s_pvis: 'À la publication, commencer par', s_blk: 'Bloqués', s_noblk: 'Personne de bloqué.', s_note: 'Les réglages sont enregistrés sur votre compte et valent sur tous vos appareils.', set_aria: 'Réglages'},
+    'de': {sx_privsec: 'Datenschutz und Sicherheit', sx_help: 'Hilfe und Konto', sx_policy: 'Datenschutzerklärung', s_legal: 'Datenschutz und Hilfe', s_priv: 'Datenschutzerklärung', s_terms: 'Nutzungsbedingungen', s_contact: 'Kontakt', s_delacc: 'Mein Konto löschen', s_tel: 'Nutzungsstatistiken senden', s_tel_h: 'Nur anonyme Zählungen der Funktionsnutzung, um die App zu verbessern. Niemals Namen, Spielstände, Nachrichten, Fotos oder Orte.', set_t: 'Netzwerk-Einstellungen', s_notif: 'Hinweise', s_games: 'Spiele', s_feed: 'Feed', s_priv: 'Datenschutz', s_inv: 'Einladung im Vollbild', s_inv_h: 'An: Der Einladungsbildschirm öffnet sich selbst. Aus: Einladungen warten unter Spiele.', s_on: 'An', s_off: 'Aus', s_snz: 'Verschobene Einladungen wieder anzeigen', s_snz_ok: 'Erledigt: Verschobene Einladungen erscheinen wieder.', s_cur: 'Standardwährung', s_auto: 'Automatisch', s_city: 'Standardstadt', s_city_h: 'Leer: nimmt die Stadt aus deinem Profil.', s_days: 'Offene Spiele zeigen', s_all: 'Alle', s_nd: '{0} Tage', s_fstart: 'Feed öffnen mit', s_ph: 'Feed-Fotos', s_ph_on: 'Laden', s_ph_off: 'Zum Ansehen tippen', ph_show: 'Foto anzeigen', s_pvis: 'Beim Posten starten mit', s_blk: 'Blockiert', s_noblk: 'Niemand blockiert.', s_note: 'Einstellungen werden in deinem Konto gespeichert und gelten auf allen Geräten.', set_aria: 'Einstellungen'}
   };
   Object.keys(K8).forEach(function (l) { Object.assign(D[l], K8[l]); });
   var K9 = {
@@ -439,7 +459,18 @@ main .ph{display:block;width:auto;height:auto;max-width:100%;max-height:min(78vh
     star: '<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 16.9 6.8 19.7l1-5.9L3.5 9.7l5.9-.8z"/>',
     eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
     search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
-    users: '<circle cx="9" cy="8" r="3.2"/><path d="M3 19c0-3.2 2.6-5.2 6-5.2s6 2 6 5.2M16 5a3.2 3.2 0 0 1 0 6M18 14c2 .6 3 2.2 3 5"/>'
+    users: '<circle cx="9" cy="8" r="3.2"/><path d="M3 19c0-3.2 2.6-5.2 6-5.2s6 2 6 5.2M16 5a3.2 3.2 0 0 1 0 6M18 14c2 .6 3 2.2 3 5"/>',
+    coin: '<circle cx="12" cy="12" r="9"/><path d="M14.8 9.2c-.5-.9-1.5-1.4-2.8-1.4-1.6 0-2.8.8-2.8 2s1.1 1.7 2.8 2.1 2.8 1 2.8 2.2-1.2 2-2.8 2c-1.3 0-2.4-.5-2.9-1.5M12 6v1.8M12 16.2V18"/>',
+    pin: '<path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+    globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/>',
+    chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+    doc: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
+    mail: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7l8.5 6 8.5-6"/>',
+    trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/>',
+    chev: '<path d="M9 5l7 7-7 7"/>',
+    refresh: '<path d="M20 11a8 8 0 0 0-14.3-4.6L4 8M4 4v4h4M4 13a8 8 0 0 0 14.3 4.6L20 16M20 20v-4h-4"/>',
+    block: '<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/>',
+    lock: '<rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'
   };
   function ic(n) { var e = document.createElement('span'); e.className = 'ic'; e.setAttribute('aria-hidden', 'true'); e.innerHTML = '<svg viewBox="0 0 24 24">' + (ICONS[n] || '') + '</svg>'; return e; }
   function ibtn(n, txt, cls, fn) { return h('button', { type: 'button', cls: 'btn ib ' + (cls || ''), on: { click: fn } }, [ic(n), h('span', { text: txt })]); }
@@ -479,7 +510,7 @@ main .ph{display:block;width:auto;height:auto;max-width:100%;max-height:min(78vh
     return loadFB().then(function () {
       firebase.initializeApp(FB_CFG);
       S.auth = firebase.auth(); S.db = firebase.firestore();
-      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.11.2', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
+      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.12', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
       try { S.db.settings({ experimentalAutoDetectLongPolling: true, merge: true }); } catch (e) {}
       try { S.auth.getRedirectResult().catch(function () {}); } catch (e) {}
       S.auth.onAuthStateChanged(function (u) { S.user = u || null; paintGate(); if (u) { loadFriends(); loadFollows(); loadBlocks().then(reload); ensureProfile(); } });
@@ -2894,49 +2925,75 @@ main .ph{display:block;width:auto;height:auto;max-width:100%;max-height:min(78vh
       });
     }
   }
+  // 7.12: Ajustes no padrão do Placar — seções com rótulo, um ícone por item, explicação curta, controle na largura toda e linhas tocáveis para links
   function paintSettings(host) {
-    function head(ic, t) { var s = h('div', { cls: 'sh' }); s.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS[ic] + '</svg>'; s.appendChild(h('b', { text: T(t) })); return s; }
-    function row(label, key, opts, after) {
-      return h('div', { cls: 'sr' }, [h('b', { text: label }), h('div', { cls: 'seg', role: 'group' }, opts.map(function (o) {
-        return h('button', { type: 'button', 'aria-pressed': String(String(P[key]) === String(o[0])), text: o[1], on: { click: function () { savePref(key, o[0]); if (after) after(o[0]); paint(); } } });
-      }))]);
+    function sec(t) { return h('div', { cls: 'st-sec', role: 'heading', 'aria-level': '2', text: t }); }
+    function box(rows) { return h('div', { cls: 'card st-box' }, rows.filter(Boolean)); }
+    function item(icn, title, hint, ctl) {
+      return h('div', { cls: 'st-row' }, [h('span', { cls: 'st-ic' }, [ic(icn)]), h('div', { cls: 'st-t' }, [h('b', { text: title }), hint ? h('div', { cls: 'sub', text: hint }) : null]), ctl ? h('div', { cls: 'st-ctl' }, [ctl]) : null]);
+    }
+    function link(icn, title, hint, href, fn, cls, id) {
+      var kids = [h('span', { cls: 'st-ic' }, [ic(icn)]), h('div', { cls: 'st-t' }, [h('b', { text: title }), hint ? h('div', { cls: 'sub', text: hint }) : null]), h('span', { cls: 'st-chev' }, [ic('chev')])];
+      var a = href ? h('a', { cls: 'st-row st-link ' + (cls || ''), href: href }, kids) : h('button', { type: 'button', cls: 'st-row st-link ' + (cls || ''), on: { click: fn } }, kids);
+      if (id) a.id = id; return a;
+    }
+    function seg(key, opts, after, cur) {
+      return h('div', { cls: 'seg', role: 'group' }, opts.map(function (o) {
+        var on = cur !== undefined ? String(cur) === String(o[0]) : String(P[key]) === String(o[0]);
+        return h('button', { type: 'button', 'aria-pressed': String(on), text: o[1], on: { click: function () { if (key) savePref(key, o[0]); if (after) after(o[0]); paint(); } } });
+      }));
     }
     var stp = lsGet('boxscore.startModule') || 'last', LN = { 'pt-BR': 'Português (Brasil)', 'pt-PT': 'Português (Portugal)', en: 'English', es: 'Español', fr: 'Français', de: 'Deutsch' };
-    var segSt = h('div', { cls: 'seg', role: 'group' }, [['last', T('s_last')], ['placar', BXMods.t('placar')], ['rede', BXMods.t('rede')]].map(function (o) {
-      return h('button', { type: 'button', 'aria-pressed': String(stp === o[0]), text: o[1], on: { click: function () { lsSet('boxscore.startModule', o[0]); toast(T('s_start_ok')); paint(); } } }); }));
     var lsel = h('select', { 'aria-label': T('s_lang') }, Object.keys(LN).map(function (k) { var op = h('option', { value: k, text: LN[k] }); if (k === LG) op.selected = true; return op; }));
     lsel.addEventListener('change', function () {
       var l = lsel.value; lsSet('boxscore.lang', l);
       try { var st = JSON.parse(localStorage.getItem('boxscore.placar.v1') || 'null'); if (st && st.settings) { st.settings.lang = l; st.settings.langAuto = false; localStorage.setItem('boxscore.placar.v1', JSON.stringify(st)); } } catch (e) {}
       location.reload();
     });
-    var c0 = h('article', { cls: 'card' }, [head('set', 's_gen'),
-      h('div', { cls: 'sr' }, [h('b', { text: T('s_start') }), segSt, h('div', { cls: 'sub', text: T('s_start_h') })]),
-      h('div', { cls: 'sr' }, [h('b', { text: T('s_lang') }), lsel]),
-      h('div', { cls: 'sr' }, [h('b', { text: T('s_legal') }), h('div', { cls: 'row', style: 'flex-wrap:wrap;gap:8px' }, [
-        h('a', { cls: 'btn', href: '../legal/privacidade.html', text: T('s_priv') }), h('a', { cls: 'btn', href: '../legal/termos.html', text: T('s_terms') }),
-        h('a', { cls: 'btn', href: '../placar/#contato', text: T('s_contact') }), h('a', { cls: 'btn', href: '../placar/#excluir-conta', text: T('s_delacc') })])]),
-      window.BXTel ? h('div', { cls: 'sr' }, [h('b', { text: T('s_tel') }), h('div', { cls: 'seg', role: 'group' }, [[1, T('s_on')], [0, T('s_off')]].map(function (o) {
-        return h('button', { type: 'button', 'aria-pressed': String(BXTel.isOn() === !!o[0]), text: o[1], on: { click: function () { BXTel.setOn(!!o[0]); paint(); } } }); })), h('div', { cls: 'sub', text: T('s_tel_h') })]) : null,
-      h('div', { cls: 'sr' }, [h('b', { text: T('s_prof') }), h('div', { cls: 'sub', text: T('s_prof_h') }), ibtn('user', T('s_prof_go'), 'pri', function () { BXMods.mark('placar'); location.href = '../placar/#perfil-rede'; })])]);
-    host.appendChild(c0);
-    var c1 = h('article', { cls: 'card' }, [head('bell', 's_notif'), row(T('s_inv'), 'inv', [[1, T('s_on')], [0, T('s_off')]]), h('div', { cls: 'sub', text: T('s_inv_h') }),
-      h('button', { type: 'button', cls: 'btn', text: T('s_snz'), on: { click: function () { lsSet('boxscore.rede.snooze', '{}'); toast(T('s_snz_ok')); reload(); } } })]);
     var city = h('input', { type: 'text', maxlength: '60', value: P.city || '', placeholder: lsGet('boxscore.profile.city') || '', autocapitalize: 'words', 'aria-label': T('s_city') });
     city.addEventListener('change', function () { savePref('city', city.value.trim().slice(0, 60)); });
-    var c2 = h('article', { cls: 'card' }, [head('ball', 's_games'),
-      row(T('s_cur'), 'cur', [['', T('s_auto')], ['BRL', 'R$'], ['USD', 'US$'], ['EUR', '€'], ['GBP', '£']], function () { S.form = null; }),
-      h('div', { cls: 'sr' }, [h('b', { text: T('s_city') }), city, h('div', { cls: 'sub', text: T('s_city_h') })]),
-      row(T('s_days'), 'days', [[0, T('s_all')], [7, Tf('s_nd', 7)], [14, Tf('s_nd', 14)], [30, Tf('s_nd', 30)]])]);
-    var c3 = h('article', { cls: 'card' }, [head('feed', 's_feed'),
-      row(T('s_fstart'), 'feedStart', [['friends', T('ds_fr')], ['discover', T('ds_dis')], ['following', T('ds_fol')]], function (v) { S.fmode = v; }),
-      row(T('s_ph'), 'photos', [[1, T('s_ph_on')], [0, T('s_ph_off')]]),
-      row(T('s_pvis'), 'postVis', [['friends', T('vis_fr')], ['players', T('vis_pl')], ['public', T('vis_pub')]])]);
-    var c4 = h('article', { cls: 'card' }, [head('shield', 's_priv'), h('b', { text: T('s_blk'), style: 'font:800 14px var(--ui)' })]);
-    if (!Object.keys(S.blocks).length) c4.appendChild(h('div', { cls: 'sub', text: T('s_noblk') }));
-    else Object.keys(S.blocks).forEach(function (u) { c4.appendChild(h('div', { cls: 'row' }, [h('span', { text: S.blocks[u].name || '?', style: 'flex:1;font:700 15px var(--ui)' }), twoTap('ub' + u, T('unblock'), '', function () { S.db.collection('users').doc(S.user.uid).collection('blocks').doc(u).delete().then(function () { delete S.blocks[u]; toast(T('unblocked_ok')); reload(); paint(); }).catch(function () { toast(T('fail')); }); })])); });
-    [c1, c2, c3, c4].forEach(function (c) { host.appendChild(c); });
-    host.appendChild(h('div', { cls: 'sub', text: T('s_note') + ' · ' + T('rede') + ' v' + VERSION }));
+    // Perfil (no topo, com a foto)
+    var prof = link('user', T('s_prof_go'), T('s_prof_h'), null, function () { BXMods.mark('placar'); location.href = '../placar/#perfil-rede'; }, 'st-prof', 'stProf');
+    prof.replaceChild(h('span', { cls: 'st-ic st-av' }, [memAv(S.user.uid, S.user.displayName || '?')]), prof.firstChild);
+    host.appendChild(box([prof]));
+    // Feed
+    host.appendChild(sec(T('s_feed')));
+    host.appendChild(box([
+      item('feed', T('s_fstart'), null, seg('feedStart', [['friends', T('ds_fr')], ['discover', T('ds_dis')], ['following', T('ds_fol')]], function (v) { S.fmode = v; })),
+      item('eye', T('s_ph'), null, seg('photos', [[1, T('s_ph_on')], [0, T('s_ph_off')]])),
+      item('lock', T('s_pvis'), null, seg('postVis', [['friends', T('vis_fr')], ['players', T('vis_pl')], ['public', T('vis_pub')]]))]));
+    // Jogos
+    host.appendChild(sec(T('s_games')));
+    host.appendChild(box([
+      item('coin', T('s_cur'), null, (function (g) { g.classList.add('st-w1'); return g; })(seg('cur', [['', T('s_auto')], ['BRL', 'R$'], ['USD', 'US$'], ['EUR', '€'], ['GBP', '£']], function () { S.form = null; }))),
+      item('pin', T('s_city'), T('s_city_h'), city),
+      item('mine', T('s_days'), null, seg('days', [[0, T('s_all')], [7, Tf('s_nd', 7)], [14, Tf('s_nd', 14)], [30, Tf('s_nd', 30)]]))]));
+    // Avisos
+    host.appendChild(sec(T('s_notif')));
+    host.appendChild(box([
+      item('bell', T('s_inv'), T('s_inv_h'), seg('inv', [[1, T('s_on')], [0, T('s_off')]])),
+      link('refresh', T('s_snz'), null, null, function () { lsSet('boxscore.rede.snooze', '{}'); toast(T('s_snz_ok')); reload(); })]));
+    // Geral
+    host.appendChild(sec(T('s_gen')));
+    host.appendChild(box([
+      item('home', T('s_start'), T('s_start_h'), seg(null, [['last', T('s_last')], ['placar', BXMods.t('placar')], ['rede', BXMods.t('rede')]], function (v) { lsSet('boxscore.startModule', v); toast(T('s_start_ok')); }, stp)),
+      item('globe', T('s_lang'), null, lsel)]));
+    // Privacidade e segurança
+    host.appendChild(sec(T('sx_privsec')));
+    var blk = Object.keys(S.blocks), bl = h('div', { cls: 'st-blk' });
+    if (!blk.length) bl.appendChild(h('div', { cls: 'sub', text: T('s_noblk') }));
+    blk.forEach(function (u) { bl.appendChild(h('div', { cls: 'who' }, [memAv(u, S.blocks[u].name || '?'), h('span', { text: S.blocks[u].name || '?', style: 'flex:1;min-width:0;font:700 15px var(--ui);overflow-wrap:anywhere' }), twoTap('ub' + u, T('unblock'), '', function () { S.db.collection('users').doc(S.user.uid).collection('blocks').doc(u).delete().then(function () { delete S.blocks[u]; toast(T('unblocked_ok')); reload(); paint(); }).catch(function () { toast(T('fail')); }); })])); });
+    host.appendChild(box([
+      item('block', T('s_blk') + (blk.length ? ' · ' + blk.length : ''), null, bl),
+      window.BXTel ? item('chart', T('s_tel'), T('s_tel_h'), seg(null, [[1, T('s_on')], [0, T('s_off')]], function (v) { BXTel.setOn(!!v); }, BXTel.isOn() ? 1 : 0)) : null,
+      link('shield', T('sx_policy'), null, '../legal/privacidade.html'),
+      link('doc', T('s_terms'), null, '../legal/termos.html')]));
+    // Ajuda e conta
+    host.appendChild(sec(T('sx_help')));
+    host.appendChild(box([
+      link('mail', T('s_contact'), null, '../placar/#contato'),
+      link('trash', T('s_delacc'), null, '../placar/#excluir-conta', null, 'st-bad')]));
+    host.appendChild(h('div', { cls: 'sub st-foot', text: T('s_note') + ' · ' + T('rede') + ' v' + VERSION }));
   }
   function paintHome(host) {
     var uid = S.user.uid, now = Date.now(), any = false;
