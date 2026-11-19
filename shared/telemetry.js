@@ -1,4 +1,4 @@
-/* BoxScore — telemetria de uso (shared 1.4.0, Beta 7.8)
+/* BoxScore — telemetria de uso (shared 1.4.1, Beta 7.8; p_dur_n na 7.10.1)
  * Só contagens de uso (quantas vezes cada recurso foi usado por dia). Nunca nomes, placares, mensagens, fotos ou local.
  * Um documento por pessoa por dia: telemetry/{uid}_{AAAAMMDD} (com login) ou telemetry/a_{id do aparelho}_{AAAAMMDD} (sem login).
  * Os contadores somam no aparelho (localStorage, sobrevive offline e ao fechar) e são enviados poucas vezes:
@@ -11,7 +11,7 @@
   var KEYS = [
     // Placar
     'p_open', 'p_start', 'p_doubles', 'p_warm', 'p_rest', 'p_limit', 'p_voice', 'p_preset', 'p_from_game',
-    'p_end', 'p_min', 'p_end_tb', 'p_end_now', 'p_later', 'p_abandon', 'p_resume',
+    'p_end', 'p_min', 'p_dur_n', 'p_end_tb', 'p_end_now', 'p_later', 'p_abandon', 'p_resume',
     'p_pt_screen', 'p_pt_band', 'p_ace_screen', 'p_ace_band', 'p_undo',
     'p_hist', 'p_hist_filter', 'p_sum', 'p_prof', 'p_stats', 'p_share', 'p_band_conn', 'p_settings', 'p_login',
     // Rede

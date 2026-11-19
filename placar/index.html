@@ -875,7 +875,7 @@ html.nfy .bar { padding-right: max(230px, env(safe-area-inset-right, 0px)); }
       <div class="actions"><button class="btn" type="button" id="sManage">Gerenciar dados salvos</button></div>
       <label class="check srow"><span class="sic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><input type="checkbox" id="sTel"> Enviar estatísticas de uso</label>
       <span class="hint" id="sTelHint">Só contagens anônimas de uso dos recursos (ex.: quantas partidas, se usou a pulseira), para melhorar o app. Nunca nomes, placares, mensagens, fotos ou local.</span>
-      <p class="note" id="verNote">BoxScore Beta 7.10 · Placar 4.28.0</p>
+      <p class="note" id="verNote">BoxScore Beta 7.10.1 · Placar 4.28.1</p>
     </div>
     <div class="actions"><button class="btn primary" type="button" data-close>Pronto</button></div>
   </div>
@@ -1979,7 +1979,7 @@ try { I18N.applyDom(); } catch (e) {}
     var at = alertText(G.state); if (at) parts.push(at);
     if (restKind) parts.push(restLine(restKind));
     speak(parts);
-    if (G.state.winner !== null) { G.meta.endedAt = Date.now(); var fe = entryFrom(G, true); upsert(fe); tel('p_end'); tel('p_min', durOf(fe) / 60000); if (G.state.endedBy === 'quick') tel('p_end_tb'); render(); persist(); showEnd(); return; }
+    if (G.state.winner !== null) { G.meta.endedAt = Date.now(); var fe = entryFrom(G, true); upsert(fe); tel('p_end'); telDur(fe); if (G.state.endedBy === 'quick') tel('p_end_tb'); render(); persist(); showEnd(); return; }
     if (restKind) beginRest(restKind);
     render(); persist();
   }
@@ -2242,6 +2242,8 @@ try { I18N.applyDom(); } catch (e) {}
     };
   }
   function tel(k, n) { try { if (window.BXTel) BXTel.count(k, n); } catch (x) {} }
+  // 7.10.1: duração só de jogos de até 6 h (jogo esquecido aberto não distorce a média); p_dur_n = quantos entraram na conta
+  function telDur(e) { var m = durOf(e) / 60000; if (m > 0 && m <= 360) { tel('p_min', m); tel('p_dur_n'); } }
   function upsert(e) {
     var i = -1; P.history.forEach(function (x, k) { if (x.id === e.id) i = k; });
     if (i >= 0) P.history[i] = e; else P.history.unshift(e);
@@ -3227,7 +3229,7 @@ try { I18N.applyDom(); } catch (e) {}
     ui.ends = false; ui.lockUntil = Date.now() + 900;
     closeSheets();
     speak([T("Partida encerrada."), Tf("Vitória de {0}.", speakNames()[w])]);
-    var me2 = entryFrom(G, true); upsert(me2); tel('p_end'); tel('p_end_now'); tel('p_min', durOf(me2) / 60000); render(); persist(); showEnd();
+    var me2 = entryFrom(G, true); upsert(me2); tel('p_end'); tel('p_end_now'); telDur(me2); render(); persist(); showEnd();
   }
   function saveLater() {
     if (G.state.pointsPlayed === 0 || G.state.winner !== null) return;
@@ -4485,7 +4487,7 @@ try { I18N.applyDom(); } catch (e) {}
     b.disabled = true; err.textContent = '';
     var doc = { topic: $('ctTopic').value, msg: msg.slice(0, 2000), email: em.slice(0, 120), uid: sy.user ? sy.user.uid : null,
       name: String((P.sync.acct && P.sync.acct.name) || '').slice(0, 80), lang: String(P.settings.lang || 'pt-BR').slice(0, 8),
-      build: '7.10', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
+      build: '7.10.1', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
     sy.db.collection('contact').add(doc).then(function () {
       b.disabled = false; $('ctMsg').value = ''; closeSheets(); showToast(T("Mensagem enviada. Obrigado! Responderemos pelo e-mail informado."));
     }, function (e) { b.disabled = false; err.textContent = Tf("Não foi possível enviar ({0}). Tente de novo.", (e && e.code) || T("erro")); });
@@ -5230,7 +5232,7 @@ try { I18N.applyDom(); } catch (e) {}
   // Beta 7.8: telemetria de uso (shared/telemetry.js) e versão da ponte do app nativo na linha de versão
   try {
     if (window.BXTel) {
-      BXTel.init({ module: 'placar', build: '7.10', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
+      BXTel.init({ module: 'placar', build: '7.10.1', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
       tel('p_open');
       $('sTel').checked = BXTel.isOn();
       $('sTel').addEventListener('change', function () { BXTel.setOn(this.checked); showToast(this.checked ? T("Estatísticas de uso ligadas. Obrigado!") : T("Estatísticas de uso desligadas.")); });

@@ -8,7 +8,7 @@
 <link rel="icon" href="../icons/icon-192.png">
 <link rel="stylesheet" href="../fonts/fonts.css">
 <style>
-/* BoxScore — Painel "Uso do app" (painel 1.0.0, Beta 7.10). Só para a equipe: lê a coleção telemetry. */
+/* BoxScore — Painel "Uso do app" (painel 1.0.1, Beta 7.10.1). Só para a equipe: lê a coleção telemetry. */
 :root { --bg: #f4f6f7; --card: #fcfcfb; --ink: #0b0b0b; --ink2: #52514e; --muted: #6b6a66; --line: #e2e1dc; --grid: #ecebe6;
   --s1: #2a78d6; --s2: #eb6834; --chip: #0a1014; --chipInk: #fff; color-scheme: light dark; }
 @media (prefers-color-scheme: dark) { :root { --bg: #0f0f0e; --card: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --muted: #9a998f; --line: #2e2e2b; --grid: #262624;
@@ -161,6 +161,7 @@ ol.steps { text-align: left; color: var(--ink2); }
   function show(v) { ['vLoad', 'vLogin', 'vDenied', 'vData'].forEach(function (k) { $(k).hidden = k !== v; }); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function fmt(n) { return Math.round(n).toLocaleString('pt-BR'); }
+  function plural(v, one, many) { return fmt(v) + ' ' + (Math.round(v) === 1 ? one : many); }
   function pct(a, b) { return b ? Math.round(100 * a / b) + '%' : '—'; }
   function dkey(t) { var d = new Date(t); return '' + d.getFullYear() + ('0' + (d.getMonth() + 1)).slice(-2) + ('0' + d.getDate()).slice(-2); }
   function dlabel(k, long) { var d = new Date(+k.slice(0, 4), +k.slice(4, 6) - 1, +k.slice(6, 8)); return d.toLocaleDateString('pt-BR', long ? { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' } : { day: '2-digit', month: '2-digit' }); }
@@ -227,12 +228,16 @@ ol.steps { text-align: left; color: var(--ink2); }
     var A = { days: days, per: {}, tot: {}, users: {}, people: {}, docs: rows.length };
     days.forEach(function (d) { A.per[d] = { logged: {}, anon: {}, c: {} }; });
     Object.keys(LBL).forEach(function (k) { A.tot[k] = 0; A.users[k] = {}; });
-    A.tot.p_min = 0;
+    A.tot.p_min = 0; A.durMin = 0; A.durN = 0;
     rows.forEach(function (r) {
       var P = A.per[r.d]; if (!P) return;
       (r.anon ? P.anon : P.logged)[r.who] = 1;
       var p = A.people[r.who] || (A.people[r.who] = { days: {}, anon: r.anon, last: '', plat: '', build: '', lang: '' });
       p.days[r.d] = 1;
+      // duração média: versões novas mandam p_dur_n (jogos de até 6 h); nas antigas, ignora o dia se a média passar de 6 h
+      var cm = +r.c.p_min || 0, cn = +r.c.p_dur_n || 0, ce = +r.c.p_end || 0;
+      if (cn > 0) { A.durMin += cm; A.durN += cn; }
+      else if (ce > 0 && cm > 0 && cm / ce <= 360) { A.durMin += cm; A.durN += ce; }
       if (r.d >= p.last) { p.last = r.d; p.plat = r.plat; p.build = r.build; p.lang = r.lang; }
       Object.keys(r.c).forEach(function (k) {
         var v = +r.c[k] || 0; if (!(v > 0)) return;
@@ -258,9 +263,9 @@ ol.steps { text-align: left; color: var(--ink2); }
     var tiles = [
       ['Pessoas ativas', fmt(N), fmt(logged) + ' com conta · ' + fmt(N - logged) + ' sem conta'],
       ['Média por dia', avg >= 10 || avg === 0 ? fmt(avg) : avg.toFixed(1).replace('.', ','), 'pessoas ativas por dia'],
-      ['Voltaram', S.days === 1 ? '—' : pct(back, N), S.days === 1 ? 'escolha 7 dias ou mais' : fmt(back) + ' usaram em 2 dias ou mais'],
-      ['Jogos iniciados', fmt(T.p_start), fmt(T.p_end) + ' terminados (' + pct(T.p_end, T.p_start) + ')'],
-      ['Duração média', T.p_end ? fmt(T.p_min / T.p_end) + ' min' : '—', 'por jogo terminado'],
+      ['Voltaram', S.days === 1 ? '—' : pct(back, N), S.days === 1 ? 'escolha 7 dias ou mais' : (back === 1 ? '1 usou' : fmt(back) + ' usaram') + ' em 2 dias ou mais'],
+      ['Jogos iniciados', fmt(T.p_start), T.p_end > T.p_start ? plural(T.p_end, 'terminado', 'terminados') + ' (inclui jogos começados antes)' : plural(T.p_end, 'terminado', 'terminados') + ' (' + pct(T.p_end, T.p_start) + ')'],
+      ['Duração média', A.durN ? fmt(A.durMin / A.durN) + ' min' : '—', A.durN ? 'em ' + plural(A.durN, 'jogo', 'jogos') + ' de até 6 h' : 'nenhum jogo terminado com até 6 h'],
       ['Pontos pela pulseira', pct(band, pts), fmt(pts) + ' pontos marcados'],
       ['Usaram a Rede', fmt(n(A.users.r_open)), pct(n(A.users.r_open), N) + ' das pessoas ativas']
     ];
@@ -350,7 +355,7 @@ ol.steps { text-align: left; color: var(--ink2); }
   // ---------- CSV (um dia por linha) ----------
   function exportCsv() {
     if (!S.agg) return;
-    var A = S.agg, keys = Object.keys(LBL).concat(['p_min']);
+    var A = S.agg, keys = Object.keys(LBL).concat(['p_min', 'p_dur_n']);
     var head = ['dia', 'pessoas', 'com_conta', 'sem_conta'].concat(keys);
     var lines = [head.join(';')].concat(A.days.map(function (d) {
       var P = A.per[d], a = n(P.logged), b = n(P.anon);
