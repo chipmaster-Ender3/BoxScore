@@ -165,6 +165,30 @@ header.hero.subp #chatB,header.hero.subp #setB,header.hero.subp #back{display:no
 main .pgsec,.st-sec{margin:14px 2px 6px;font:800 16px/1.2 var(--ui);letter-spacing:0;text-transform:none;color:var(--ink)}
 main #lHome>.pgsec:first-child{margin-top:4px}
 </style>
+<style id="v730">
+/* 7.30: conversas com foto, hora como no celular, emojis */
+main .crow{gap:12px}main .crow .mav{width:48px;height:48px;flex:none}
+main .crow .cn b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat .ct .cwho{flex:1;min-width:0;display:flex;align-items:center;gap:10px;border:0;background:transparent;color:inherit;padding:0;text-align:left;cursor:pointer;font:inherit}
+.chat .ct .cwho .mav{width:40px;height:40px;font-size:16px;flex:none}.chat .ct .cwho b{flex:1}
+.chat .bub{border-radius:18px;padding:7px 12px 6px}
+.chat .bub .bt{white-space:pre-wrap}
+.chat .bub small{display:inline-block;float:right;margin:6px 0 -2px 10px;line-height:1}
+.chat .bub.me{background:var(--acc);color:var(--bg);border-color:var(--acc)}
+.chat .bub.big{background:transparent;border-color:transparent;padding:0 4px}.chat .bub.big .bt{font-size:44px;line-height:1.1}.chat .bub.big small{float:none;display:block;color:var(--muted);opacity:1;margin:2px 0 0}
+.chat .cf{align-items:center}.chat .cf .emob{width:46px;min-width:46px;height:46px;min-height:46px;color:var(--muted)}
+.chat .emp2{border-top:1px solid var(--line);background:var(--panel);padding:8px 12px 4px;display:grid;gap:6px;max-height:min(46vh,300px)}
+.chat .emp2[hidden]{display:none}
+.chat .emt{display:flex;gap:4px;padding:3px;border-radius:999px;background:var(--segbg)}
+.chat .emt button{flex:1;min-height:36px;border:0;border-radius:999px;background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.chat .emt button[aria-selected=true]{background:var(--panel);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.chat .emt .ic{width:20px;height:20px}
+.chat .emh{font:700 13px var(--ui);color:var(--muted);padding:0 2px}
+.chat .emg{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:2px;overflow-y:auto;min-height:96px}
+.chat .emg .eb{height:44px;border:0;border-radius:10px;background:transparent;font-size:26px;line-height:1;cursor:pointer;padding:0}
+.chat .emg .eb:hover,.chat .emg .eb:focus-visible{background:var(--segbg)}
+.chat .emn{grid-column:1/-1;color:var(--muted);font:500 14px var(--ui);padding:12px 2px}
+</style>
 </head><body>
 <main>
 <header id="hdr" class="hero"><button class="btn" id="navBack" type="button" hidden>←</button><div class="htx"><small id="kick">BoxScore</small><h1 id="ttl"></h1></div><small id="ver"></small><button class="btn" id="chatB" type="button" hidden></button><button class="btn" id="setB" type="button" hidden></button><button class="btn" id="back" type="button"></button></header>
@@ -187,7 +211,7 @@ main #lHome>.pgsec:first-child{margin-top:4px}
 (function () {
   'use strict';
   BXMods.mark('rede');
-  var VERSION = '0.49.0';
+  var VERSION = '0.50.0';
   var FB_CFG = { apiKey: 'AIzaSyD_L90YxJAVRuTfPqwNbETJlbV9BYdnuYI', authDomain: 'boxsocore.firebaseapp.com', projectId: 'boxsocore', storageBucket: 'boxsocore.firebasestorage.app', messagingSenderId: '639383913161', appId: '1:639383913161:web:a9bb75fcf99f4b03378318' };
   var FB_VER = '10.12.2', FB_LIBS = ['app', 'auth', 'firestore'];
   var HOUR = 3600000;
@@ -524,6 +548,15 @@ main #lHome>.pgsec:first-child{margin-top:4px}
     de: { fb_game: 'Das Spiel', fb_who: 'Wer spielt', fb_when: 'Wann und wo', fb_lvl: 'Niveau', fb_note: 'Notiz' }
   };
   Object.keys(KJ8).forEach(function (l) { Object.assign(D[l], KJ8[l]); });
+  var KJ9 = {   // 7.30: conversas com foto e emojis
+    'pt-BR': { yday: 'Ontem', emo: 'Emojis', emo_rec: 'Recentes', emo_face: 'Rostos', emo_hand: 'Gestos', emo_sport: 'Tênis e esporte', emo_heart: 'Corações e símbolos', emo_none: 'Os emojis que você usar aparecem aqui.' },
+    'pt-PT': { yday: 'Ontem', emo: 'Emojis', emo_rec: 'Recentes', emo_face: 'Caras', emo_hand: 'Gestos', emo_sport: 'Ténis e desporto', emo_heart: 'Corações e símbolos', emo_none: 'Os emojis que usar aparecem aqui.' },
+    en: { yday: 'Yesterday', emo: 'Emoji', emo_rec: 'Recent', emo_face: 'Faces', emo_hand: 'Gestures', emo_sport: 'Tennis and sport', emo_heart: 'Hearts and symbols', emo_none: 'Emoji you use show up here.' },
+    es: { yday: 'Ayer', emo: 'Emojis', emo_rec: 'Recientes', emo_face: 'Caras', emo_hand: 'Gestos', emo_sport: 'Tenis y deporte', emo_heart: 'Corazones y símbolos', emo_none: 'Los emojis que uses aparecen aquí.' },
+    fr: { yday: 'Hier', emo: 'Émojis', emo_rec: 'Récents', emo_face: 'Visages', emo_hand: 'Gestes', emo_sport: 'Tennis et sport', emo_heart: 'Cœurs et symboles', emo_none: 'Les émojis que vous utilisez apparaissent ici.' },
+    de: { yday: 'Gestern', emo: 'Emojis', emo_rec: 'Zuletzt', emo_face: 'Gesichter', emo_hand: 'Gesten', emo_sport: 'Tennis und Sport', emo_heart: 'Herzen und Symbole', emo_none: 'Emojis, die du nutzt, erscheinen hier.' }
+  };
+  Object.keys(KJ9).forEach(function (l) { Object.assign(D[l], KJ9[l]); });
   var K23 = {"pt-BR": {"pay_yes": "Inscrição paga", "pay_no": "Inscrição pendente", "pay_on": "Inscrição marcada como paga.", "pay_off": "Inscrição marcada como pendente.", "pay_tap": "Toque para marcar pago ou pendente", "pay_sum": "Pagos: {0} de {1} · {2}", "pay_h": "Toque no selo de cada jogador na classificação para marcar o pagamento."}, "pt-PT": {"pay_yes": "Inscrição paga", "pay_no": "Inscrição pendente", "pay_on": "Inscrição marcada como paga.", "pay_off": "Inscrição marcada como pendente.", "pay_tap": "Toque para marcar paga ou pendente", "pay_sum": "Pagas: {0} de {1} · {2}", "pay_h": "Toque no selo de cada jogador na classificação para marcar o pagamento."}, "en": {"pay_yes": "Fee paid", "pay_no": "Fee pending", "pay_on": "Fee marked as paid.", "pay_off": "Fee marked as pending.", "pay_tap": "Tap to mark paid or pending", "pay_sum": "Paid: {0} of {1} · {2}", "pay_h": "Tap each player's badge in the standings to mark the payment."}, "es": {"pay_yes": "Inscripción pagada", "pay_no": "Inscripción pendiente", "pay_on": "Inscripción marcada como pagada.", "pay_off": "Inscripción marcada como pendiente.", "pay_tap": "Toca para marcar pagada o pendiente", "pay_sum": "Pagadas: {0} de {1} · {2}", "pay_h": "Toca la etiqueta de cada jugador en la clasificación para marcar el pago."}, "fr": {"pay_yes": "Inscription payée", "pay_no": "Inscription en attente", "pay_on": "Inscription marquée comme payée.", "pay_off": "Inscription marquée en attente.", "pay_tap": "Touchez pour marquer payée ou en attente", "pay_sum": "Payées : {0} sur {1} · {2}", "pay_h": "Touchez le badge de chaque joueur dans le classement pour noter le paiement."}, "de": {"pay_yes": "Startgeld bezahlt", "pay_no": "Startgeld offen", "pay_on": "Startgeld als bezahlt markiert.", "pay_off": "Startgeld als offen markiert.", "pay_tap": "Tippen für bezahlt oder offen", "pay_sum": "Bezahlt: {0} von {1} · {2}", "pay_h": "Tippe in der Tabelle auf das Abzeichen jedes Spielers, um die Zahlung zu markieren."}};
   Object.keys(K23).forEach(function (l) { Object.assign(D[l], K23[l]); });
   var K24 = {"pt-BR": {"rv_rounds": "Rodadas", "rp_never_me": "Neste ranking cada adversário vale uma vez só.", "rp_ok_me": "Você já enfrentou {0} adversários diferentes: pode repetir adversário.", "rp_need_me": "Para repetir adversário, enfrente {0} diferentes antes (você tem {1}).", "rd_new": "Gerar rodada", "rd_none_adm": "Nenhuma rodada ainda. Gere a primeira para sortear os jogos.", "rd_none": "Nenhuma rodada sorteada ainda.", "rd_n": "Rodada {0}", "rd_ended": "Encerrou {0}", "rd_due": "Até {0}", "rd_np": "Não jogado", "rd_todo": "A jogar", "rd_bye": "Folga: {0}", "rd_del": "Apagar esta rodada", "rd_del_ok": "Rodada apagada.", "rd_info": "{0} jogos para {1} jogadores.", "rd_k": "{0} por jogador", "rd_new_t": "Rodada {0}", "rd_new_h": "Quem nunca se enfrentou e quem jogou menos tem prioridade. Novos jogadores entram automaticamente.", "rd_per": "Jogos por jogador", "rd_dl": "Prazo", "rd_redraw": "Sortear de novo", "rd_go": "Publicar rodada", "rd_ok": "Rodada publicada.", "rd_few": "Precisa de pelo menos 2 jogadores.", "sk_rep": "Não contou: adversário repetido antes da hora", "sk_round": "Não contou: confronto fora da rodada", "sk_adm": "Não contou: só o administrador lança", "sk_day": "Não contou: limite de jogos no dia", "ab_mode": "Como os jogos acontecem", "md_free": "Livre (convites)", "md_rounds": "Rodadas sorteadas", "md_h": "Dá para trocar com o ranking em andamento: os jogos já contados continuam valendo.", "ab_rep": "Repetir adversário", "rp_n": "Nunca", "rp_0": "Sempre", "rp_2": "Depois de enfrentar 1/2 dos jogadores", "rp_3": "Depois de enfrentar 1/3 dos jogadores", "rp_4": "Depois de enfrentar 1/4 dos jogadores", "rp_0s": "Sempre", "rp_ns": "Nunca", "rp_h": "Evita que alguém suba jogando sempre com os mesmos. A fração conta só quem já jogou no ranking."}, "pt-PT": {"rv_rounds": "Jornadas", "rp_never_me": "Neste ranking cada adversário vale uma vez só.", "rp_ok_me": "Já defrontou {0} adversários diferentes: pode repetir adversário.", "rp_need_me": "Para repetir adversário, defronte {0} diferentes antes (tem {1}).", "rd_new": "Gerar jornada", "rd_none_adm": "Ainda não há jornadas. Gere a primeira para sortear os jogos.", "rd_none": "Ainda não há jornadas sorteadas.", "rd_n": "Jornada {0}", "rd_ended": "Encerrou {0}", "rd_due": "Até {0}", "rd_np": "Não jogado", "rd_todo": "A jogar", "rd_bye": "Folga: {0}", "rd_del": "Apagar esta jornada", "rd_del_ok": "Jornada apagada.", "rd_info": "{0} jogos para {1} jogadores.", "rd_k": "{0} por jogador", "rd_new_t": "Jornada {0}", "rd_new_h": "Quem nunca se defrontou e quem jogou menos tem prioridade. Novos jogadores entram automaticamente.", "rd_per": "Jogos por jogador", "rd_dl": "Prazo", "rd_redraw": "Sortear de novo", "rd_go": "Publicar jornada", "rd_ok": "Jornada publicada.", "rd_few": "Precisa de pelo menos 2 jogadores.", "sk_rep": "Não contou: adversário repetido antes da hora", "sk_round": "Não contou: confronto fora da jornada", "sk_adm": "Não contou: só o administrador lança", "sk_day": "Não contou: limite de jogos no dia", "ab_mode": "Como os jogos acontecem", "md_free": "Livre (convites)", "md_rounds": "Jornadas sorteadas", "md_h": "Pode trocar com o ranking a decorrer: os jogos já contados continuam a valer.", "ab_rep": "Repetir adversário", "rp_n": "Nunca", "rp_0": "Sempre", "rp_2": "Depois de defrontar 1/2 dos jogadores", "rp_3": "Depois de defrontar 1/3 dos jogadores", "rp_4": "Depois de defrontar 1/4 dos jogadores", "rp_0s": "Sempre", "rp_ns": "Nunca", "rp_h": "Evita que alguém suba jogando sempre com os mesmos. A fração conta só quem já jogou no ranking."}, "en": {"rv_rounds": "Rounds", "rp_never_me": "In this ranking each opponent counts only once.", "rp_ok_me": "You've faced {0} different opponents: you can play a repeat opponent.", "rp_need_me": "To play an opponent again, face {0} different ones first (you have {1}).", "rd_new": "Draw round", "rd_none_adm": "No rounds yet. Draw the first one to set the matches.", "rd_none": "No rounds drawn yet.", "rd_n": "Round {0}", "rd_ended": "Ended {0}", "rd_due": "By {0}", "rd_np": "Not played", "rd_todo": "To play", "rd_bye": "Bye: {0}", "rd_del": "Delete this round", "rd_del_ok": "Round deleted.", "rd_info": "{0} matches for {1} players.", "rd_k": "{0} per player", "rd_new_t": "Round {0}", "rd_new_h": "Players who never met and who played less get priority. New players join automatically.", "rd_per": "Matches per player", "rd_dl": "Deadline", "rd_redraw": "Draw again", "rd_go": "Publish round", "rd_ok": "Round published.", "rd_few": "Needs at least 2 players.", "sk_rep": "Not counted: repeat opponent too soon", "sk_round": "Not counted: match not in a round", "sk_adm": "Not counted: only the admin enters results", "sk_day": "Not counted: daily match limit", "ab_mode": "How matches happen", "md_free": "Free (invites)", "md_rounds": "Drawn rounds", "md_h": "You can switch while the ranking is running: matches already counted stay.", "ab_rep": "Repeat opponent", "rp_n": "Never", "rp_0": "Always", "rp_2": "After facing 1/2 of the players", "rp_3": "After facing 1/3 of the players", "rp_4": "After facing 1/4 of the players", "rp_0s": "Always", "rp_ns": "Never", "rp_h": "Stops someone climbing by always playing the same people. The fraction counts only players who have played."}, "es": {"rv_rounds": "Jornadas", "rp_never_me": "En este ranking cada rival cuenta una sola vez.", "rp_ok_me": "Ya enfrentaste a {0} rivales distintos: puedes repetir rival.", "rp_need_me": "Para repetir rival, enfrenta antes a {0} distintos (tienes {1}).", "rd_new": "Sortear jornada", "rd_none_adm": "Aún no hay jornadas. Sortea la primera para definir los partidos.", "rd_none": "Aún no hay jornadas sorteadas.", "rd_n": "Jornada {0}", "rd_ended": "Terminó {0}", "rd_due": "Hasta {0}", "rd_np": "No jugado", "rd_todo": "Por jugar", "rd_bye": "Descansa: {0}", "rd_del": "Borrar esta jornada", "rd_del_ok": "Jornada borrada.", "rd_info": "{0} partidos para {1} jugadores.", "rd_k": "{0} por jugador", "rd_new_t": "Jornada {0}", "rd_new_h": "Tienen prioridad quienes nunca se enfrentaron y quienes jugaron menos. Los nuevos entran solos.", "rd_per": "Partidos por jugador", "rd_dl": "Plazo", "rd_redraw": "Sortear de nuevo", "rd_go": "Publicar jornada", "rd_ok": "Jornada publicada.", "rd_few": "Se necesitan al menos 2 jugadores.", "sk_rep": "No contó: rival repetido antes de tiempo", "sk_round": "No contó: partido fuera de la jornada", "sk_adm": "No contó: solo el administrador carga resultados", "sk_day": "No contó: límite de partidos del día", "ab_mode": "Cómo se juegan los partidos", "md_free": "Libre (invitaciones)", "md_rounds": "Jornadas sorteadas", "md_h": "Se puede cambiar con el ranking en marcha: los partidos ya contados siguen valiendo.", "ab_rep": "Repetir rival", "rp_n": "Nunca", "rp_0": "Siempre", "rp_2": "Tras enfrentar 1/2 de los jugadores", "rp_3": "Tras enfrentar 1/3 de los jugadores", "rp_4": "Tras enfrentar 1/4 de los jugadores", "rp_0s": "Siempre", "rp_ns": "Nunca", "rp_h": "Evita que alguien suba jugando siempre con los mismos. La fracción cuenta solo a quienes ya jugaron."}, "fr": {"rv_rounds": "Tours", "rp_never_me": "Dans ce classement chaque adversaire ne compte qu'une fois.", "rp_ok_me": "Vous avez affronté {0} adversaires différents : vous pouvez rejouer un adversaire.", "rp_need_me": "Pour rejouer un adversaire, affrontez-en d'abord {0} différents (vous en avez {1}).", "rd_new": "Tirer un tour", "rd_none_adm": "Aucun tour pour l'instant. Tirez le premier pour fixer les matchs.", "rd_none": "Aucun tour tiré pour l'instant.", "rd_n": "Tour {0}", "rd_ended": "Terminé le {0}", "rd_due": "Jusqu'au {0}", "rd_np": "Non joué", "rd_todo": "À jouer", "rd_bye": "Exempt : {0}", "rd_del": "Supprimer ce tour", "rd_del_ok": "Tour supprimé.", "rd_info": "{0} matchs pour {1} joueurs.", "rd_k": "{0} par joueur", "rd_new_t": "Tour {0}", "rd_new_h": "Priorité à ceux qui ne se sont jamais affrontés et à ceux qui ont moins joué. Les nouveaux entrent automatiquement.", "rd_per": "Matchs par joueur", "rd_dl": "Délai", "rd_redraw": "Retirer", "rd_go": "Publier le tour", "rd_ok": "Tour publié.", "rd_few": "Il faut au moins 2 joueurs.", "sk_rep": "Non compté : adversaire répété trop tôt", "sk_round": "Non compté : match hors tour", "sk_adm": "Non compté : seul l'administrateur saisit", "sk_day": "Non compté : limite de matchs du jour", "ab_mode": "Comment se jouent les matchs", "md_free": "Libre (invitations)", "md_rounds": "Tours tirés au sort", "md_h": "Modifiable en cours de classement : les matchs déjà comptés restent valables.", "ab_rep": "Rejouer un adversaire", "rp_n": "Jamais", "rp_0": "Toujours", "rp_2": "Après avoir affronté 1/2 des joueurs", "rp_3": "Après avoir affronté 1/3 des joueurs", "rp_4": "Après avoir affronté 1/4 des joueurs", "rp_0s": "Toujours", "rp_ns": "Jamais", "rp_h": "Empêche de monter en jouant toujours les mêmes. La fraction ne compte que ceux qui ont joué."}, "de": {"rv_rounds": "Runden", "rp_never_me": "In dieser Rangliste zählt jeder Gegner nur einmal.", "rp_ok_me": "Du hast {0} verschiedene Gegner gespielt: Wiederholung erlaubt.", "rp_need_me": "Um einen Gegner erneut zu spielen, erst {0} verschiedene spielen (du hast {1}).", "rd_new": "Runde auslosen", "rd_none_adm": "Noch keine Runden. Lose die erste aus, um die Spiele festzulegen.", "rd_none": "Noch keine Runde ausgelost.", "rd_n": "Runde {0}", "rd_ended": "Beendet {0}", "rd_due": "Bis {0}", "rd_np": "Nicht gespielt", "rd_todo": "Offen", "rd_bye": "Spielfrei: {0}", "rd_del": "Diese Runde löschen", "rd_del_ok": "Runde gelöscht.", "rd_info": "{0} Spiele für {1} Spieler.", "rd_k": "{0} pro Spieler", "rd_new_t": "Runde {0}", "rd_new_h": "Wer sich nie getroffen und wer weniger gespielt hat, hat Vorrang. Neue Spieler kommen automatisch dazu.", "rd_per": "Spiele pro Spieler", "rd_dl": "Frist", "rd_redraw": "Neu auslosen", "rd_go": "Runde veröffentlichen", "rd_ok": "Runde veröffentlicht.", "rd_few": "Mindestens 2 Spieler nötig.", "sk_rep": "Nicht gewertet: Gegner zu früh wiederholt", "sk_round": "Nicht gewertet: Spiel nicht in einer Runde", "sk_adm": "Nicht gewertet: nur der Admin trägt ein", "sk_day": "Nicht gewertet: Tageslimit erreicht", "ab_mode": "Wie gespielt wird", "md_free": "Frei (Einladungen)", "md_rounds": "Ausgeloste Runden", "md_h": "Auch während der Rangliste umstellbar: bereits gewertete Spiele bleiben.", "ab_rep": "Gegner wiederholen", "rp_n": "Nie", "rp_0": "Immer", "rp_2": "Nach 1/2 der Spieler", "rp_3": "Nach 1/3 der Spieler", "rp_4": "Nach 1/4 der Spieler", "rp_0s": "Immer", "rp_ns": "Nie", "rp_h": "Verhindert, dass jemand nur gegen dieselben spielt. Der Anteil zählt nur Spieler, die schon gespielt haben."}};
@@ -583,6 +616,8 @@ main #lHome>.pgsec:first-child{margin-top:4px}
 
   var S = { wg: {}, wgBad: {}, dq: { n: '', c: '', k: '' }, groups: {}, disc: {}, gReqs: {}, sentReq: {}, gid: '', gtab: 'sum', ranks: {}, rkBusy: {}, rkTry: {}, gf: 'mine', dcity: true, discAt: 0, discLoading: false, gLoaded: false, user: null, db: null, auth: null, posts: {}, pub: {}, follows: {}, fmode: 'friends', pubAt: 0, pubLoading: false, blocks: {}, chats: [], friends: [], friendsLoaded: false, games: {}, jt: 'play', jf: { p: 'all', o: '', r: '', l: '' }, jx: {}, tab: 'feed', loading: false, err: false, form: null, armed: '' };
   var ICONS = {
+    smile: '<circle cx="12" cy="12" r="9"/><path d="M8.5 14.5c1 1.3 2.2 2 3.5 2s2.5-.7 3.5-2"/><path d="M9 9.5h.01M15 9.5h.01"/>',   // 7.30
+    kbd: '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h.01M11 10h.01M15 10h.01M7 14h10"/>',
     heart: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',   // 7.27
     dots: '<circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
     bars: '<path d="M5 20v-5M12 20V10M19 20V4"/>',
@@ -663,7 +698,7 @@ main #lHome>.pgsec:first-child{margin-top:4px}
     return loadFB().then(function () {
       firebase.initializeApp(FB_CFG);
       S.auth = firebase.auth(); S.db = firebase.firestore();
-      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.29', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
+      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.30', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
       try { S.db.settings({ experimentalAutoDetectLongPolling: true, merge: true }); } catch (e) {}
       try { S.auth.getRedirectResult().catch(function () {}); } catch (e) {}
       S.auth.onAuthStateChanged(function (u) { S.user = u || null; paintGate(); if (u) { loadFriends(); loadFollows(); loadBlocks().then(reload); ensureProfile(); } });
@@ -1177,12 +1212,46 @@ main #lHome>.pgsec:first-child{margin-top:4px}
     } catch (e) { return dayL(ms); }
   }
   setInterval(function () { [].forEach.call(document.querySelectorAll('[data-ts]'), function (el) { var t = postWhen(+el.getAttribute('data-ts')); if (el.textContent !== t) el.textContent = t; }); }, 60e3);
+  // 7.30: hora na lista de conversas como no celular: hoje = hora; ontem = "Ontem"; antes = data curta
+  function whenShort(ms) { var d = new Date(ms), n = new Date(), y = new Date(n.getFullYear(), n.getMonth(), n.getDate() - 1);
+    if (d.toDateString() === n.toDateString()) return clock(ms); if (d.toDateString() === y.toDateString()) return T('yday');
+    try { return d.toLocaleDateString(LG, { day: '2-digit', month: '2-digit' }); } catch (e) { return ''; } }
   function dayL(ms) { try { return new Date(ms).toLocaleDateString(LG, { weekday: 'short', day: 'numeric', month: 'short' }); } catch (e) { return ''; } }
   function msgBtn(uid, name, g) { return icBtn('chat', T('msg'), function () { openChat(uid, name, g); }); }
   function closeChat() {
     if (CH.unsub) { try { CH.unsub(); } catch (e) {} CH.unsub = null; }
     if (CH.root) { CH.root.remove(); CH.root = null; }
     if (S.user && S.tab === 'chat') paint();
+  }
+  // ---------- 7.30: emojis na conversa ----------
+  var EMO = {
+    face: '😀 😃 😄 😁 😆 😂 🤣 😊 🙂 😉 😍 😘 😎 🤩 🥳 😅 😌 🤔 🤨 😏 😴 😮 😢 😭 😤 😡 🥵 🥶 😱 🙄 🤐 😇'.split(' '),
+    hand: '👍 👎 👏 🙌 🙏 💪 🤝 👊 ✊ ✌️ 🤞 🤙 👌 👋 🫶 ☝️'.split(' '),
+    sport: '🎾 🏆 🥇 🥈 🥉 🏅 🔥 ⚡ 💥 🎯 ⏱️ 📅 📍 🏟️ 🚗 ☀️ 🌧️ 💧 🍺 🥤 🍕 🎉'.split(' '),
+    heart: '❤️ 🧡 💛 💚 💙 💜 🖤 🤍 💯 ✅ ❌ ❓ ❗ ⭐ 💬 👀'.split(' ')
+  };
+  function emoRecent() { try { var r = JSON.parse(localStorage.getItem('boxscore.rede.emojis') || '[]'); return Array.isArray(r) ? r.slice(0, 16) : []; } catch (e) { return []; } }
+  function emoUse(e) { var r = emoRecent().filter(function (x) { return x !== e; }); r.unshift(e); try { localStorage.setItem('boxscore.rede.emojis', JSON.stringify(r.slice(0, 16))); } catch (x) {} }
+  function insertAt(inp, txt) {
+    var a = inp.selectionStart == null ? inp.value.length : inp.selectionStart, b = inp.selectionEnd == null ? a : inp.selectionEnd;
+    var v = inp.value.slice(0, a) + txt + inp.value.slice(b); if (v.length > 500) return;
+    inp.value = v; var c = a + txt.length; try { inp.setSelectionRange(c, c); } catch (e) {}
+  }
+  function onlyEmoji(t) { t = String(t || '').trim(); if (!t || t.length > 12) return false; try { return /^(?:\p{Extended_Pictographic}|️|‍|\s)+$/u.test(t); } catch (e) { return false; } }
+  function emojiPanel(pick) {
+    var cats = [['rec', 'hist'], ['face', 'smile'], ['hand', 'user'], ['sport', 'ball'], ['heart', 'star']], cur = emoRecent().length ? 'rec' : 'face';
+    var tabs = h('div', { cls: 'emt', role: 'tablist' }), grid = h('div', { cls: 'emg', role: 'grid' }), ttl = h('div', { cls: 'emh' });
+    var box = h('div', { cls: 'emp2', role: 'dialog', 'aria-label': T('emo') }, [tabs, ttl, grid]);
+    function draw() {
+      tabs.textContent = ''; grid.textContent = '';
+      cats.forEach(function (c) { tabs.appendChild(h('button', { type: 'button', role: 'tab', 'aria-selected': String(cur === c[0]), 'aria-label': T('emo_' + c[0]), title: T('emo_' + c[0]), on: { click: function () { cur = c[0]; draw(); } } }, [ic(c[1])])); });
+      ttl.textContent = T('emo_' + cur);
+      var list = cur === 'rec' ? emoRecent() : EMO[cur];
+      if (!list.length) { grid.appendChild(h('div', { cls: 'emn', text: T('emo_none') })); return; }
+      list.forEach(function (e) { grid.appendChild(h('button', { type: 'button', cls: 'eb', 'aria-label': e, text: e, on: { click: function () { emoUse(e); pick(e); } } })); });
+    }
+    box.refresh = function () { cur = emoRecent().length ? 'rec' : 'face'; draw(); };   // abre sempre nos Recentes, quando houver
+    draw(); return box;
   }
   function openChat(uid, name, g) {
     if (CH.root) closeChat();
@@ -1193,13 +1262,17 @@ main #lHome>.pgsec:first-child{margin-top:4px}
     var sendB = h('button', { type: 'button', cls: 'btn pri', text: T('ch_send') });
     var top = h('div', { cls: 'ct' }, [
       h('button', { type: 'button', cls: 'btn', text: '←', 'aria-label': BXMods.t('back'), on: { click: closeChat } }),
-      h('b', { text: name || '?' }),
-      h('button', { type: 'button', cls: 'btn', text: T('view'), on: { click: function () { showProfile(uid, name); } } }),
+      // 7.30: foto e nome no topo; tocar abre o perfil (antes era o botão "Ver perfil")
+      h('button', { type: 'button', cls: 'cwho', 'aria-label': T('view') + ': ' + (name || '?'), title: T('view'), on: { click: function () { showProfile(uid, name); } } }, [memAv(uid, name), h('b', { text: name || '?' })]),
       moreBtn(uid, name, g)]);
     var ctxEl = g ? h('div', { cls: 'cx', text: Tf('ch_ctx', fmtWhen(g.startAt), g.place) }) : h('div');
     if (!g) ctxEl.hidden = true;
-    var form = h('div', { cls: 'cf' }, [inp, sendB]);
-    var root = h('div', { cls: 'chat', role: 'dialog', 'aria-label': name || '' }, [h('div', { cls: 'w' }, [top, ctxEl, list, form])]);
+    // 7.30: emojis — botão ao lado do campo abre um painel compacto (recentes + 4 grupos), sem sair da conversa
+    var emoB = h('button', { type: 'button', cls: 'btn icb emob', 'aria-label': T('emo'), title: T('emo'), 'aria-expanded': 'false' }, [ic('smile')]);
+    var emoP = emojiPanel(function (e) { insertAt(inp, e); }); emoP.hidden = true;
+    emoB.addEventListener('click', function () { var on = emoP.hidden; emoP.hidden = !on; emoB.setAttribute('aria-expanded', String(on)); emoB.replaceChildren(ic(on ? 'kbd' : 'smile')); if (on) emoP.refresh(); else try { inp.focus(); } catch (x) {} });
+    var form = h('div', { cls: 'cf' }, [emoB, inp, sendB]);
+    var root = h('div', { cls: 'chat', role: 'dialog', 'aria-label': name || '' }, [h('div', { cls: 'w' }, [top, ctxEl, list, emoP, form])]);
     document.body.appendChild(root); CH.root = root;
     function draw(msgs) {
       list.textContent = '';
@@ -1207,7 +1280,7 @@ main #lHome>.pgsec:first-child{margin-top:4px}
       var lastDay = '';
       msgs.forEach(function (m) {
         var d = dayL(m.at); if (d !== lastDay) { lastDay = d; list.appendChild(h('div', { cls: 'day', text: d })); }
-        list.appendChild(h('div', { cls: 'bub' + (m.from === mine ? ' me' : '') }, [document.createTextNode(m.text), h('small', { text: clock(m.at) })]));
+        list.appendChild(h('div', { cls: 'bub' + (m.from === mine ? ' me' : '') + (onlyEmoji(m.text) ? ' big' : '') }, [h('span', { cls: 'bt', text: m.text }), h('small', { text: clock(m.at) })]));   // 7.30: só emoji = grande
       });
       list.scrollTop = list.scrollHeight;
     }
@@ -1230,7 +1303,7 @@ main #lHome>.pgsec:first-child{margin-top:4px}
       var meta = { members: [mine, uid].sort(), names: nm, last: text.slice(0, 80), lastAt: now, lastFrom: mine, reads: rd };
       if (g && g.id) meta.gameId = g.id;
       cref.set(meta, { merge: true }).then(function () { return cref.collection('msgs').add({ from: mine, text: text, at: now }); }).then(function () {
-        inp.value = ''; listen();
+        inp.value = ''; emoP.hidden = true; emoB.setAttribute('aria-expanded', 'false'); emoB.replaceChildren(ic('smile')); listen();
         var c = S.chats.filter(function (x) { return x.id === id; })[0]; if (!c) { c = { id: id, members: meta.members }; S.chats.push(c); } c.names = nm; c.last = meta.last; c.lastAt = now; c.lastFrom = mine; c.reads = rd;
       }).catch(function () { toast(T('ch_fail')); }).then(function () { sendB.disabled = false; inp.focus(); });
     }
@@ -1244,8 +1317,9 @@ main #lHome>.pgsec:first-child{margin-top:4px}
       var o = pairOther(c); withChat[o] = 1;
       var fr = S.friends.filter(function (x) { return x.uid === o; })[0], nm = (fr && fr.name !== '?' && fr.name) || (c.names || {})[o] || '?';
       var row = h('article', { cls: 'card crow', role: 'button', tabindex: '0', on: { click: function () { openChat(o, nm, null); } } }, [
+        memAv(o, nm),   // 7.30: foto, como nas outras telas
         h('div', { cls: 'cn' }, [h('b', { text: nm }), h('span', { text: (c.lastFrom === me0 ? '↪ ' : '') + (c.last || '') })]),
-        c.lastAt ? h('time', { text: clock(c.lastAt) }) : null,
+        c.lastAt ? h('time', { title: fmtWhen(c.lastAt), text: whenShort(c.lastAt) }) : null,
         isUnread(c) ? h('span', { cls: 'ub', 'aria-label': '•', text: '' }) : null]);
       row.addEventListener('keydown', function (e) { if (e.key === 'Enter') openChat(o, nm, null); });
       host.appendChild(row);
@@ -1255,7 +1329,7 @@ main #lHome>.pgsec:first-child{margin-top:4px}
       empty(host, 'chat', T('ev_chat_t'), fr0 ? T('ev_chat_d') + ' ' + T('ev_chat_d2') : T('ev_chat_d'), fr0 ? '' : T('ev_go_find'), function () { S.tab = 'find'; paint(); }); }
     if (rest.length) {
       host.appendChild(h('div', { cls: 'sub', text: T('ch_friends'), style: 'margin-top:6px;font-weight:700' }));
-      rest.forEach(function (x) { host.appendChild(h('div', { cls: 'card who' }, [h('span', { text: x.name + (x.code ? ' · ' + x.code : '') }), msgBtn(x.uid, x.name, null)])); });
+      rest.forEach(function (x) { host.appendChild(h('div', { cls: 'card who' }, [memAv(x.uid, x.name), h('span', { style: 'flex:1;min-width:0', text: x.name + (x.code ? ' · ' + x.code : '') }), msgBtn(x.uid, x.name, null)])); });   // 7.30: com foto
     }
     paintBlocked(host);
   }

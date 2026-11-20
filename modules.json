@@ -1,8 +1,8 @@
-{"schema":1,"build":"7.29","modules":[
+{"schema":1,"build":"7.30","modules":[
 {"id":"shell","name":"Casca","version":"1.2.1","core":true,"hidden":true,"path":"","files":["./","index.html","manifest.webmanifest","icons/icon-192.png","icons/icon-512.png","icons/icon-maskable-512.png","fonts/fonts.css","fonts/BigShouldersDisplay-latin.woff2","fonts/BigShouldersDisplay-latin-ext.woff2","fonts/PublicSans-latin.woff2","fonts/PublicSans-latin-ext.woff2"]},
 {"id":"shared","name":"Compartilhado","version":"1.6.1","core":true,"hidden":true,"path":"shared/","files":["shared/modules.js","shared/match-v1.js","shared/profile-view.js","shared/telemetry.js","shared/heroes.js","shared/sharecard.js"]},
 {"id":"legal","name":"Privacidade e termos","version":"1.1.0","core":true,"hidden":true,"path":"legal/","files":["legal/privacidade.html","legal/termos.html","legal/excluir-conta.html","legal/config.js","legal/legal.js","legal/legal.css"]},
 {"id":"placar","name":"Placar","version":"4.40.0","core":true,"path":"placar/","files":["placar/","placar/index.html"]},
 {"id":"painel","name":"Uso do app","version":"1.0.2","hidden":true,"path":"painel/","files":["painel/","painel/index.html"]},
-{"id":"rede","name":"Rede","version":"0.49.0","path":"rede/","files":["rede/","rede/index.html"]}
+{"id":"rede","name":"Rede","version":"0.50.0","path":"rede/","files":["rede/","rede/index.html"]}
 ]}
