@@ -156,6 +156,15 @@ main .orow.arow{min-height:64px;margin:0 0 10px}main .orow.arow .oi{background:v
 main .emp{display:grid;justify-items:center;text-align:center;gap:10px;padding:36px 16px}main .emp .ei{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;background:var(--segbg);color:var(--ink)}main .emp .ei .ic{width:32px;height:32px}
 main .emp b{font:800 18px/1.25 var(--ui)}main .emp p{margin:0;max-width:320px;color:var(--muted);font:500 15px/1.45 var(--ui)}main .emp .btn{margin-top:6px;min-width:220px}
 </style>
+<style id="v729">
+/* 7.29: padrão visual, etapa 3 (formulário em blocos, topo das subtelas, títulos de seção) */
+main .fblk{display:grid;gap:12px;margin:0 0 12px}
+main .fblk .sech .sub{font:600 14px/1.3 var(--ui);color:var(--s-open)}
+main #pNew .fbtns{margin:4px 0 8px}
+header.hero.subp #chatB,header.hero.subp #setB,header.hero.subp #back{display:none}
+main .pgsec,.st-sec{margin:14px 2px 6px;font:800 16px/1.2 var(--ui);letter-spacing:0;text-transform:none;color:var(--ink)}
+main #lHome>.pgsec:first-child{margin-top:4px}
+</style>
 </head><body>
 <main>
 <header id="hdr" class="hero"><button class="btn" id="navBack" type="button" hidden>←</button><div class="htx"><small id="kick">BoxScore</small><h1 id="ttl"></h1></div><small id="ver"></small><button class="btn" id="chatB" type="button" hidden></button><button class="btn" id="setB" type="button" hidden></button><button class="btn" id="back" type="button"></button></header>
@@ -178,7 +187,7 @@ main .emp b{font:800 18px/1.25 var(--ui)}main .emp p{margin:0;max-width:320px;co
 (function () {
   'use strict';
   BXMods.mark('rede');
-  var VERSION = '0.48.0';
+  var VERSION = '0.49.0';
   var FB_CFG = { apiKey: 'AIzaSyD_L90YxJAVRuTfPqwNbETJlbV9BYdnuYI', authDomain: 'boxsocore.firebaseapp.com', projectId: 'boxsocore', storageBucket: 'boxsocore.firebasestorage.app', messagingSenderId: '639383913161', appId: '1:639383913161:web:a9bb75fcf99f4b03378318' };
   var FB_VER = '10.12.2', FB_LIBS = ['app', 'auth', 'firestore'];
   var HOUR = 3600000;
@@ -506,6 +515,15 @@ main .emp b{font:800 18px/1.25 var(--ui)}main .emp p{margin:0;max-width:320px;co
       ev_inv_t: 'Gerade keine Einladungen', ev_inv_d: 'Wenn dich jemand zum Spielen einlädt, erscheint die Einladung hier.', ev_play_t: 'Keine Spiele geplant', ev_play_d: 'Plane ein Spiel und lade deine Partner ein.', ev_done_t: 'Noch keine gespielten Spiele', ev_done_d: 'Beendete Spiele erscheinen hier, mit Filtern und Teilen.', ev_find_t: 'Keine offenen Spiele in der Nähe', ev_find_d: 'Erstelle ein offenes Spiel und lass andere beitreten.', ev_chat_t: 'Noch keine Chats', ev_chat_d: 'Vereinbare Zeit, Ort und Platz direkt mit deinen Spielpartnern.', ev_chat_d2: 'Wähle unten einen Freund, um zu beginnen.', ev_feed_t: 'Noch nichts hier', ev_home_t: 'Alles erledigt', ev_go_find: 'Offene Spiele ansehen', ev_go_new: 'Spiel planen' }
   };
   Object.keys(KJ7).forEach(function (l) { Object.assign(D[l], KJ7[l]); });
+  var KJ8 = {   // 7.29: padrão visual, etapa 3
+    'pt-BR': { fb_game: 'O jogo', fb_who: 'Quem joga', fb_when: 'Quando e onde', fb_lvl: 'Nível', fb_note: 'Recado' },
+    'pt-PT': { fb_game: 'O jogo', fb_who: 'Quem joga', fb_when: 'Quando e onde', fb_lvl: 'Nível', fb_note: 'Recado' },
+    en: { fb_game: 'The game', fb_who: 'Who plays', fb_when: 'When and where', fb_lvl: 'Level', fb_note: 'Note' },
+    es: { fb_game: 'El partido', fb_who: 'Quién juega', fb_when: 'Cuándo y dónde', fb_lvl: 'Nivel', fb_note: 'Mensaje' },
+    fr: { fb_game: 'Le match', fb_who: 'Qui joue', fb_when: 'Quand et où', fb_lvl: 'Niveau', fb_note: 'Message' },
+    de: { fb_game: 'Das Spiel', fb_who: 'Wer spielt', fb_when: 'Wann und wo', fb_lvl: 'Niveau', fb_note: 'Notiz' }
+  };
+  Object.keys(KJ8).forEach(function (l) { Object.assign(D[l], KJ8[l]); });
   var K23 = {"pt-BR": {"pay_yes": "Inscrição paga", "pay_no": "Inscrição pendente", "pay_on": "Inscrição marcada como paga.", "pay_off": "Inscrição marcada como pendente.", "pay_tap": "Toque para marcar pago ou pendente", "pay_sum": "Pagos: {0} de {1} · {2}", "pay_h": "Toque no selo de cada jogador na classificação para marcar o pagamento."}, "pt-PT": {"pay_yes": "Inscrição paga", "pay_no": "Inscrição pendente", "pay_on": "Inscrição marcada como paga.", "pay_off": "Inscrição marcada como pendente.", "pay_tap": "Toque para marcar paga ou pendente", "pay_sum": "Pagas: {0} de {1} · {2}", "pay_h": "Toque no selo de cada jogador na classificação para marcar o pagamento."}, "en": {"pay_yes": "Fee paid", "pay_no": "Fee pending", "pay_on": "Fee marked as paid.", "pay_off": "Fee marked as pending.", "pay_tap": "Tap to mark paid or pending", "pay_sum": "Paid: {0} of {1} · {2}", "pay_h": "Tap each player's badge in the standings to mark the payment."}, "es": {"pay_yes": "Inscripción pagada", "pay_no": "Inscripción pendiente", "pay_on": "Inscripción marcada como pagada.", "pay_off": "Inscripción marcada como pendiente.", "pay_tap": "Toca para marcar pagada o pendiente", "pay_sum": "Pagadas: {0} de {1} · {2}", "pay_h": "Toca la etiqueta de cada jugador en la clasificación para marcar el pago."}, "fr": {"pay_yes": "Inscription payée", "pay_no": "Inscription en attente", "pay_on": "Inscription marquée comme payée.", "pay_off": "Inscription marquée en attente.", "pay_tap": "Touchez pour marquer payée ou en attente", "pay_sum": "Payées : {0} sur {1} · {2}", "pay_h": "Touchez le badge de chaque joueur dans le classement pour noter le paiement."}, "de": {"pay_yes": "Startgeld bezahlt", "pay_no": "Startgeld offen", "pay_on": "Startgeld als bezahlt markiert.", "pay_off": "Startgeld als offen markiert.", "pay_tap": "Tippen für bezahlt oder offen", "pay_sum": "Bezahlt: {0} von {1} · {2}", "pay_h": "Tippe in der Tabelle auf das Abzeichen jedes Spielers, um die Zahlung zu markieren."}};
   Object.keys(K23).forEach(function (l) { Object.assign(D[l], K23[l]); });
   var K24 = {"pt-BR": {"rv_rounds": "Rodadas", "rp_never_me": "Neste ranking cada adversário vale uma vez só.", "rp_ok_me": "Você já enfrentou {0} adversários diferentes: pode repetir adversário.", "rp_need_me": "Para repetir adversário, enfrente {0} diferentes antes (você tem {1}).", "rd_new": "Gerar rodada", "rd_none_adm": "Nenhuma rodada ainda. Gere a primeira para sortear os jogos.", "rd_none": "Nenhuma rodada sorteada ainda.", "rd_n": "Rodada {0}", "rd_ended": "Encerrou {0}", "rd_due": "Até {0}", "rd_np": "Não jogado", "rd_todo": "A jogar", "rd_bye": "Folga: {0}", "rd_del": "Apagar esta rodada", "rd_del_ok": "Rodada apagada.", "rd_info": "{0} jogos para {1} jogadores.", "rd_k": "{0} por jogador", "rd_new_t": "Rodada {0}", "rd_new_h": "Quem nunca se enfrentou e quem jogou menos tem prioridade. Novos jogadores entram automaticamente.", "rd_per": "Jogos por jogador", "rd_dl": "Prazo", "rd_redraw": "Sortear de novo", "rd_go": "Publicar rodada", "rd_ok": "Rodada publicada.", "rd_few": "Precisa de pelo menos 2 jogadores.", "sk_rep": "Não contou: adversário repetido antes da hora", "sk_round": "Não contou: confronto fora da rodada", "sk_adm": "Não contou: só o administrador lança", "sk_day": "Não contou: limite de jogos no dia", "ab_mode": "Como os jogos acontecem", "md_free": "Livre (convites)", "md_rounds": "Rodadas sorteadas", "md_h": "Dá para trocar com o ranking em andamento: os jogos já contados continuam valendo.", "ab_rep": "Repetir adversário", "rp_n": "Nunca", "rp_0": "Sempre", "rp_2": "Depois de enfrentar 1/2 dos jogadores", "rp_3": "Depois de enfrentar 1/3 dos jogadores", "rp_4": "Depois de enfrentar 1/4 dos jogadores", "rp_0s": "Sempre", "rp_ns": "Nunca", "rp_h": "Evita que alguém suba jogando sempre com os mesmos. A fração conta só quem já jogou no ranking."}, "pt-PT": {"rv_rounds": "Jornadas", "rp_never_me": "Neste ranking cada adversário vale uma vez só.", "rp_ok_me": "Já defrontou {0} adversários diferentes: pode repetir adversário.", "rp_need_me": "Para repetir adversário, defronte {0} diferentes antes (tem {1}).", "rd_new": "Gerar jornada", "rd_none_adm": "Ainda não há jornadas. Gere a primeira para sortear os jogos.", "rd_none": "Ainda não há jornadas sorteadas.", "rd_n": "Jornada {0}", "rd_ended": "Encerrou {0}", "rd_due": "Até {0}", "rd_np": "Não jogado", "rd_todo": "A jogar", "rd_bye": "Folga: {0}", "rd_del": "Apagar esta jornada", "rd_del_ok": "Jornada apagada.", "rd_info": "{0} jogos para {1} jogadores.", "rd_k": "{0} por jogador", "rd_new_t": "Jornada {0}", "rd_new_h": "Quem nunca se defrontou e quem jogou menos tem prioridade. Novos jogadores entram automaticamente.", "rd_per": "Jogos por jogador", "rd_dl": "Prazo", "rd_redraw": "Sortear de novo", "rd_go": "Publicar jornada", "rd_ok": "Jornada publicada.", "rd_few": "Precisa de pelo menos 2 jogadores.", "sk_rep": "Não contou: adversário repetido antes da hora", "sk_round": "Não contou: confronto fora da jornada", "sk_adm": "Não contou: só o administrador lança", "sk_day": "Não contou: limite de jogos no dia", "ab_mode": "Como os jogos acontecem", "md_free": "Livre (convites)", "md_rounds": "Jornadas sorteadas", "md_h": "Pode trocar com o ranking a decorrer: os jogos já contados continuam a valer.", "ab_rep": "Repetir adversário", "rp_n": "Nunca", "rp_0": "Sempre", "rp_2": "Depois de defrontar 1/2 dos jogadores", "rp_3": "Depois de defrontar 1/3 dos jogadores", "rp_4": "Depois de defrontar 1/4 dos jogadores", "rp_0s": "Sempre", "rp_ns": "Nunca", "rp_h": "Evita que alguém suba jogando sempre com os mesmos. A fração conta só quem já jogou no ranking."}, "en": {"rv_rounds": "Rounds", "rp_never_me": "In this ranking each opponent counts only once.", "rp_ok_me": "You've faced {0} different opponents: you can play a repeat opponent.", "rp_need_me": "To play an opponent again, face {0} different ones first (you have {1}).", "rd_new": "Draw round", "rd_none_adm": "No rounds yet. Draw the first one to set the matches.", "rd_none": "No rounds drawn yet.", "rd_n": "Round {0}", "rd_ended": "Ended {0}", "rd_due": "By {0}", "rd_np": "Not played", "rd_todo": "To play", "rd_bye": "Bye: {0}", "rd_del": "Delete this round", "rd_del_ok": "Round deleted.", "rd_info": "{0} matches for {1} players.", "rd_k": "{0} per player", "rd_new_t": "Round {0}", "rd_new_h": "Players who never met and who played less get priority. New players join automatically.", "rd_per": "Matches per player", "rd_dl": "Deadline", "rd_redraw": "Draw again", "rd_go": "Publish round", "rd_ok": "Round published.", "rd_few": "Needs at least 2 players.", "sk_rep": "Not counted: repeat opponent too soon", "sk_round": "Not counted: match not in a round", "sk_adm": "Not counted: only the admin enters results", "sk_day": "Not counted: daily match limit", "ab_mode": "How matches happen", "md_free": "Free (invites)", "md_rounds": "Drawn rounds", "md_h": "You can switch while the ranking is running: matches already counted stay.", "ab_rep": "Repeat opponent", "rp_n": "Never", "rp_0": "Always", "rp_2": "After facing 1/2 of the players", "rp_3": "After facing 1/3 of the players", "rp_4": "After facing 1/4 of the players", "rp_0s": "Always", "rp_ns": "Never", "rp_h": "Stops someone climbing by always playing the same people. The fraction counts only players who have played."}, "es": {"rv_rounds": "Jornadas", "rp_never_me": "En este ranking cada rival cuenta una sola vez.", "rp_ok_me": "Ya enfrentaste a {0} rivales distintos: puedes repetir rival.", "rp_need_me": "Para repetir rival, enfrenta antes a {0} distintos (tienes {1}).", "rd_new": "Sortear jornada", "rd_none_adm": "Aún no hay jornadas. Sortea la primera para definir los partidos.", "rd_none": "Aún no hay jornadas sorteadas.", "rd_n": "Jornada {0}", "rd_ended": "Terminó {0}", "rd_due": "Hasta {0}", "rd_np": "No jugado", "rd_todo": "Por jugar", "rd_bye": "Descansa: {0}", "rd_del": "Borrar esta jornada", "rd_del_ok": "Jornada borrada.", "rd_info": "{0} partidos para {1} jugadores.", "rd_k": "{0} por jugador", "rd_new_t": "Jornada {0}", "rd_new_h": "Tienen prioridad quienes nunca se enfrentaron y quienes jugaron menos. Los nuevos entran solos.", "rd_per": "Partidos por jugador", "rd_dl": "Plazo", "rd_redraw": "Sortear de nuevo", "rd_go": "Publicar jornada", "rd_ok": "Jornada publicada.", "rd_few": "Se necesitan al menos 2 jugadores.", "sk_rep": "No contó: rival repetido antes de tiempo", "sk_round": "No contó: partido fuera de la jornada", "sk_adm": "No contó: solo el administrador carga resultados", "sk_day": "No contó: límite de partidos del día", "ab_mode": "Cómo se juegan los partidos", "md_free": "Libre (invitaciones)", "md_rounds": "Jornadas sorteadas", "md_h": "Se puede cambiar con el ranking en marcha: los partidos ya contados siguen valiendo.", "ab_rep": "Repetir rival", "rp_n": "Nunca", "rp_0": "Siempre", "rp_2": "Tras enfrentar 1/2 de los jugadores", "rp_3": "Tras enfrentar 1/3 de los jugadores", "rp_4": "Tras enfrentar 1/4 de los jugadores", "rp_0s": "Siempre", "rp_ns": "Nunca", "rp_h": "Evita que alguien suba jugando siempre con los mismos. La fracción cuenta solo a quienes ya jugaron."}, "fr": {"rv_rounds": "Tours", "rp_never_me": "Dans ce classement chaque adversaire ne compte qu'une fois.", "rp_ok_me": "Vous avez affronté {0} adversaires différents : vous pouvez rejouer un adversaire.", "rp_need_me": "Pour rejouer un adversaire, affrontez-en d'abord {0} différents (vous en avez {1}).", "rd_new": "Tirer un tour", "rd_none_adm": "Aucun tour pour l'instant. Tirez le premier pour fixer les matchs.", "rd_none": "Aucun tour tiré pour l'instant.", "rd_n": "Tour {0}", "rd_ended": "Terminé le {0}", "rd_due": "Jusqu'au {0}", "rd_np": "Non joué", "rd_todo": "À jouer", "rd_bye": "Exempt : {0}", "rd_del": "Supprimer ce tour", "rd_del_ok": "Tour supprimé.", "rd_info": "{0} matchs pour {1} joueurs.", "rd_k": "{0} par joueur", "rd_new_t": "Tour {0}", "rd_new_h": "Priorité à ceux qui ne se sont jamais affrontés et à ceux qui ont moins joué. Les nouveaux entrent automatiquement.", "rd_per": "Matchs par joueur", "rd_dl": "Délai", "rd_redraw": "Retirer", "rd_go": "Publier le tour", "rd_ok": "Tour publié.", "rd_few": "Il faut au moins 2 joueurs.", "sk_rep": "Non compté : adversaire répété trop tôt", "sk_round": "Non compté : match hors tour", "sk_adm": "Non compté : seul l'administrateur saisit", "sk_day": "Non compté : limite de matchs du jour", "ab_mode": "Comment se jouent les matchs", "md_free": "Libre (invitations)", "md_rounds": "Tours tirés au sort", "md_h": "Modifiable en cours de classement : les matchs déjà comptés restent valables.", "ab_rep": "Rejouer un adversaire", "rp_n": "Jamais", "rp_0": "Toujours", "rp_2": "Après avoir affronté 1/2 des joueurs", "rp_3": "Après avoir affronté 1/3 des joueurs", "rp_4": "Après avoir affronté 1/4 des joueurs", "rp_0s": "Toujours", "rp_ns": "Jamais", "rp_h": "Empêche de monter en jouant toujours les mêmes. La fraction ne compte que ceux qui ont joué."}, "de": {"rv_rounds": "Runden", "rp_never_me": "In dieser Rangliste zählt jeder Gegner nur einmal.", "rp_ok_me": "Du hast {0} verschiedene Gegner gespielt: Wiederholung erlaubt.", "rp_need_me": "Um einen Gegner erneut zu spielen, erst {0} verschiedene spielen (du hast {1}).", "rd_new": "Runde auslosen", "rd_none_adm": "Noch keine Runden. Lose die erste aus, um die Spiele festzulegen.", "rd_none": "Noch keine Runde ausgelost.", "rd_n": "Runde {0}", "rd_ended": "Beendet {0}", "rd_due": "Bis {0}", "rd_np": "Nicht gespielt", "rd_todo": "Offen", "rd_bye": "Spielfrei: {0}", "rd_del": "Diese Runde löschen", "rd_del_ok": "Runde gelöscht.", "rd_info": "{0} Spiele für {1} Spieler.", "rd_k": "{0} pro Spieler", "rd_new_t": "Runde {0}", "rd_new_h": "Wer sich nie getroffen und wer weniger gespielt hat, hat Vorrang. Neue Spieler kommen automatisch dazu.", "rd_per": "Spiele pro Spieler", "rd_dl": "Frist", "rd_redraw": "Neu auslosen", "rd_go": "Runde veröffentlichen", "rd_ok": "Runde veröffentlicht.", "rd_few": "Mindestens 2 Spieler nötig.", "sk_rep": "Nicht gewertet: Gegner zu früh wiederholt", "sk_round": "Nicht gewertet: Spiel nicht in einer Runde", "sk_adm": "Nicht gewertet: nur der Admin trägt ein", "sk_day": "Nicht gewertet: Tageslimit erreicht", "ab_mode": "Wie gespielt wird", "md_free": "Frei (Einladungen)", "md_rounds": "Ausgeloste Runden", "md_h": "Auch während der Rangliste umstellbar: bereits gewertete Spiele bleiben.", "ab_rep": "Gegner wiederholen", "rp_n": "Nie", "rp_0": "Immer", "rp_2": "Nach 1/2 der Spieler", "rp_3": "Nach 1/3 der Spieler", "rp_4": "Nach 1/4 der Spieler", "rp_0s": "Immer", "rp_ns": "Nie", "rp_h": "Verhindert, dass jemand nur gegen dieselben spielt. Der Anteil zählt nur Spieler, die schon gespielt haben."}};
@@ -539,6 +557,7 @@ main .emp b{font:800 18px/1.25 var(--ui)}main .emp p{margin:0;max-width:320px;co
   function money(v, cur) { try { return new Intl.NumberFormat(LG, { style: 'currency', currency: cur || CUR[LG] || 'BRL' }).format(v); } catch (e) { return (cur || '') + ' ' + Number(v).toFixed(2); } }
   function nPlayers(g) { return g.mode === 'doubles' ? 4 : 2; }
   var LG = BXMods.lang();
+  try { document.documentElement.lang = LG; } catch (e) {}   // 7.29
   function T(k) { var d = D[LG] || D.en; return d[k] != null ? d[k] : (D['pt-BR'][k] || k); }
   function Tf(k) { var s = T(k); for (var i = 1; i < arguments.length; i++) s = s.replace('{' + (i - 1) + '}', arguments[i]); return s; }
 
@@ -644,7 +663,7 @@ main .emp b{font:800 18px/1.25 var(--ui)}main .emp p{margin:0;max-width:320px;co
     return loadFB().then(function () {
       firebase.initializeApp(FB_CFG);
       S.auth = firebase.auth(); S.db = firebase.firestore();
-      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.28', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
+      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.29', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
       try { S.db.settings({ experimentalAutoDetectLongPolling: true, merge: true }); } catch (e) {}
       try { S.auth.getRedirectResult().catch(function () {}); } catch (e) {}
       S.auth.onAuthStateChanged(function (u) { S.user = u || null; paintGate(); if (u) { loadFriends(); loadFollows(); loadBlocks().then(reload); ensureProfile(); } });
@@ -1797,8 +1816,15 @@ main .emp b{font:800 18px/1.25 var(--ui)}main .emp p{margin:0;max-width:320px;co
       sumEl.textContent = isFinite(pr) && pr > 0 ? Tf('cost_tot', money(pr * hr, f.cur)) + ' · ' + Tf('cost_per', money(pr * hr / n, f.cur)) + ' ' + Tf('cost_n', n) : T('cost_none');
     }
     sum();
-    var card = h('div', { cls: 'card' }, [
-      lab(T('f_mode'), seg('mode', [['singles', T('singles')], ['doubles', T('doubles')]])),
+    // 7.29: o formulário em blocos com ícone (O jogo · Quem joga · Quando e onde · Nível · Custo da quadra · Recado)
+    function blk(icon, title, sub, kids) { return h('div', { cls: 'card fblk' }, [secH(icon, title, sub)].concat(kids)); }
+    function whenTxt() { var t = new Date(f.date + 'T' + (f.time || '00:00')).getTime(); return isFinite(t) ? fmtWhen(t) : ''; }
+    var dIn = inp('date', 'date', { lang: LG }), tIn = inp('time', 'time', { lang: LG });
+    var cards = [
+      blk('ball', T('fb_game'), '', [
+        lab(T('f_mode'), seg('mode', [['singles', T('singles')], ['doubles', T('doubles')]])),
+        f.mode === 'doubles' ? lab(T('f_slots'), seg('slots', [[1, '1'], [2, '2'], [3, '3']])) : null]),
+      blk('users', T('fb_who'), '', [
       lab(T('f_vis'), seg('vis', [['invite', T('vis_i')], ['friends', T('friends')], ['open', T('open')]].concat(mg.length ? [['group', T('vis_g')]] : []))),
       h('div', { cls: 'sub', text: T(f.vis === 'open' ? 'vis_o' : f.vis === 'invite' ? 'vis_i_t' : f.vis === 'group' ? 'vis_g_t' : 'vis_f') }),
       f.vis === 'group' ? lab(T('f_group'), sel('gid', mg.map(function (x) { return [x.id, x.name]; }), function () { var gg = S.groups[f.gid]; if (gg && gg.city) f.city = gg.city; f.invited = []; paintForm(); })) : null,
@@ -1806,21 +1832,25 @@ main .emp b{font:800 18px/1.25 var(--ui)}main .emp p{margin:0;max-width:320px;co
       f.vis === 'group' ? h('div', { cls: 'sub', text: T(f.gwho === 'any' ? 'g_any_h' : 'g_pick_h') }) : null,
       f.vis === 'group' && f.gwho !== 'any' ? gmBox() : null,
       f.vis === 'group' && (S.groups[f.gid] || {}).cats && cats(S.groups[f.gid]).length ? h('div', { cls: 'sub', text: T('ct_only') }) : null,
-      f.vis === 'invite' ? h('div', { cls: 'f' }, [T('inv_h'), invBox]) : null,
-      h('div', { cls: 'two' }, [lab(T('f_date'), inp('date', 'date')), lab(T('f_time'), inp('time', 'time'))]),
-      lab(T('f_place'), inp('place', 'text', { list: 'plList', maxlength: '80', autocomplete: 'off' })), dl,
-      lab(T('f_city'), inp('city', 'text', { maxlength: '60' })),
-      f.mode === 'doubles' ? lab(T('f_slots'), seg('slots', [[1, '1'], [2, '2'], [3, '3']])) : null,
-      lab(T('f_level'), sel('lvSys', [['', T('lv_any')], ['cls', T('sys_cls')], ['abc', T('sys_abc')], ['ntrp', T('sys_ntrp')]], function () { f.lvFrom = ''; f.lvTo = ''; paintForm(); })), lvRow,
-      h('div', { cls: 'f' }, [T('f_cost'), h('div', { cls: 'card', style: 'background:var(--bg)' }, [
+        f.vis === 'invite' ? h('div', { cls: 'f' }, [T('inv_h'), invBox]) : null]),
+      blk('mine', T('fb_when'), whenTxt() || ' ', [
+        h('div', { cls: 'two' }, [lab(T('f_date'), dIn), lab(T('f_time'), tIn)]),
+        lab(T('f_place'), inp('place', 'text', { list: 'plList', maxlength: '80', autocomplete: 'off' })), dl,
+        lab(T('f_city'), inp('city', 'text', { maxlength: '60' }))]),
+      blk('bars', T('fb_lvl'), '', [
+        lab(T('f_level'), sel('lvSys', [['', T('lv_any')], ['cls', T('sys_cls')], ['abc', T('sys_abc')], ['ntrp', T('sys_ntrp')]], function () { f.lvFrom = ''; f.lvTo = ''; paintForm(); })), lvRow]),
+      blk('coin', T('f_cost'), '', [
         h('div', { cls: 'two' }, [lab(T('f_hour'), inp('price', 'text', { inputmode: 'decimal', id: 'fPrice', placeholder: '0,00' })), lab(T('f_cur'), sel('cur', [['BRL', 'R$ BRL'], ['EUR', '€ EUR'], ['USD', '$ USD']], sum))]),
-        lab(T('f_hours'), sel('hours', [['1', Tf('hrs', 1)], ['1.5', Tf('hrs', 1.5)], ['2', Tf('hrs', 2)], ['3', Tf('hrs', 3)]], sum)), sumEl])]),
-      lab(T('f_note'), inp('note', 'text', { maxlength: '80' })),
+        lab(T('f_hours'), sel('hours', [['1', Tf('hrs', 1)], ['1.5', Tf('hrs', 1.5)], ['2', Tf('hrs', 2)], ['3', Tf('hrs', 3)]], sum)), sumEl]),
+      blk('edit', T('fb_note'), '', [lab(T('f_note'), inp('note', 'text', { maxlength: '80' }))]),
       f.err ? h('div', { cls: 'msg', text: f.err }) : null,
-      h('div', { cls: 'two' }, [h('button', { type: 'button', cls: 'btn', id: 'bCancelNew', text: T('cancel_new'), on: { click: function () { S.form = null; navBack(); } } }),
+      h('div', { cls: 'two fbtns' }, [h('button', { type: 'button', cls: 'btn', id: 'bCancelNew', text: T('cancel_new'), on: { click: function () { S.form = null; navBack(); } } }),
         h('button', { type: 'button', cls: 'btn pri', id: 'bPub', text: T('publish'), on: { click: function () { create(f); } } })])
-    ]);
-    host.appendChild(card);
+    ];
+    // o resumo "sáb., 21 de nov. · 18:00" acompanha a data e a hora escolhidas, no formato do idioma do app
+    function updWhen() { var sb = cards[2].querySelector('.sech .sub'); if (sb) sb.textContent = whenTxt(); }
+    dIn.addEventListener('input', updWhen); tIn.addEventListener('input', updWhen); dIn.addEventListener('change', updWhen); tIn.addEventListener('change', updWhen);
+    cards.forEach(function (c) { if (c) host.appendChild(c); });
   }
 
   // ---------- grupos (Beta 5.15) ----------
@@ -3405,8 +3435,8 @@ main .emp b{font:800 18px/1.25 var(--ui)}main .emp p{margin:0;max-width:320px;co
     var ti = (TX.my && TX.my.inv) || [];
     if (ti.length) need.push(function () { var x = ti[0]; item(Tf('tn_inv2', x.e.name || '?'), x.t.name, T('h_open'), function () { S.tab = 'groups'; S.gf = 'mine'; S.gid = x.g.id; S.gtab = 'tor'; S.tg = x.g.id; S.tid = x.t.id; S.ttab = 'ins'; if (TX.my) TX.my.at = 0; paint(); }, 'trophy'); });
     if (tp.length) need.push(function () { var x = tp[0]; item(Tp('h_tor', tp.length), x.t.name, T('h_open'), function () { S.tab = 'groups'; S.gf = 'mine'; S.gid = x.g.id; S.gtab = 'tor'; S.tg = x.g.id; S.tid = x.t.id; S.ttab = 'bra'; TX.rd = 0; paint(); }, 'trophy'); });
-    if (need.length) { host.appendChild(h('div', { cls: 'sub', text: T('h_need') })); need.forEach(function (f) { f(); }); }
-    if (nxt) { any = true; host.appendChild(h('div', { cls: 'sub', text: T('h_next') })); host.appendChild(cardMine(nxt)); }
+    if (need.length) { host.appendChild(h('h2', { cls: 'pgsec', text: T('h_need') })); need.forEach(function (f) { f(); }); }
+    if (nxt) { any = true; host.appendChild(h('h2', { cls: 'pgsec', text: T('h_next') })); host.appendChild(cardMine(nxt)); }
     if (myTorCard(host)) any = true;
     var wl = watched().filter(function (id) { return !S.groups[id]; });
     if (wl.length) {
@@ -3442,6 +3472,7 @@ main .emp b{font:800 18px/1.25 var(--ui)}main .emp p{margin:0;max-width:320px;co
       else { NAV.stack.push(NAV.last); if (NAV.stack.length > 30) NAV.stack.shift(); }
     }
     NAV.last = cur; NAV.lastK = k;
+    var hd0 = $('hdr'); if (hd0) hd0.classList.toggle('subp', !navRoot(cur));   // 7.29: subtela = só ← e título no topo
     var nb = $('navBack'); if (nb) { nb.hidden = navRoot(cur); nb.setAttribute('aria-label', BXMods.t('back')); nb.title = BXMods.t('back'); }
     navGuard();
   }
