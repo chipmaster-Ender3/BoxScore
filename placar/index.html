@@ -888,7 +888,7 @@ html.nfy .bar { padding-right: max(230px, env(safe-area-inset-right, 0px)); }
 <div class="pcard"><div class="ph"><span class="opt-ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="4"/><path d="M8 10a4 4 0 0 1 8 0M12 10l2-2.5"/></svg></span><span class="opt-t"><b id="pWeightL">Peso (kg)</b></span></div><input type="text" id="pWeight" inputmode="decimal" maxlength="5" autocomplete="off" aria-label="Peso"></div>
 <div class="pcard wide"><div class="ph"><span class="opt-ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9.5h8M8 12.5h5"/></svg></span><span class="opt-t"><b>Contato e avisos</b></span></div><div class="two"><input type="tel" inputmode="tel" id="pWa" maxlength="24" autocomplete="off" placeholder="WhatsApp com código do país" aria-label="WhatsApp"><input type="email" id="pMailN" maxlength="80" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="E-mail para avisos" aria-label="E-mail para avisos"></div><label class="check"><input type="checkbox" id="pNWa"> Prefiro avisos por WhatsApp</label><label class="check"><input type="checkbox" id="pNMail"> Prefiro avisos por e-mail</label><p class="hint" style="margin:0">Quem convida você abre o WhatsApp ou o e-mail já com o convite pronto. Seu contato só aparece para quem você liberar em Privacidade.</p></div>
 </div>
-    <div class="actions" style="margin-top:12px"><button class="btn" type="button" id="pExport">Copiar meus dados (JSON)</button></div><div id="pBox"></div></div>
+    </div>
     <div data-pane="tn"><div class="pgrid">
 <div class="pcard"><div class="ph"><span class="opt-ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 13V5a1.5 1.5 0 0 1 3 0v6M11 11V4a1.5 1.5 0 0 1 3 0v7M14 11V6a1.5 1.5 0 0 1 3 0v8c0 4-2 7-6 7-3 0-4-2-6-5l-1.5-2.5a1.5 1.5 0 0 1 2.5-1.5L8 13"/></svg></span><span class="opt-t"><b>Mão dominante</b></span></div><div class="seg" data-pkey="hand"><button type="button" data-v="R">Destro</button><button type="button" data-v="L">Canhoto</button></div></div>
 <div class="pcard"><div class="ph"><span class="opt-ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16c3-8 11-9 16-5M16 7l4 4-5 2"/></svg></span><span class="opt-t"><b>Backhand</b></span></div><div class="seg" data-pkey="backhand"><button type="button" data-v="1">Uma mão</button><button type="button" data-v="2">Duas mãos</button></div></div>
@@ -1011,7 +1011,7 @@ html.nfy .bar { padding-right: max(230px, env(safe-area-inset-right, 0px)); }
       <div class="actions"><button class="btn" type="button" id="sManage">Gerenciar dados salvos</button></div>
       <label class="check srow"><span class="sic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><input type="checkbox" id="sTel"> Enviar estatísticas de uso</label>
       <span class="hint" id="sTelHint">Só contagens anônimas de uso dos recursos (ex.: quantas partidas, se usou a pulseira), para melhorar o app. Nunca nomes, placares, mensagens, fotos ou local.</span>
-      <p class="note" id="verNote">BoxScore Beta 7.24 · Placar 4.37.0</p>
+      <p class="note" id="verNote">BoxScore Beta 7.25 · Placar 4.38.0</p>
     </div>
     <div class="actions"><button class="btn primary" type="button" data-close>Pronto</button></div>
   </div>
@@ -3333,7 +3333,7 @@ try { I18N.applyDom(); } catch (e) {}
     });
     $('pPhotoDel').addEventListener('click', function () { var pl = profPlayer(); if (pl) { pl.photo = ''; pl.photoSrc = 'none'; touch(pl); renderProf(); render(); } });
     $('pBack').addEventListener('click', function () { viewId = null; ui.profTab = 'me'; renderProf(); });
-    $('pExport').addEventListener('click', function () { copyText(JSON.stringify(exportBundle(), null, 2), 'pBox', $('pExport')); });
+    // 7.25: saiu o "Copiar meus dados (JSON)" do Perfil (portabilidade continua por pedido, como diz a Política de Privacidade)
   }
   var crop = null;
   function cropDraw() {
@@ -4795,7 +4795,7 @@ try { I18N.applyDom(); } catch (e) {}
     b.disabled = true; err.textContent = '';
     var doc = { topic: $('ctTopic').value, msg: msg.slice(0, 2000), email: em.slice(0, 120), uid: sy.user ? sy.user.uid : null,
       name: String((P.sync.acct && P.sync.acct.name) || '').slice(0, 80), lang: String(P.settings.lang || 'pt-BR').slice(0, 8),
-      build: '7.24', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
+      build: '7.25', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
     sy.db.collection('contact').add(doc).then(function () {
       b.disabled = false; $('ctMsg').value = ''; closeSheets(); showToast(T("Mensagem enviada. Obrigado! Responderemos pelo e-mail informado."));
     }, function (e) { b.disabled = false; err.textContent = Tf("Não foi possível enviar ({0}). Tente de novo.", (e && e.code) || T("erro")); });
@@ -5570,7 +5570,7 @@ try { I18N.applyDom(); } catch (e) {}
   // Beta 7.8: telemetria de uso (shared/telemetry.js) e versão da ponte do app nativo na linha de versão
   try {
     if (window.BXTel) {
-      BXTel.init({ module: 'placar', build: '7.24', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
+      BXTel.init({ module: 'placar', build: '7.25', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
       tel('p_open');
       $('sTel').checked = BXTel.isOn();
       $('sTel').addEventListener('change', function () { BXTel.setOn(this.checked); showToast(this.checked ? T("Estatísticas de uso ligadas. Obrigado!") : T("Estatísticas de uso desligadas.")); });
