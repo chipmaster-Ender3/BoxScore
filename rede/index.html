@@ -144,6 +144,18 @@ main .youin{display:flex;align-items:center;gap:6px;color:var(--s-open);font:700
 main .pact{display:inline-flex;align-items:center;gap:6px;min-height:44px;min-width:44px;padding:0 10px;border:0;border-radius:12px;background:transparent;color:var(--ink);font:700 15px var(--ui);cursor:pointer}main .pact .ic{width:22px;height:22px}
 main .pact.on{color:#E0245E}main .pact.on .ic svg{fill:currentColor}main .pact.pmore{margin-left:auto;color:var(--muted)}
 </style>
+<style id="v728">
+/* 7.28: padrão visual, etapa 2 (folhas de baixo, avisos, telas vazias) */
+.um .umb{border-radius:24px 24px 0 0;padding-top:8px;gap:10px;transition:transform .15s}
+.um .grab{width:100%;height:22px;display:grid;place-items:center;cursor:grab;touch-action:none}.um .grab::before{content:"";width:40px;height:5px;border-radius:3px;background:var(--line)}
+.orow{display:flex;align-items:center;gap:14px;width:100%;min-height:68px;padding:10px 14px;border-radius:16px;border:1px solid var(--line);background:var(--panel);color:var(--ink);text-align:left;font:inherit;cursor:pointer}
+.orow .oi{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--segbg);flex:none}.orow .oi .ic{width:22px;height:22px}
+.orow .ox{display:grid;gap:2px;flex:1;min-width:0}.orow .ox b{font:800 16px/1.25 var(--ui)}.orow .ox small{font:500 13px/1.3 var(--ui);color:var(--muted)}
+.orow .och{color:var(--muted);flex:none}.orow .och .ic{width:20px;height:20px}
+main .orow.arow{min-height:64px;margin:0 0 10px}main .orow.arow .oi{background:var(--s-can-bg);color:var(--s-can)}main .orow.arow .ox b{font-size:16px}
+main .emp{display:grid;justify-items:center;text-align:center;gap:10px;padding:36px 16px}main .emp .ei{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;background:var(--segbg);color:var(--ink)}main .emp .ei .ic{width:32px;height:32px}
+main .emp b{font:800 18px/1.25 var(--ui)}main .emp p{margin:0;max-width:320px;color:var(--muted);font:500 15px/1.45 var(--ui)}main .emp .btn{margin-top:6px;min-width:220px}
+</style>
 </head><body>
 <main>
 <header id="hdr" class="hero"><button class="btn" id="navBack" type="button" hidden>←</button><div class="htx"><small id="kick">BoxScore</small><h1 id="ttl"></h1></div><small id="ver"></small><button class="btn" id="chatB" type="button" hidden></button><button class="btn" id="setB" type="button" hidden></button><button class="btn" id="back" type="button"></button></header>
@@ -166,7 +178,7 @@ main .pact.on{color:#E0245E}main .pact.on .ic svg{fill:currentColor}main .pact.p
 (function () {
   'use strict';
   BXMods.mark('rede');
-  var VERSION = '0.47.0';
+  var VERSION = '0.48.0';
   var FB_CFG = { apiKey: 'AIzaSyD_L90YxJAVRuTfPqwNbETJlbV9BYdnuYI', authDomain: 'boxsocore.firebaseapp.com', projectId: 'boxsocore', storageBucket: 'boxsocore.firebasestorage.app', messagingSenderId: '639383913161', appId: '1:639383913161:web:a9bb75fcf99f4b03378318' };
   var FB_VER = '10.12.2', FB_LIBS = ['app', 'auth', 'firestore'];
   var HOUR = 3600000;
@@ -473,6 +485,27 @@ main .pact.on{color:#E0245E}main .pact.on .ic svg{fill:currentColor}main .pact.p
     de: { mt_v1: '1 Platz', mt_vn: '{0} Plätze', plrs_n: 'Spieler · {0} von {1}', you_in: 'Du spielst', more_opts: 'Weitere Optionen', share_inv: 'Einladung teilen' }
   };
   Object.keys(KJ6).forEach(function (l) { Object.assign(D[l], KJ6[l]); });
+  var KJ7 = {   // 7.28: padrão visual, etapa 2 (plural certo, menu Criar, avisos, telas vazias)
+    'pt-BR': { h_tm: '{0} convites para formar dupla', h_tm1: '1 convite para formar dupla', h_tor: '{0} resultados de torneio para confirmar', h_tor1: '1 resultado de torneio para confirmar', ev_home_d: 'Convites, pedidos e mensagens novas aparecem aqui.', e_feed: 'Quando você ou seus amigos publicarem, aparece aqui. Toque em "Nova publicação" ou em Compartilhar num jogo jogado.', h_req: '{0} pedidos para entrar', h_req1: '1 pedido para entrar', h_inv: '{0} convites para jogar', h_inv1: '1 convite para jogar', h_ask: '{0} pedidos para jogar com você', h_ask1: '1 pedido para jogar com você', h_unread: '{0} conversas não lidas', h_unread1: '1 conversa não lida', ct_players: '{0} jogadores', ct_players1: '1 jogador', sr_n: '{0} grupos encontrados', sr_n1: '1 grupo encontrado',
+      pl_game_d: 'Convide amigos ou abra vagas para a sua partida', pl_group_d: 'Ranking, torneio e jogos com a sua turma', pl_post: 'Nova publicação', pl_post_d: 'Foto ou texto no feed dos seus amigos',
+      ev_inv_t: 'Nenhum convite agora', ev_inv_d: 'Quando alguém chamar você para jogar, o convite aparece aqui.', ev_play_t: 'Nenhum jogo marcado', ev_play_d: 'Marque um jogo e convide os seus parceiros.', ev_done_t: 'Nenhum jogo jogado ainda', ev_done_d: 'Os jogos que você terminar aparecem aqui, com filtros e Compartilhar.', ev_find_t: 'Nenhum jogo aberto por aqui', ev_find_d: 'Crie um jogo aberto e deixe outros jogadores pedirem para entrar.', ev_chat_t: 'Nenhuma conversa ainda', ev_chat_d: 'Combine horário, local e quadra direto com os seus parceiros de jogo.', ev_chat_d2: 'Escolha um amigo abaixo para começar.', ev_feed_t: 'Nada por aqui ainda', ev_home_t: 'Tudo em dia', ev_go_find: 'Ver jogos abertos', ev_go_new: 'Marcar um jogo' },
+    'pt-PT': { h_tm: '{0} convites para formar par', h_tm1: '1 convite para formar par', h_tor: '{0} resultados de torneio para confirmar', h_tor1: '1 resultado de torneio para confirmar', ev_home_d: 'Convites, pedidos e mensagens novas aparecem aqui.', e_feed: 'Quando você ou os seus amigos publicarem, aparece aqui. Toque em "Nova publicação" ou em Partilhar num jogo jogado.', h_req: '{0} pedidos para entrar', h_req1: '1 pedido para entrar', h_inv: '{0} convites para jogar', h_inv1: '1 convite para jogar', h_ask: '{0} pedidos para jogar consigo', h_ask1: '1 pedido para jogar consigo', h_unread: '{0} conversas por ler', h_unread1: '1 conversa por ler', ct_players: '{0} jogadores', ct_players1: '1 jogador', sr_n: '{0} grupos encontrados', sr_n1: '1 grupo encontrado',
+      pl_game_d: 'Convide amigos ou abra vagas para a sua partida', pl_group_d: 'Ranking, torneio e jogos com a sua turma', pl_post: 'Nova publicação', pl_post_d: 'Foto ou texto no feed dos seus amigos',
+      ev_inv_t: 'Nenhum convite agora', ev_inv_d: 'Quando alguém o chamar para jogar, o convite aparece aqui.', ev_play_t: 'Nenhum jogo marcado', ev_play_d: 'Marque um jogo e convide os seus parceiros.', ev_done_t: 'Ainda não há jogos jogados', ev_done_d: 'Os jogos que terminar aparecem aqui, com filtros e Partilhar.', ev_find_t: 'Nenhum jogo aberto por aqui', ev_find_d: 'Crie um jogo aberto e deixe outros jogadores pedirem para entrar.', ev_chat_t: 'Ainda não há conversas', ev_chat_d: 'Combine horário, local e campo diretamente com os seus parceiros de jogo.', ev_chat_d2: 'Escolha um amigo abaixo para começar.', ev_feed_t: 'Ainda não há nada aqui', ev_home_t: 'Tudo em dia', ev_go_find: 'Ver jogos abertos', ev_go_new: 'Marcar um jogo' },
+    en: { h_tm: '{0} pair invites', h_tm1: '1 pair invite', h_tor: '{0} tournament results to confirm', h_tor1: '1 tournament result to confirm', ev_home_d: 'New invites, requests and messages show up here.', e_feed: 'When you or your friends post, it shows up here. Tap "New post" or Share on a played game.', h_req: '{0} requests to join', h_req1: '1 request to join', h_inv: '{0} game invites', h_inv1: '1 game invite', h_ask: '{0} requests to play with you', h_ask1: '1 request to play with you', h_unread: '{0} unread chats', h_unread1: '1 unread chat', ct_players: '{0} players', ct_players1: '1 player', sr_n: '{0} groups found', sr_n1: '1 group found',
+      pl_game_d: 'Invite friends or open spots for your match', pl_group_d: 'Ladder, tournament and games with your crew', pl_post: 'New post', pl_post_d: 'Photo or text in your friends\' feed',
+      ev_inv_t: 'No invites right now', ev_inv_d: 'When someone asks you to play, the invite shows up here.', ev_play_t: 'No games scheduled', ev_play_d: 'Set up a game and invite your partners.', ev_done_t: 'No games played yet', ev_done_d: 'Games you finish show up here, with filters and Share.', ev_find_t: 'No open games around here', ev_find_d: 'Create an open game and let other players ask to join.', ev_chat_t: 'No chats yet', ev_chat_d: 'Agree on time, place and court directly with your playing partners.', ev_chat_d2: 'Pick a friend below to start.', ev_feed_t: 'Nothing here yet', ev_home_t: 'All caught up', ev_go_find: 'See open games', ev_go_new: 'Set up a game' },
+    es: { h_tm: '{0} invitaciones de pareja', h_tm1: '1 invitación de pareja', h_tor: '{0} resultados de torneo para confirmar', h_tor1: '1 resultado de torneo para confirmar', ev_home_d: 'Las invitaciones, solicitudes y mensajes nuevos aparecen aquí.', e_feed: 'Cuando tú o tus amigos publiquen, aparece aquí. Toca "Nueva publicación" o Compartir en un partido jugado.', h_req: '{0} solicitudes para entrar', h_req1: '1 solicitud para entrar', h_inv: '{0} invitaciones a jugar', h_inv1: '1 invitación a jugar', h_ask: '{0} solicitudes para jugar contigo', h_ask1: '1 solicitud para jugar contigo', h_unread: '{0} chats sin leer', h_unread1: '1 chat sin leer', ct_players: '{0} jugadores', ct_players1: '1 jugador', sr_n: '{0} grupos encontrados', sr_n1: '1 grupo encontrado',
+      pl_game_d: 'Invita amigos o abre plazas para tu partido', pl_group_d: 'Ranking, torneo y partidos con tu grupo', pl_post: 'Nueva publicación', pl_post_d: 'Foto o texto en el feed de tus amigos',
+      ev_inv_t: 'No hay invitaciones ahora', ev_inv_d: 'Cuando alguien te invite a jugar, la invitación aparece aquí.', ev_play_t: 'No hay partidos programados', ev_play_d: 'Programa un partido e invita a tus compañeros.', ev_done_t: 'Aún no hay partidos jugados', ev_done_d: 'Los partidos que termines aparecen aquí, con filtros y Compartir.', ev_find_t: 'No hay partidos abiertos por aquí', ev_find_d: 'Crea un partido abierto y deja que otros pidan entrar.', ev_chat_t: 'Aún no hay chats', ev_chat_d: 'Acuerda horario, lugar y pista directamente con tus compañeros.', ev_chat_d2: 'Elige un amigo abajo para empezar.', ev_feed_t: 'Aún no hay nada aquí', ev_home_t: 'Todo al día', ev_go_find: 'Ver partidos abiertos', ev_go_new: 'Programar un partido' },
+    fr: { h_tm: '{0} invitations de paire', h_tm1: '1 invitation de paire', h_tor: '{0} résultats de tournoi à confirmer', h_tor1: '1 résultat de tournoi à confirmer', ev_home_d: 'Les nouvelles invitations, demandes et messages apparaissent ici.', e_feed: 'Quand vous ou vos amis publiez, cela apparaît ici. Touchez « Nouvelle publication » ou Partager sur un match joué.', h_req: '{0} demandes pour entrer', h_req1: '1 demande pour entrer', h_inv: '{0} invitations à jouer', h_inv1: '1 invitation à jouer', h_ask: '{0} demandes pour jouer avec vous', h_ask1: '1 demande pour jouer avec vous', h_unread: '{0} conversations non lues', h_unread1: '1 conversation non lue', ct_players: '{0} joueurs', ct_players1: '1 joueur', sr_n: '{0} groupes trouvés', sr_n1: '1 groupe trouvé',
+      pl_game_d: 'Invitez des amis ou ouvrez des places pour votre match', pl_group_d: 'Classement, tournoi et matchs avec votre groupe', pl_post: 'Nouvelle publication', pl_post_d: 'Photo ou texte dans le fil de vos amis',
+      ev_inv_t: 'Aucune invitation pour le moment', ev_inv_d: 'Quand quelqu\'un vous invite à jouer, l\'invitation apparaît ici.', ev_play_t: 'Aucun match prévu', ev_play_d: 'Organisez un match et invitez vos partenaires.', ev_done_t: 'Aucun match joué pour l\'instant', ev_done_d: 'Les matchs terminés apparaissent ici, avec filtres et Partager.', ev_find_t: 'Aucun match ouvert par ici', ev_find_d: 'Créez un match ouvert et laissez d\'autres joueurs demander à entrer.', ev_chat_t: 'Aucune conversation', ev_chat_d: 'Fixez l\'heure, le lieu et le court directement avec vos partenaires.', ev_chat_d2: 'Choisissez un ami ci-dessous pour commencer.', ev_feed_t: 'Rien ici pour l\'instant', ev_home_t: 'Tout est à jour', ev_go_find: 'Voir les matchs ouverts', ev_go_new: 'Organiser un match' },
+    de: { h_tm: '{0} Paar-Einladungen', h_tm1: '1 Paar-Einladung', h_tor: '{0} Turnierergebnisse zu bestätigen', h_tor1: '1 Turnierergebnis zu bestätigen', ev_home_d: 'Neue Einladungen, Anfragen und Nachrichten erscheinen hier.', e_feed: 'Wenn du oder deine Freunde posten, erscheint es hier. Tippe auf „Neuer Beitrag“ oder auf Teilen bei einem gespielten Spiel.', h_req: '{0} Beitrittsanfragen', h_req1: '1 Beitrittsanfrage', h_inv: '{0} Spieleinladungen', h_inv1: '1 Spieleinladung', h_ask: '{0} Spielanfragen an dich', h_ask1: '1 Spielanfrage an dich', h_unread: '{0} ungelesene Chats', h_unread1: '1 ungelesener Chat', ct_players: '{0} Spieler', ct_players1: '1 Spieler', sr_n: '{0} Gruppen gefunden', sr_n1: '1 Gruppe gefunden',
+      pl_game_d: 'Lade Freunde ein oder öffne Plätze für dein Spiel', pl_group_d: 'Rangliste, Turnier und Spiele mit deiner Gruppe', pl_post: 'Neuer Beitrag', pl_post_d: 'Foto oder Text im Feed deiner Freunde',
+      ev_inv_t: 'Gerade keine Einladungen', ev_inv_d: 'Wenn dich jemand zum Spielen einlädt, erscheint die Einladung hier.', ev_play_t: 'Keine Spiele geplant', ev_play_d: 'Plane ein Spiel und lade deine Partner ein.', ev_done_t: 'Noch keine gespielten Spiele', ev_done_d: 'Beendete Spiele erscheinen hier, mit Filtern und Teilen.', ev_find_t: 'Keine offenen Spiele in der Nähe', ev_find_d: 'Erstelle ein offenes Spiel und lass andere beitreten.', ev_chat_t: 'Noch keine Chats', ev_chat_d: 'Vereinbare Zeit, Ort und Platz direkt mit deinen Spielpartnern.', ev_chat_d2: 'Wähle unten einen Freund, um zu beginnen.', ev_feed_t: 'Noch nichts hier', ev_home_t: 'Alles erledigt', ev_go_find: 'Offene Spiele ansehen', ev_go_new: 'Spiel planen' }
+  };
+  Object.keys(KJ7).forEach(function (l) { Object.assign(D[l], KJ7[l]); });
   var K23 = {"pt-BR": {"pay_yes": "Inscrição paga", "pay_no": "Inscrição pendente", "pay_on": "Inscrição marcada como paga.", "pay_off": "Inscrição marcada como pendente.", "pay_tap": "Toque para marcar pago ou pendente", "pay_sum": "Pagos: {0} de {1} · {2}", "pay_h": "Toque no selo de cada jogador na classificação para marcar o pagamento."}, "pt-PT": {"pay_yes": "Inscrição paga", "pay_no": "Inscrição pendente", "pay_on": "Inscrição marcada como paga.", "pay_off": "Inscrição marcada como pendente.", "pay_tap": "Toque para marcar paga ou pendente", "pay_sum": "Pagas: {0} de {1} · {2}", "pay_h": "Toque no selo de cada jogador na classificação para marcar o pagamento."}, "en": {"pay_yes": "Fee paid", "pay_no": "Fee pending", "pay_on": "Fee marked as paid.", "pay_off": "Fee marked as pending.", "pay_tap": "Tap to mark paid or pending", "pay_sum": "Paid: {0} of {1} · {2}", "pay_h": "Tap each player's badge in the standings to mark the payment."}, "es": {"pay_yes": "Inscripción pagada", "pay_no": "Inscripción pendiente", "pay_on": "Inscripción marcada como pagada.", "pay_off": "Inscripción marcada como pendiente.", "pay_tap": "Toca para marcar pagada o pendiente", "pay_sum": "Pagadas: {0} de {1} · {2}", "pay_h": "Toca la etiqueta de cada jugador en la clasificación para marcar el pago."}, "fr": {"pay_yes": "Inscription payée", "pay_no": "Inscription en attente", "pay_on": "Inscription marquée comme payée.", "pay_off": "Inscription marquée en attente.", "pay_tap": "Touchez pour marquer payée ou en attente", "pay_sum": "Payées : {0} sur {1} · {2}", "pay_h": "Touchez le badge de chaque joueur dans le classement pour noter le paiement."}, "de": {"pay_yes": "Startgeld bezahlt", "pay_no": "Startgeld offen", "pay_on": "Startgeld als bezahlt markiert.", "pay_off": "Startgeld als offen markiert.", "pay_tap": "Tippen für bezahlt oder offen", "pay_sum": "Bezahlt: {0} von {1} · {2}", "pay_h": "Tippe in der Tabelle auf das Abzeichen jedes Spielers, um die Zahlung zu markieren."}};
   Object.keys(K23).forEach(function (l) { Object.assign(D[l], K23[l]); });
   var K24 = {"pt-BR": {"rv_rounds": "Rodadas", "rp_never_me": "Neste ranking cada adversário vale uma vez só.", "rp_ok_me": "Você já enfrentou {0} adversários diferentes: pode repetir adversário.", "rp_need_me": "Para repetir adversário, enfrente {0} diferentes antes (você tem {1}).", "rd_new": "Gerar rodada", "rd_none_adm": "Nenhuma rodada ainda. Gere a primeira para sortear os jogos.", "rd_none": "Nenhuma rodada sorteada ainda.", "rd_n": "Rodada {0}", "rd_ended": "Encerrou {0}", "rd_due": "Até {0}", "rd_np": "Não jogado", "rd_todo": "A jogar", "rd_bye": "Folga: {0}", "rd_del": "Apagar esta rodada", "rd_del_ok": "Rodada apagada.", "rd_info": "{0} jogos para {1} jogadores.", "rd_k": "{0} por jogador", "rd_new_t": "Rodada {0}", "rd_new_h": "Quem nunca se enfrentou e quem jogou menos tem prioridade. Novos jogadores entram automaticamente.", "rd_per": "Jogos por jogador", "rd_dl": "Prazo", "rd_redraw": "Sortear de novo", "rd_go": "Publicar rodada", "rd_ok": "Rodada publicada.", "rd_few": "Precisa de pelo menos 2 jogadores.", "sk_rep": "Não contou: adversário repetido antes da hora", "sk_round": "Não contou: confronto fora da rodada", "sk_adm": "Não contou: só o administrador lança", "sk_day": "Não contou: limite de jogos no dia", "ab_mode": "Como os jogos acontecem", "md_free": "Livre (convites)", "md_rounds": "Rodadas sorteadas", "md_h": "Dá para trocar com o ranking em andamento: os jogos já contados continuam valendo.", "ab_rep": "Repetir adversário", "rp_n": "Nunca", "rp_0": "Sempre", "rp_2": "Depois de enfrentar 1/2 dos jogadores", "rp_3": "Depois de enfrentar 1/3 dos jogadores", "rp_4": "Depois de enfrentar 1/4 dos jogadores", "rp_0s": "Sempre", "rp_ns": "Nunca", "rp_h": "Evita que alguém suba jogando sempre com os mesmos. A fração conta só quem já jogou no ranking."}, "pt-PT": {"rv_rounds": "Jornadas", "rp_never_me": "Neste ranking cada adversário vale uma vez só.", "rp_ok_me": "Já defrontou {0} adversários diferentes: pode repetir adversário.", "rp_need_me": "Para repetir adversário, defronte {0} diferentes antes (tem {1}).", "rd_new": "Gerar jornada", "rd_none_adm": "Ainda não há jornadas. Gere a primeira para sortear os jogos.", "rd_none": "Ainda não há jornadas sorteadas.", "rd_n": "Jornada {0}", "rd_ended": "Encerrou {0}", "rd_due": "Até {0}", "rd_np": "Não jogado", "rd_todo": "A jogar", "rd_bye": "Folga: {0}", "rd_del": "Apagar esta jornada", "rd_del_ok": "Jornada apagada.", "rd_info": "{0} jogos para {1} jogadores.", "rd_k": "{0} por jogador", "rd_new_t": "Jornada {0}", "rd_new_h": "Quem nunca se defrontou e quem jogou menos tem prioridade. Novos jogadores entram automaticamente.", "rd_per": "Jogos por jogador", "rd_dl": "Prazo", "rd_redraw": "Sortear de novo", "rd_go": "Publicar jornada", "rd_ok": "Jornada publicada.", "rd_few": "Precisa de pelo menos 2 jogadores.", "sk_rep": "Não contou: adversário repetido antes da hora", "sk_round": "Não contou: confronto fora da jornada", "sk_adm": "Não contou: só o administrador lança", "sk_day": "Não contou: limite de jogos no dia", "ab_mode": "Como os jogos acontecem", "md_free": "Livre (convites)", "md_rounds": "Jornadas sorteadas", "md_h": "Pode trocar com o ranking a decorrer: os jogos já contados continuam a valer.", "ab_rep": "Repetir adversário", "rp_n": "Nunca", "rp_0": "Sempre", "rp_2": "Depois de defrontar 1/2 dos jogadores", "rp_3": "Depois de defrontar 1/3 dos jogadores", "rp_4": "Depois de defrontar 1/4 dos jogadores", "rp_0s": "Sempre", "rp_ns": "Nunca", "rp_h": "Evita que alguém suba jogando sempre com os mesmos. A fração conta só quem já jogou no ranking."}, "en": {"rv_rounds": "Rounds", "rp_never_me": "In this ranking each opponent counts only once.", "rp_ok_me": "You've faced {0} different opponents: you can play a repeat opponent.", "rp_need_me": "To play an opponent again, face {0} different ones first (you have {1}).", "rd_new": "Draw round", "rd_none_adm": "No rounds yet. Draw the first one to set the matches.", "rd_none": "No rounds drawn yet.", "rd_n": "Round {0}", "rd_ended": "Ended {0}", "rd_due": "By {0}", "rd_np": "Not played", "rd_todo": "To play", "rd_bye": "Bye: {0}", "rd_del": "Delete this round", "rd_del_ok": "Round deleted.", "rd_info": "{0} matches for {1} players.", "rd_k": "{0} per player", "rd_new_t": "Round {0}", "rd_new_h": "Players who never met and who played less get priority. New players join automatically.", "rd_per": "Matches per player", "rd_dl": "Deadline", "rd_redraw": "Draw again", "rd_go": "Publish round", "rd_ok": "Round published.", "rd_few": "Needs at least 2 players.", "sk_rep": "Not counted: repeat opponent too soon", "sk_round": "Not counted: match not in a round", "sk_adm": "Not counted: only the admin enters results", "sk_day": "Not counted: daily match limit", "ab_mode": "How matches happen", "md_free": "Free (invites)", "md_rounds": "Drawn rounds", "md_h": "You can switch while the ranking is running: matches already counted stay.", "ab_rep": "Repeat opponent", "rp_n": "Never", "rp_0": "Always", "rp_2": "After facing 1/2 of the players", "rp_3": "After facing 1/3 of the players", "rp_4": "After facing 1/4 of the players", "rp_0s": "Always", "rp_ns": "Never", "rp_h": "Stops someone climbing by always playing the same people. The fraction counts only players who have played."}, "es": {"rv_rounds": "Jornadas", "rp_never_me": "En este ranking cada rival cuenta una sola vez.", "rp_ok_me": "Ya enfrentaste a {0} rivales distintos: puedes repetir rival.", "rp_need_me": "Para repetir rival, enfrenta antes a {0} distintos (tienes {1}).", "rd_new": "Sortear jornada", "rd_none_adm": "Aún no hay jornadas. Sortea la primera para definir los partidos.", "rd_none": "Aún no hay jornadas sorteadas.", "rd_n": "Jornada {0}", "rd_ended": "Terminó {0}", "rd_due": "Hasta {0}", "rd_np": "No jugado", "rd_todo": "Por jugar", "rd_bye": "Descansa: {0}", "rd_del": "Borrar esta jornada", "rd_del_ok": "Jornada borrada.", "rd_info": "{0} partidos para {1} jugadores.", "rd_k": "{0} por jugador", "rd_new_t": "Jornada {0}", "rd_new_h": "Tienen prioridad quienes nunca se enfrentaron y quienes jugaron menos. Los nuevos entran solos.", "rd_per": "Partidos por jugador", "rd_dl": "Plazo", "rd_redraw": "Sortear de nuevo", "rd_go": "Publicar jornada", "rd_ok": "Jornada publicada.", "rd_few": "Se necesitan al menos 2 jugadores.", "sk_rep": "No contó: rival repetido antes de tiempo", "sk_round": "No contó: partido fuera de la jornada", "sk_adm": "No contó: solo el administrador carga resultados", "sk_day": "No contó: límite de partidos del día", "ab_mode": "Cómo se juegan los partidos", "md_free": "Libre (invitaciones)", "md_rounds": "Jornadas sorteadas", "md_h": "Se puede cambiar con el ranking en marcha: los partidos ya contados siguen valiendo.", "ab_rep": "Repetir rival", "rp_n": "Nunca", "rp_0": "Siempre", "rp_2": "Tras enfrentar 1/2 de los jugadores", "rp_3": "Tras enfrentar 1/3 de los jugadores", "rp_4": "Tras enfrentar 1/4 de los jugadores", "rp_0s": "Siempre", "rp_ns": "Nunca", "rp_h": "Evita que alguien suba jugando siempre con los mismos. La fracción cuenta solo a quienes ya jugaron."}, "fr": {"rv_rounds": "Tours", "rp_never_me": "Dans ce classement chaque adversaire ne compte qu'une fois.", "rp_ok_me": "Vous avez affronté {0} adversaires différents : vous pouvez rejouer un adversaire.", "rp_need_me": "Pour rejouer un adversaire, affrontez-en d'abord {0} différents (vous en avez {1}).", "rd_new": "Tirer un tour", "rd_none_adm": "Aucun tour pour l'instant. Tirez le premier pour fixer les matchs.", "rd_none": "Aucun tour tiré pour l'instant.", "rd_n": "Tour {0}", "rd_ended": "Terminé le {0}", "rd_due": "Jusqu'au {0}", "rd_np": "Non joué", "rd_todo": "À jouer", "rd_bye": "Exempt : {0}", "rd_del": "Supprimer ce tour", "rd_del_ok": "Tour supprimé.", "rd_info": "{0} matchs pour {1} joueurs.", "rd_k": "{0} par joueur", "rd_new_t": "Tour {0}", "rd_new_h": "Priorité à ceux qui ne se sont jamais affrontés et à ceux qui ont moins joué. Les nouveaux entrent automatiquement.", "rd_per": "Matchs par joueur", "rd_dl": "Délai", "rd_redraw": "Retirer", "rd_go": "Publier le tour", "rd_ok": "Tour publié.", "rd_few": "Il faut au moins 2 joueurs.", "sk_rep": "Non compté : adversaire répété trop tôt", "sk_round": "Non compté : match hors tour", "sk_adm": "Non compté : seul l'administrateur saisit", "sk_day": "Non compté : limite de matchs du jour", "ab_mode": "Comment se jouent les matchs", "md_free": "Libre (invitations)", "md_rounds": "Tours tirés au sort", "md_h": "Modifiable en cours de classement : les matchs déjà comptés restent valables.", "ab_rep": "Rejouer un adversaire", "rp_n": "Jamais", "rp_0": "Toujours", "rp_2": "Après avoir affronté 1/2 des joueurs", "rp_3": "Après avoir affronté 1/3 des joueurs", "rp_4": "Après avoir affronté 1/4 des joueurs", "rp_0s": "Toujours", "rp_ns": "Jamais", "rp_h": "Empêche de monter en jouant toujours les mêmes. La fraction ne compte que ceux qui ont joué."}, "de": {"rv_rounds": "Runden", "rp_never_me": "In dieser Rangliste zählt jeder Gegner nur einmal.", "rp_ok_me": "Du hast {0} verschiedene Gegner gespielt: Wiederholung erlaubt.", "rp_need_me": "Um einen Gegner erneut zu spielen, erst {0} verschiedene spielen (du hast {1}).", "rd_new": "Runde auslosen", "rd_none_adm": "Noch keine Runden. Lose die erste aus, um die Spiele festzulegen.", "rd_none": "Noch keine Runde ausgelost.", "rd_n": "Runde {0}", "rd_ended": "Beendet {0}", "rd_due": "Bis {0}", "rd_np": "Nicht gespielt", "rd_todo": "Offen", "rd_bye": "Spielfrei: {0}", "rd_del": "Diese Runde löschen", "rd_del_ok": "Runde gelöscht.", "rd_info": "{0} Spiele für {1} Spieler.", "rd_k": "{0} pro Spieler", "rd_new_t": "Runde {0}", "rd_new_h": "Wer sich nie getroffen und wer weniger gespielt hat, hat Vorrang. Neue Spieler kommen automatisch dazu.", "rd_per": "Spiele pro Spieler", "rd_dl": "Frist", "rd_redraw": "Neu auslosen", "rd_go": "Runde veröffentlichen", "rd_ok": "Runde veröffentlicht.", "rd_few": "Mindestens 2 Spieler nötig.", "sk_rep": "Nicht gewertet: Gegner zu früh wiederholt", "sk_round": "Nicht gewertet: Spiel nicht in einer Runde", "sk_adm": "Nicht gewertet: nur der Admin trägt ein", "sk_day": "Nicht gewertet: Tageslimit erreicht", "ab_mode": "Wie gespielt wird", "md_free": "Frei (Einladungen)", "md_rounds": "Ausgeloste Runden", "md_h": "Auch während der Rangliste umstellbar: bereits gewertete Spiele bleiben.", "ab_rep": "Gegner wiederholen", "rp_n": "Nie", "rp_0": "Immer", "rp_2": "Nach 1/2 der Spieler", "rp_3": "Nach 1/3 der Spieler", "rp_4": "Nach 1/4 der Spieler", "rp_0s": "Immer", "rp_ns": "Nie", "rp_h": "Verhindert, dass jemand nur gegen dieselben spielt. Der Anteil zählt nur Spieler, die schon gespielt haben."}};
@@ -498,6 +531,7 @@ main .pact.on{color:#E0245E}main .pact.on .ic svg{fill:currentColor}main .pact.p
   var K32 = {"pt-BR": {"s_gen": "Geral", "s_start": "Abrir o app em", "s_last": "Último usado", "s_start_h": "Vale para o Placar e a Rede, a partir da próxima vez que abrir o app.", "s_start_ok": "Pronto: vale a partir da próxima vez que abrir o app.", "s_lang": "Idioma / Language", "s_prof": "Meu perfil", "s_prof_h": "Nome, foto, nível, cidade, contato e privacidade. É o mesmo perfil do Placar.", "s_prof_go": "Editar meu perfil"}, "pt-PT": {"s_gen": "Geral", "s_start": "Abrir a app em", "s_last": "Último usado", "s_start_h": "Vale para o Marcador e a Rede, a partir da próxima vez que abrir a app.", "s_start_ok": "Feito: vale a partir da próxima vez que abrir a app.", "s_lang": "Idioma / Language", "s_prof": "O meu perfil", "s_prof_h": "Nome, foto, nível, cidade, contacto e privacidade. É o mesmo perfil do Marcador.", "s_prof_go": "Editar o meu perfil"}, "en": {"s_gen": "General", "s_start": "Open the app in", "s_last": "Last used", "s_start_h": "Applies to Scoreboard and Network, from the next time you open the app.", "s_start_ok": "Done: applies the next time you open the app.", "s_lang": "Language / Idioma", "s_prof": "My profile", "s_prof_h": "Name, photo, level, city, contact and privacy. Same profile as the Scoreboard.", "s_prof_go": "Edit my profile"}, "es": {"s_gen": "General", "s_start": "Abrir la app en", "s_last": "Último usado", "s_start_h": "Vale para Marcador y Red, desde la próxima vez que abras la app.", "s_start_ok": "Listo: vale desde la próxima vez que abras la app.", "s_lang": "Idioma / Language", "s_prof": "Mi perfil", "s_prof_h": "Nombre, foto, nivel, ciudad, contacto y privacidad. Es el mismo perfil del Marcador.", "s_prof_go": "Editar mi perfil"}, "fr": {"s_gen": "Général", "s_start": "Ouvrir l'app sur", "s_last": "Dernier utilisé", "s_start_h": "Vaut pour le Tableau et le Réseau, à la prochaine ouverture de l'app.", "s_start_ok": "C'est fait : valable à la prochaine ouverture de l'app.", "s_lang": "Langue / Language", "s_prof": "Mon profil", "s_prof_h": "Nom, photo, niveau, ville, contact et confidentialité. Même profil que le Tableau.", "s_prof_go": "Modifier mon profil"}, "de": {"s_gen": "Allgemein", "s_start": "App öffnen in", "s_last": "Zuletzt benutzt", "s_start_h": "Gilt für Anzeige und Netzwerk, ab dem nächsten Öffnen der App.", "s_start_ok": "Fertig: gilt beim nächsten Öffnen der App.", "s_lang": "Sprache / Language", "s_prof": "Mein Profil", "s_prof_h": "Name, Foto, Niveau, Stadt, Kontakt und Privatsphäre. Dasselbe Profil wie in der Anzeige.", "s_prof_go": "Mein Profil bearbeiten"}};
   Object.keys(K32).forEach(function (l) { Object.assign(D[l], K32[l]); });
   Object.keys(K11).forEach(function (l) { Object.assign(D[l], K11[l]); });
+  Object.keys(KJ7).forEach(function (l) { Object.assign(D[l], KJ7[l]); });   // 7.28: por último, para valer sobre textos antigos com "(s)"
   var CUR = { 'pt-BR': 'BRL', 'pt-PT': 'EUR', en: 'USD', es: 'EUR', fr: 'EUR', de: 'EUR' };
   var LV = { cls: ['P', '5', '4', '3', '2', '1'], abc: ['C', 'B', 'A'], ntrp: ['1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0', '5.5', '6.0', '6.5', '7.0'] };
   function lvL(sys, v) { if (!sys || !v) return ''; if (sys === 'cls') return v === 'P' ? T('lv_p') : Tf('lv_cls', v); if (sys === 'abc') return Tf('lv_abc', v); return 'NTRP ' + v; }
@@ -610,7 +644,7 @@ main .pact.on{color:#E0245E}main .pact.on .ic svg{fill:currentColor}main .pact.p
     return loadFB().then(function () {
       firebase.initializeApp(FB_CFG);
       S.auth = firebase.auth(); S.db = firebase.firestore();
-      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.27', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
+      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.28', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
       try { S.db.settings({ experimentalAutoDetectLongPolling: true, merge: true }); } catch (e) {}
       try { S.auth.getRedirectResult().catch(function () {}); } catch (e) {}
       S.auth.onAuthStateChanged(function (u) { S.user = u || null; paintGate(); if (u) { loadFriends(); loadFollows(); loadBlocks().then(reload); ensureProfile(); } });
@@ -875,6 +909,7 @@ main .pact.on{color:#E0245E}main .pact.on .ic svg{fill:currentColor}main .pact.p
     var box = h('div', { cls: 'umb' }), root = h('div', { cls: 'um', id: 'umenu', role: 'dialog' }, [box]);
     function close() { root.remove(); }
     root.addEventListener('click', function (e) { if (e.target === root) close(); });
+    setTimeout(function () { if (!box.querySelector('.grab')) grab(root); }, 0);
     function btn(txt, cls, fn) { return h('button', { type: 'button', cls: 'btn ' + (cls || ''), text: txt, on: { click: fn } }); }
     var isB = !!S.blocks[uid];
     function main() {
@@ -882,7 +917,6 @@ main .pact.on{color:#E0245E}main .pact.on .ic svg{fill:currentColor}main .pact.p
       box.appendChild(btn(T('view'), '', function () { close(); showProfile(uid, name); }));
       box.appendChild(btn(T('report'), '', reportView));
       box.appendChild(btn(isB ? T('unblock') : T('block'), isB ? '' : 'bad', isB ? unblock : blockView));
-      box.appendChild(btn(T('close'), '', close));
     }
     function blockView() {
       box.textContent = ''; box.appendChild(h('b', { text: T('block') + ': ' + (name || '?') })); box.appendChild(h('div', { cls: 'sub', text: T('block_info') }));
@@ -1100,10 +1134,8 @@ main .pact.on{color:#E0245E}main .pact.on .ic svg{fill:currentColor}main .pact.p
     host.appendChild(h('button', { type: 'button', cls: 'btn pri', text: '+ ' + T('np_btn'), on: { click: function () { openComposer(null); } } }));
     if ((S.loading || (mode !== 'friends' && S.pubLoading)) && !list.length) { note(host, T('loading')); return; }
     if (!list.length) {
-      var em = h('div', { cls: 'femp' }); em.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS.feed + '</svg>';
-      em.appendChild(h('div', { cls: 'sub', text: T(mode === 'discover' ? 'e_dis' : mode === 'following' ? 'e_fol' : 'e_feed') }));
-      if (mode !== 'discover') em.appendChild(ibtn('find', T('fe_go_dis'), 'pri', function () { S.fmode = 'discover'; savePref('feedStart', 'discover'); loadPublic(); paint(); }));
-      host.appendChild(em); return;
+      empty(host, 'feed', T('ev_feed_t'), T(mode === 'discover' ? 'e_dis' : mode === 'following' ? 'e_fol' : 'e_feed'), mode !== 'discover' ? T('fe_go_dis') : '', function () { S.fmode = 'discover'; savePref('feedStart', 'discover'); loadPublic(); paint(); });
+      return;
     }
     list.forEach(function (p) { host.appendChild(cardPost(p)); });
   }
@@ -1200,7 +1232,8 @@ main .pact.on{color:#E0245E}main .pact.on .ic svg{fill:currentColor}main .pact.p
       host.appendChild(row);
     });
     var rest = S.friends.filter(function (x) { return !withChat[x.uid] && !S.blocks[x.uid]; });
-    if (!chats.length) note(host, T('ch_none'));
+    if (!chats.length) { var fr0 = S.friends.filter(function (x) { return !S.blocks[x.uid]; }).length;
+      empty(host, 'chat', T('ev_chat_t'), fr0 ? T('ev_chat_d') + ' ' + T('ev_chat_d2') : T('ev_chat_d'), fr0 ? '' : T('ev_go_find'), function () { S.tab = 'find'; paint(); }); }
     if (rest.length) {
       host.appendChild(h('div', { cls: 'sub', text: T('ch_friends'), style: 'margin-top:6px;font-weight:700' }));
       rest.forEach(function (x) { host.appendChild(h('div', { cls: 'card who' }, [h('span', { text: x.name + (x.code ? ' · ' + x.code : '') }), msgBtn(x.uid, x.name, null)])); });
@@ -1365,6 +1398,7 @@ main .pact.on{color:#E0245E}main .pact.on .ic svg{fill:currentColor}main .pact.p
     var armed = S.armed === key;
     return h('button', { type: 'button', cls: 'btn ' + (cls || ''), text: armed ? T('sure') : label, on: { click: function () { if (S.armed === key) { S.armed = ''; fn(); } else { S.armed = key; paint(); setTimeout(function () { if (S.armed === key) { S.armed = ''; paint(); } }, 3000); } } } });
   }
+  function Tp(k, n) { return n === 1 && D[LG] && D[LG][k + '1'] ? T(k + '1') : Tf(k, n); }   // 7.28: plural certo (sem "(s)")
   function mtI(icon, txt) { return h('span', { cls: 'mti' }, [ic(icon), h('span', { text: txt })]); }
   function head(g) {
     var st = g.status || 'open', cls = st === 'open' || st === 'finished' ? 'ok' : st === 'cancelled' ? 'bad' : '';
@@ -1440,7 +1474,7 @@ main .pact.on{color:#E0245E}main .pact.on .ic svg{fill:currentColor}main .pact.p
   }
   function paintDone(host, all, uid, now) {
     var list = doneList(all, uid, now), F = S.jf;
-    if (!list.length) { note(host, T('e_done')); return; }
+    if (!list.length) { empty(host, 'trophy', T('ev_done_t'), T('ev_done_d'), T('ev_go_new'), function () { S.tab = 'neu'; paint(); }); return; }
     var rows = list.map(function (g) { return { g: g, o: gOutcome(g), at: g.finishedAt || g.startAt }; });
     var opps = {}, plcs = {};
     rows.forEach(function (r) { r.o.opp.forEach(function (x) { if (x.name) opps[x.name] = 1; }); if (r.g.place) plcs[r.g.place] = 1; });
@@ -1650,7 +1684,7 @@ main .pact.on{color:#E0245E}main .pact.on .ic svg{fill:currentColor}main .pact.p
           close(); it[3]();
         } } }, [ic(it[1]), lb]);
         return b;
-      }).concat([h('button', { type: 'button', cls: 'btn', text: T('close'), on: { click: close } })]);
+      });
     });
   }
   function shareGame(g) {
@@ -1697,6 +1731,11 @@ main .pact.on{color:#E0245E}main .pact.on .ic svg{fill:currentColor}main .pact.p
     sb2.style.background = S.tab === 'set' ? 'var(--ink)' : ''; sb2.style.color = S.tab === 'set' ? 'var(--panel)' : '';
   }
   function note(host, txt) { host.appendChild(h('div', { cls: 'empty', text: txt })); }
+  // 7.28: tela vazia padrão — ícone num círculo, título, uma frase e o botão da próxima ação
+  function empty(host, icon, title, txt, btnT, fn) {
+    host.appendChild(h('div', { cls: 'emp' }, [h('span', { cls: 'ei' }, [ic(icon)]), h('b', { text: title }), txt ? h('p', { text: txt }) : null,
+      btnT ? h('button', { type: 'button', cls: 'btn pri', text: btnT, on: { click: fn } }) : null]));
+  }
   function paintForm() {
     var host = $('pNew'); host.textContent = ''; loadFriends();
     if (!S.form) {
@@ -1799,13 +1838,25 @@ main .pact.on{color:#E0245E}main .pact.on .ic svg{fill:currentColor}main .pact.p
   }
   function sheet(kids) {
     var root = h('div', { cls: 'um', role: 'dialog', on: { click: function (e) { if (e.target === root) root.remove(); } } }, [h('div', { cls: 'umb' }, kids(function () { root.remove(); }))]);
-    document.body.appendChild(root); return root;
+    grab(root); document.body.appendChild(root); return root;
   }
+  // 7.28: alça da folha de baixo — arrastar para baixo fecha
+  function grab(root) {
+    var box = root.querySelector('.umb'); if (!box) return;
+    var g = h('div', { cls: 'grab', 'aria-hidden': 'true' }); box.insertBefore(g, box.firstChild);
+    var y0 = null, dy = 0;
+    g.addEventListener('pointerdown', function (e) { y0 = e.clientY; dy = 0; try { g.setPointerCapture(e.pointerId); } catch (x) {} });
+    g.addEventListener('pointermove', function (e) { if (y0 == null) return; dy = Math.max(0, e.clientY - y0); box.style.transform = 'translateY(' + dy + 'px)'; });
+    function end() { if (y0 == null) return; y0 = null; if (dy > 60) root.remove(); else box.style.transform = ''; }
+    g.addEventListener('pointerup', end); g.addEventListener('pointercancel', end);
+  }
+  // 7.28: opção de folha com ícone, título e explicação (fecha tocando fora, arrastando a alça, voltar ou Esc)
+  function optRow(icon, title, sub, fn, cls) { return h('button', { type: 'button', cls: 'orow ' + (cls || ''), on: { click: fn } }, [h('span', { cls: 'oi' }, [ic(icon)]), h('span', { cls: 'ox' }, [h('b', { text: title }), sub ? h('small', { text: sub }) : null]), h('span', { cls: 'och' }, [ic('chev')])]); }
   function plusSheet() {
     sheet(function (close) { return [h('b', { text: T('plus_t') }),
-      h('button', { type: 'button', cls: 'btn pri', text: T('plus_game'), on: { click: function () { close(); S.tab = 'neu'; paint(); } } }),
-      h('button', { type: 'button', cls: 'btn', text: T('plus_group'), on: { click: function () { close(); openGroupCreate(); } } }),
-      h('button', { type: 'button', cls: 'btn', text: T('close'), on: { click: close } })]; });
+      optRow('mine', T('plus_game'), T('pl_game_d'), function () { close(); S.tab = 'neu'; paint(); }),
+      optRow('users', T('plus_group'), T('pl_group_d'), function () { close(); openGroupCreate(); }),
+      optRow('feed', T('pl_post'), T('pl_post_d'), function () { close(); openComposer(null); })]; });
   }
   function loadGroups() {
     if (!S.user || !S.db) return Promise.resolve();
@@ -2025,7 +2076,7 @@ main .pact.on{color:#E0245E}main .pact.on .ic svg{fill:currentColor}main .pact.p
         var l2 = Object.keys(S.disc).map(function (k) { return S.disc[k]; }).filter(function (x) {
           return (x.members || []).indexOf(uid) < 0 && (!n1 || norm(x.name).indexOf(n1) >= 0) && (!c1 || norm(x.city).indexOf(c1) >= 0) && (!k1 || cats(x).some(function (c) { return norm(c.name).indexOf(k1) >= 0; }));
         }).sort(function (a, b) { return (b.members || []).length - (a.members || []).length; });
-        cnt.textContent = S.discLoading && !l2.length ? T('loading') : l2.length ? Tf('sr_n', l2.length) : (n1 || c1 || k1 ? T('sr_none') : T('grp_e_disc'));
+        cnt.textContent = S.discLoading && !l2.length ? T('loading') : l2.length ? Tp('sr_n', l2.length) : (n1 || c1 || k1 ? T('sr_none') : T('grp_e_disc'));
         l2.forEach(function (x) { lst.appendChild(cardGroup(x, false)); });
       }
       var box = h('article', { cls: 'card' }, [secH('search', T('sr_t')), fld('users', T('sr_name'), 'n', fill), fld('find', T('sr_city'), 'c', fill), fld('tag', T('sr_cat'), 'k', fill)]);
@@ -2686,7 +2737,7 @@ main .pact.on{color:#E0245E}main .pact.on .ic svg{fill:currentColor}main .pact.p
     host.appendChild(h('div', { cls: 'seg' }, cs.map(function (x) { return h('button', { type: 'button', 'aria-pressed': String(sel && sel.id === x.id), text: x.name + (rkCfgOf(x).kind === 'doubles' && norm(x.name).indexOf(norm(T('kd_d'))) < 0 ? ' · ' + T('kd_d') : ''), on: { click: function () { CX.sel[g.id] = x.id; paint(); } } }); })));
     if (sel) {
       var cf = rkCfgOf(sel), sd = cf.kind === 'doubles', n = sd ? teamsOf(g, sel).length : catIn(g, sel.id).length;
-      host.appendChild(h('div', { cls: 'row' }, [h('span', { cls: 'chip', text: Tf('ct_season', sel.season) }), h('span', { cls: 'chip', text: Tf(sd ? 'tm_n' : 'ct_players', n) })]));
+      host.appendChild(h('div', { cls: 'row' }, [h('span', { cls: 'chip', text: Tf('ct_season', sel.season) }), h('span', { cls: 'chip', text: (sd ? Tf('tm_n', n) : Tp('ct_players', n)) })]));
       if (sd && !ro) { var tbx = h('article', { cls: 'card' }); teamBox(tbx, g, sel); host.appendChild(tbx); }
       host.appendChild(viewSeg(g, cf));
       if ((RX.view[g.id] || 'cls') === 'about') {
@@ -3337,23 +3388,23 @@ main .pact.on{color:#E0245E}main .pact.on .ic svg{fill:currentColor}main .pact.p
   function paintHome(host) {
     var uid = S.user.uid, now = Date.now(), any = false;
     var gp = 0, gfirst = ''; Object.keys(S.gReqs).forEach(function (k) { var n = (S.gReqs[k] || []).length + (CX.cr[k] || []).length; if (n) { gp += n; if (!gfirst) gfirst = k; } });
-    var invN = 0, pend = 0, nxt = null;
+    var invN = 0, pend = 0, nxt = null, invFirst = null;
     Object.keys(S.games).forEach(function (k) { var g = S.games[k];
-      if (isInv(g, uid) && (g.accepted || []).indexOf(uid) < 0 && (g.declined || []).indexOf(uid) < 0 && g.status === 'open' && g.startAt > now) invN++;
+      if (isInv(g, uid) && (g.accepted || []).indexOf(uid) < 0 && (g.declined || []).indexOf(uid) < 0 && g.status === 'open' && g.startAt > now) { invN++; if (!invFirst || g.startAt < invFirst.startAt) invFirst = g; }
       if (g.hostUid === uid && (g.status === 'open' || g.status === 'full')) pend += (g.asked || []).length;
       if ((g.hostUid === uid || (g.accepted || []).indexOf(uid) >= 0) && (g.status === 'open' || g.status === 'full') && g.startAt > now - 2 * HOUR && (!nxt || g.startAt < nxt.startAt)) nxt = g; });
     function go(tab, fn) { return function () { S.tab = tab; if (fn) fn(); paint(); }; }
-    function item(title, sub, btnT, fn, icn) { any = true; host.appendChild(h('article', { cls: 'card' }, [secH(icn || 'bell', title, sub || null), ibtn('eye', btnT, 'pri', fn)])); }
+    function item(title, sub, btnT, fn, icn) { any = true; host.appendChild(optRow(icn || 'bell', title, sub || '', fn, 'arow')); }   // 7.28: linha tocável, como as notificações do celular
     var need = [];
-    if (gp) need.push(function () { item(Tf('h_req', gp), T('h_req_s'), T('h_review'), go('groups', function () { S.gid = gfirst; S.gtab = 'mem'; S.gf = 'mine'; }), 'users'); });
-    if (invN) need.push(function () { item(Tf('h_inv', invN), '', T('h_open'), go('find'), 'ball'); });
-    if (pend) need.push(function () { item(Tf('h_ask', pend), '', T('h_open'), go('mine', function () { S.jt = 'play'; }), 'users'); });
-    if (unreadN()) need.push(function () { item(Tf('h_unread', unreadN()), '', T('h_open'), function () { S.tab = 'chat'; paint(); reload(); }, 'chat'); });
+    if (gp) need.push(function () { item(Tp('h_req', gp), T('h_req_s'), T('h_review'), go('groups', function () { S.gid = gfirst; S.gtab = 'mem'; S.gf = 'mine'; }), 'users'); });
+    if (invN) need.push(function () { item(Tp('h_inv', invN), invFirst ? invFirst.hostName + ' · ' + fmtWhen(invFirst.startAt) : '', T('h_open'), go('mine', function () { S.jt = 'inv'; }), 'ball'); });
+    if (pend) need.push(function () { item(Tp('h_ask', pend), '', T('h_open'), go('mine', function () { S.jt = 'play'; }), 'users'); });
+    if (unreadN()) need.push(function () { item(Tp('h_unread', unreadN()), '', T('h_open'), function () { S.tab = 'chat'; paint(); reload(); }, 'chat'); });
     var tp = ((TX.my && TX.my.list) || []).filter(function (x) { return x.m && x.m.prop && !inSlot(x.me, x.m.prop) && !x.m.ok; });
-    if (TIV.list.length) need.push(function () { var x = TIV.list[0]; item(Tf('h_tm', TIV.list.length), x.g.name, T('h_open'), function () { S.tab = 'groups'; S.gf = 'mine'; S.gid = x.g.id; S.gtab = 'rank'; CX.sel[x.g.id] = x.t.cat; TIV.at = 0; paint(); }, 'users'); });
+    if (TIV.list.length) need.push(function () { var x = TIV.list[0]; item(Tp('h_tm', TIV.list.length), x.g.name, T('h_open'), function () { S.tab = 'groups'; S.gf = 'mine'; S.gid = x.g.id; S.gtab = 'rank'; CX.sel[x.g.id] = x.t.cat; TIV.at = 0; paint(); }, 'users'); });
     var ti = (TX.my && TX.my.inv) || [];
     if (ti.length) need.push(function () { var x = ti[0]; item(Tf('tn_inv2', x.e.name || '?'), x.t.name, T('h_open'), function () { S.tab = 'groups'; S.gf = 'mine'; S.gid = x.g.id; S.gtab = 'tor'; S.tg = x.g.id; S.tid = x.t.id; S.ttab = 'ins'; if (TX.my) TX.my.at = 0; paint(); }, 'trophy'); });
-    if (tp.length) need.push(function () { var x = tp[0]; item(Tf('h_tor', tp.length), x.t.name, T('h_open'), function () { S.tab = 'groups'; S.gf = 'mine'; S.gid = x.g.id; S.gtab = 'tor'; S.tg = x.g.id; S.tid = x.t.id; S.ttab = 'bra'; TX.rd = 0; paint(); }, 'trophy'); });
+    if (tp.length) need.push(function () { var x = tp[0]; item(Tp('h_tor', tp.length), x.t.name, T('h_open'), function () { S.tab = 'groups'; S.gf = 'mine'; S.gid = x.g.id; S.gtab = 'tor'; S.tg = x.g.id; S.tid = x.t.id; S.ttab = 'bra'; TX.rd = 0; paint(); }, 'trophy'); });
     if (need.length) { host.appendChild(h('div', { cls: 'sub', text: T('h_need') })); need.forEach(function (f) { f(); }); }
     if (nxt) { any = true; host.appendChild(h('div', { cls: 'sub', text: T('h_next') })); host.appendChild(cardMine(nxt)); }
     if (myTorCard(host)) any = true;
@@ -3367,7 +3418,7 @@ main .pact.on{color:#E0245E}main .pact.on .ic svg{fill:currentColor}main .pact.p
     }
     var ng = Object.keys(S.groups).length;
     if (!ng) { any = true; host.appendChild(h('article', { cls: 'card' }, [h('b', { text: T('h_grp_t') }), h('div', { cls: 'sub', text: T('h_grp_d') }), h('button', { type: 'button', cls: 'btn pri', text: T('grp_disc'), on: { click: go('groups', function () { S.gf = 'disc'; S.gid = ''; loadDisc(); }) } })])); }
-    if (!any || (S.loading && !any)) { if (S.loading) note(host, T('loading')); else note(host, T('h_none')); }
+    if (!any || (S.loading && !any)) { if (S.loading) note(host, T('loading')); else empty(host, 'bell', T('ev_home_t'), T('ev_home_d'), T('ev_go_find'), function () { S.tab = 'find'; paint(); }); }
   }
 
   // ---------- 7.18: navegação — "voltar" padrão ----------
@@ -3444,18 +3495,18 @@ main .pact.on{color:#E0245E}main .pact.on .ic svg{fill:currentColor}main .pact.p
     if (S.tab === 'find') {
       var q = norm($('fCity').value);
       var list = all.filter(function (g) { return g.hostUid !== uid && !isInv(g, uid) && (g.accepted || []).indexOf(uid) < 0 && (g.declined || []).indexOf(uid) < 0 && g.status === 'open' && g.startAt > now - 3 * HOUR && (!P.days || g.startAt < now + P.days * 86400000) && (!q || norm(g.city).indexOf(q) >= 0 || norm(g.place).indexOf(q) >= 0); }).sort(function (a, b) { return a.startAt - b.startAt; });
-      if (S.loading && !all.length) note(lf, T('loading')); else if (S.err) note(lf, T('err')); else if (!list.length) note(lf, T('e_find'));
+      if (S.loading && !all.length) note(lf, T('loading')); else if (S.err) note(lf, T('err')); else if (!list.length) empty(lf, 'find', T('ev_find_t'), T('ev_find_d'), T('ev_go_new'), function () { S.tab = 'neu'; paint(); });
       list.forEach(function (g) { lf.appendChild(cardFind(g)); });
     }
     var lm = $('lMine'); lm.textContent = '';
     if (S.tab === 'mine') {
       if (S.loading && !all.length) note(lm, T('loading')); else if (S.err) note(lm, T('err'));
-      else if (S.jt === 'inv') { if (!invL.length) note(lm, T('e_inv')); invL.forEach(function (g) { lm.appendChild(cardFind(g)); }); }
+      else if (S.jt === 'inv') { if (!invL.length) empty(lm, 'mail', T('ev_inv_t'), T('ev_inv_d'), T('ev_go_find'), function () { S.tab = 'find'; paint(); }); invL.forEach(function (g) { lm.appendChild(cardFind(g)); }); }
       else if (S.jt === 'done') paintDone(lm, all, uid, now);
       else {
         // 7.21: os jogos que eu vou jogar, do mais próximo para o mais distante
         var play = all.filter(function (g) { var me = g.hostUid === uid || (g.accepted || []).indexOf(uid) >= 0 || (g.asked || []).indexOf(uid) >= 0; return me && (g.status === 'open' || g.status === 'full' || g.status === 'started') && g.startAt > now - 24 * HOUR; }).sort(function (a, b) { return a.startAt - b.startAt; });
-        if (!play.length) note(lm, T('e_play'));
+        if (!play.length) empty(lm, 'mine', T('ev_play_t'), T('ev_play_d'), T('ev_go_new'), function () { S.tab = 'neu'; paint(); });
         play.forEach(function (g) { lm.appendChild(cardMine(g)); });
       }
     }
