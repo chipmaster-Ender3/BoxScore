@@ -1,4 +1,4 @@
-/* BoxScore — imagens dos cabeçalhos (shared 1.5.0, Beta 7.17)
+/* BoxScore — imagens dos cabeçalhos (shared 1.5.1, Beta 7.20)
  * Cada janela do Placar e cada tela da Rede tem uma ilustração de tênis ligada ao seu título,
  * desenhada aqui no canvas (sem fotos de terceiros, funciona sem internet). O assunto fica à direita;
  * o título vai à esquerda, sobre um escurecimento feito no CSS.
@@ -201,6 +201,7 @@
     ajustes: function (c, r) { SCENES.set(c, r); },
     conversas: function (c, r) { SCENES.contact(c, r); },
     publicar: function (c, r) { surface(c, 'clay', r); lines(c, [[0, 250, W, 250]]); photo(c, 720, 150, 220, 250, -0.08, function (k, w, h) { k.fillStyle = '#5DA043'; k.fillRect(0, 0, w, h); k.strokeStyle = '#fff'; k.lineWidth = 4; k.strokeRect(14, 14, w - 28, h - 28); k.beginPath(); k.moveTo(14, h / 2); k.lineTo(w - 14, h / 2); k.stroke(); ball(k, w * .65, h * .35, 16); }); ball(c, 880, 70, 24); },
+    jogador: function (c, r) { surface(c, 'hard', r); lines(c, [[120, 40, W, 40], [520, 40, 520, H], [120, 200, W, 200]]); rk(c, 880, 200, .5, 0.45, 'c'); avatar(c, 720, 150, 92); ball(c, 610, 240, 22); },
     trofeu: function (c, r) { surface(c, 'night', r); trophy(c, 740, 150, 1.0); ball(c, 870, 240, 22, true); }
   };
   function draw(key) {
