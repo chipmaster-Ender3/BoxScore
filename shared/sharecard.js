@@ -1,5 +1,5 @@
 /* BoxScore — cartão do resultado (imagem 1080×1350) para compartilhar. Beta 7.23.
- * Antes ficava dentro do Placar; agora o Placar e a Rede desenham a mesma imagem, com os mesmos 5 temas.
+ * Antes ficava dentro do Placar; agora o Placar e a Comunidade desenham a mesma imagem, com os mesmos 5 temas.
  * Uso: BXCard.draw(partida, tema, ctx) → Promise<canvas>
  *   partida: { names:[a,b], players:[[..],[..]], pids:[[..],[..]], setsWon:[x,y], winner:0|1|null, finished, sets:[{games:[a,b], tb?, kind?} ou {txt}], place, surface, playStart, endedAt, id }
  *   ctx: { colors:{p1,p2,num}, players:{id:{photo}}, locale, lang, surf:{saibro:'Saibro',…}, T, Tf } — T/Tf opcionais (sem eles usa o dicionário daqui)

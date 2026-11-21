@@ -1,5 +1,5 @@
 // BoxScore casca (Beta 5.0): service worker que guarda cada módulo separado e abre sem internet.
-// Módulos "core" (casca, compartilhado, Placar) são guardados na instalação; os demais (Rede) só quando o usuário ativa.
+// Módulos "core" (casca, compartilhado, Placar) são guardados na instalação; os demais (Comunidade) só quando o usuário ativa.
 var SCOPE = self.registration.scope;
 var FB = ['app', 'auth', 'firestore'].map(function (n) { return 'https://www.gstatic.com/firebasejs/10.12.2/firebase-' + n + '-compat.js'; });
 var META = 'bx-meta';

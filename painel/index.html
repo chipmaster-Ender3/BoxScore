@@ -8,7 +8,7 @@
 <link rel="icon" href="../icons/icon-192.png">
 <link rel="stylesheet" href="../fonts/fonts.css">
 <style>
-/* BoxScore — Painel "Uso do app" (painel 1.0.2, Beta 7.11). Só para a equipe: lê a coleção telemetry. */
+/* BoxScore — Painel "Uso do app" (painel 1.0.3, Beta 7.34). Só para a equipe: lê a coleção telemetry. */
 :root { --bg: #f4f6f7; --card: #fcfcfb; --ink: #0b0b0b; --ink2: #52514e; --muted: #6b6a66; --line: #e2e1dc; --grid: #ecebe6;
   --s1: #2a78d6; --s2: #eb6834; --chip: #0a1014; --chipInk: #fff; color-scheme: light dark; }
 @media (prefers-color-scheme: dark) { :root { --bg: #0f0f0e; --card: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --muted: #9a998f; --line: #2e2e2b; --grid: #262624;
@@ -123,7 +123,7 @@ ol.steps { text-align: left; color: var(--ink2); }
 
     <div class="grid2" style="margin-top:14px">
       <div class="card"><h2>Placar · recursos usados</h2><div id="tbPlacar"></div></div>
-      <div class="card"><h2>Rede · recursos usados</h2><div id="tbRede"></div></div>
+      <div class="card"><h2>Comunidade · recursos usados</h2><div id="tbRede"></div></div>
     </div>
 
     <div class="grid2" style="margin-top:14px">
@@ -143,16 +143,16 @@ ol.steps { text-align: left; color: var(--ink2); }
   var FB_CFG = { apiKey: 'AIzaSyD_L90YxJAVRuTfPqwNbETJlbV9BYdnuYI', authDomain: 'boxsocore.firebaseapp.com', projectId: 'boxsocore', storageBucket: 'boxsocore.firebasestorage.app', messagingSenderId: '639383913161', appId: '1:639383913161:web:a9bb75fcf99f4b03378318' };
   var LBL = {
     p_open: 'Abriu o Placar', p_start: 'Jogo iniciado', p_doubles: 'Jogo de duplas', p_warm: 'Com aquecimento', p_rest: 'Com descanso',
-    p_limit: 'Com limite de tempo', p_voice: 'Com voz ligada', p_preset: 'Usou configuração salva', p_from_game: 'Jogo vindo da Rede',
+    p_limit: 'Com limite de tempo', p_voice: 'Com voz ligada', p_preset: 'Usou configuração salva', p_from_game: 'Jogo vindo da Comunidade',
     p_end: 'Jogo terminado', p_end_tb: 'Terminado no modo rápido', p_end_now: 'Encerrado antes do fim', p_later: 'Deixado para depois',
     p_abandon: 'Abandonado', p_resume: 'Retomado', p_pt_screen: 'Ponto pela tela', p_pt_band: 'Ponto pela pulseira',
     p_ace_screen: 'Ace pela tela', p_ace_band: 'Ace pela pulseira', p_undo: 'Desfazer ponto', p_hist: 'Abriu o histórico',
     p_hist_filter: 'Usou filtro do histórico', p_sum: 'Abriu resumo da partida', p_prof: 'Abriu perfis', p_stats: 'Viu estatísticas',
-    p_share: 'Abriu Compartilhar', p_sh_rede: 'Compartilhou na Rede', p_sh_ig: 'Compartilhou no Instagram', p_sh_apps: 'Compartilhou em outros apps', p_sh_copy: 'Copiou imagem ou texto', p_sh_save: 'Salvou a imagem', p_band_conn: 'Conectou a pulseira', p_settings: 'Abriu Ajustes', p_login: 'Fez login',
-    r_open: 'Abriu a Rede', r_tab_feed: 'Aba Feed', r_tab_find: 'Aba Buscar', r_tab_neu: 'Botão +', r_tab_groups: 'Aba Grupos',
+    p_share: 'Abriu Compartilhar', p_sh_rede: 'Compartilhou na Comunidade', p_sh_ig: 'Compartilhou no Instagram', p_sh_apps: 'Compartilhou em outros apps', p_sh_copy: 'Copiou imagem ou texto', p_sh_save: 'Salvou a imagem', p_band_conn: 'Conectou a pulseira', p_settings: 'Abriu Ajustes', p_login: 'Fez login',
+    r_open: 'Abriu a Comunidade', r_tab_feed: 'Aba Feed', r_tab_find: 'Aba Buscar', r_tab_neu: 'Botão +', r_tab_groups: 'Aba Grupos',
     r_tab_notif: 'Aba Início/Avisos', r_game_new: 'Criou jogo', r_game_accept: 'Aceitou jogo', r_post: 'Publicou', r_post_photo: 'Publicou com foto',
     r_like: 'Curtiu', r_comment: 'Comentou', r_msg: 'Enviou mensagem', r_follow: 'Seguiu alguém', r_group_new: 'Criou grupo',
-    r_group_join: 'Entrou em grupo', r_result: 'Lançou resultado', r_tour_new: 'Criou torneio (chaves)', r_tour_join: 'Entrou em torneio', r_settings: 'Abriu Ajustes da Rede'
+    r_group_join: 'Entrou em grupo', r_result: 'Lançou resultado', r_tour_new: 'Criou torneio (chaves)', r_tour_join: 'Entrou em torneio', r_settings: 'Abriu Ajustes da Comunidade'
   };
   var PLAT = { android: 'App Android', ios: 'App iPhone', pwa: 'Instalado (PWA)', web: 'Navegador', '': 'Não informado' };
   var $ = function (id) { return document.getElementById(id); };
@@ -267,7 +267,7 @@ ol.steps { text-align: left; color: var(--ink2); }
       ['Jogos iniciados', fmt(T.p_start), T.p_end > T.p_start ? plural(T.p_end, 'terminado', 'terminados') + ' (inclui jogos começados antes)' : plural(T.p_end, 'terminado', 'terminados') + ' (' + pct(T.p_end, T.p_start) + ')'],
       ['Duração média', A.durN ? fmt(A.durMin / A.durN) + ' min' : '—', A.durN ? 'em ' + plural(A.durN, 'jogo', 'jogos') + ' de até 6 h' : 'nenhum jogo terminado com até 6 h'],
       ['Pontos pela pulseira', pct(band, pts), fmt(pts) + ' pontos marcados'],
-      ['Usaram a Rede', fmt(n(A.users.r_open)), pct(n(A.users.r_open), N) + ' das pessoas ativas']
+      ['Usaram a Comunidade', fmt(n(A.users.r_open)), pct(n(A.users.r_open), N) + ' das pessoas ativas']
     ];
     $('tiles').innerHTML = tiles.map(function (t) { return '<div class="tile"><div class="l">' + esc(t[0]) + '</div><div class="v">' + esc(t[1]) + '</div><div class="n">' + esc(t[2]) + '</div></div>'; }).join('');
 

@@ -11,6 +11,6 @@ window.BX_LEGAL = {
   updated: '18 de novembro de 2026',            // data por extenso (usada se updatedISO estiver vazio)
   updatedISO: '2026-11-18',                     // data da versão (AAAA-MM-DD); cada idioma mostra no seu formato
   version: '1.0',
-  minAgeNetwork: 18,                            // idade mínima para a Rede (recursos sociais)
+  minAgeNetwork: 18,                            // idade mínima para a Comunidade (recursos sociais)
   deleteDays: 15                                // prazo para concluir pedidos de exclusão
 };

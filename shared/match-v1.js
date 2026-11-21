@@ -1,4 +1,4 @@
-/* BoxScore: formato de partida v1 (compartilhado entre Placar e Rede).
+/* BoxScore: formato de partida v1 (compartilhado entre Placar e Comunidade).
    Regras do formato: só dados públicos da partida, sem arrays dentro de arrays (o Firestore não aceita),
    sem valores undefined. Campos novos entram como opcionais; mudar o significado de um campo exige v2. */
 (function (g) {
@@ -50,7 +50,7 @@
     };
   }
 
-  // Monta uma partida do Placar a partir do formato v1 (por exemplo, partida criada por um convite da Rede).
+  // Monta uma partida do Placar a partir do formato v1 (por exemplo, partida criada por um convite da Comunidade).
   function toEntry(m) {
     var names = m.sides.map(function (s) { return s.players.map(function (p) { return p.name; }).join(' / '); });
     return {

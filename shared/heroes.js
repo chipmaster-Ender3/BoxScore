@@ -1,5 +1,5 @@
 /* BoxScore — imagens dos cabeçalhos (shared 1.5.1, Beta 7.20)
- * Cada janela do Placar e cada tela da Rede tem uma ilustração de tênis ligada ao seu título,
+ * Cada janela do Placar e cada tela da Comunidade tem uma ilustração de tênis ligada ao seu título,
  * desenhada aqui no canvas (sem fotos de terceiros, funciona sem internet). O assunto fica à direita;
  * o título vai à esquerda, sobre um escurecimento feito no CSS.
  * Uso: BXHero.get('hist').then(url => ...)  ·  BXHero.apply(elemento, 'hist')  (põe --hero no elemento)
@@ -189,7 +189,7 @@
     user: function (c, r) { surface(c, 'clay', r); lines(c, [[0, 80, W, 80], [600, 80, 600, H]]); ball(c, 720, 140, 46); magnifier(c, 720, 140, 78); },
     fr: function (c, r) { surface(c, 'red', r); lines(c, [[W * .45, 0, W, H * .78]], 12); rk(c, 700, 190, .5, -0.55, 'a'); rk(c, 860, 190, .5, 0.55, 'b'); ball(c, 760, 70, 24); ball(c, 820, 92, 24); },
     close: function (c, r) { surface(c, 'night', r); net(c, 150, 420, 940, 90); ball(c, 720, 128, 28, true); },
-    // Rede
+    // Comunidade
     avisos: function (c, r) { surface(c, 'night', r); lines(c, [[120, 50, W, 50], [520, 50, 520, H]], 8, 'rgba(220,232,255,.75)'); bell(c, 740, 140, 1.0); ball(c, 860, 230, 24, true); },
     feed: function (c, r) { surface(c, 'stands', r); lines(c, [[0, 200, W, 200]], 7); ball(c, 760, 230, 26); rk(c, 880, 300, .32, 0.4, 'c'); },
     jogos: function (c, r) { surface(c, 'hard', r); lines(c, [[120, 40, W, 40], [120, 40, 120, H]]); net(c, 140, 300, 940, 70); rk(c, 840, 230, .38, 0.9, 'a'); ball(c, 620, 240, 22); },

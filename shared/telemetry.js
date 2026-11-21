@@ -14,7 +14,7 @@
     'p_end', 'p_min', 'p_dur_n', 'p_end_tb', 'p_end_now', 'p_later', 'p_abandon', 'p_resume',
     'p_pt_screen', 'p_pt_band', 'p_ace_screen', 'p_ace_band', 'p_undo',
     'p_hist', 'p_hist_filter', 'p_sum', 'p_prof', 'p_stats', 'p_share', 'p_sh_rede', 'p_sh_ig', 'p_sh_apps', 'p_sh_copy', 'p_sh_save', 'p_band_conn', 'p_settings', 'p_login',
-    // Rede
+    // Comunidade
     'r_open', 'r_tab_feed', 'r_tab_find', 'r_tab_neu', 'r_tab_groups', 'r_tab_notif',
     'r_game_new', 'r_game_accept', 'r_post', 'r_post_photo', 'r_like', 'r_comment', 'r_msg', 'r_follow',
     'r_group_new', 'r_group_join', 'r_result', 'r_tour_new', 'r_tour_join', 'r_settings'
