@@ -12,7 +12,7 @@
     // Placar
     'p_open', 'p_start', 'p_doubles', 'p_warm', 'p_rest', 'p_limit', 'p_voice', 'p_preset', 'p_from_game',
     'p_end', 'p_min', 'p_dur_n', 'p_end_tb', 'p_end_now', 'p_later', 'p_abandon', 'p_resume',
-    'p_pt_screen', 'p_pt_band', 'p_ace_screen', 'p_ace_band', 'p_undo',
+    'p_pt_screen', 'p_pt_band', 'p_pt_notif', 'p_bg_on', 'p_ace_screen', 'p_ace_band', 'p_undo',
     'p_hist', 'p_hist_filter', 'p_sum', 'p_prof', 'p_stats', 'p_share', 'p_sh_rede', 'p_sh_ig', 'p_sh_apps', 'p_sh_copy', 'p_sh_save', 'p_band_conn', 'p_settings', 'p_login',
     // Comunidade
     'r_open', 'r_tab_feed', 'r_tab_find', 'r_tab_neu', 'r_tab_groups', 'r_tab_notif',

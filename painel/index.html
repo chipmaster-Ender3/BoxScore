@@ -8,7 +8,7 @@
 <link rel="icon" href="../icons/icon-192.png">
 <link rel="stylesheet" href="../fonts/fonts.css">
 <style>
-/* BoxScore — Painel "Uso do app" (painel 1.0.3, Beta 7.34). Só para a equipe: lê a coleção telemetry. */
+/* BoxScore — Painel "Uso do app" (painel 1.0.4, Beta 7.36). Só para a equipe: lê a coleção telemetry. */
 :root { --bg: #f4f6f7; --card: #fcfcfb; --ink: #0b0b0b; --ink2: #52514e; --muted: #6b6a66; --line: #e2e1dc; --grid: #ecebe6;
   --s1: #2a78d6; --s2: #eb6834; --chip: #0a1014; --chipInk: #fff; color-scheme: light dark; }
 @media (prefers-color-scheme: dark) { :root { --bg: #0f0f0e; --card: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --muted: #9a998f; --line: #2e2e2b; --grid: #262624;
@@ -145,7 +145,7 @@ ol.steps { text-align: left; color: var(--ink2); }
     p_open: 'Abriu o Placar', p_start: 'Jogo iniciado', p_doubles: 'Jogo de duplas', p_warm: 'Com aquecimento', p_rest: 'Com descanso',
     p_limit: 'Com limite de tempo', p_voice: 'Com voz ligada', p_preset: 'Usou configuração salva', p_from_game: 'Jogo vindo da Comunidade',
     p_end: 'Jogo terminado', p_end_tb: 'Terminado no modo rápido', p_end_now: 'Encerrado antes do fim', p_later: 'Deixado para depois',
-    p_abandon: 'Abandonado', p_resume: 'Retomado', p_pt_screen: 'Ponto pela tela', p_pt_band: 'Ponto pela pulseira',
+    p_abandon: 'Abandonado', p_resume: 'Retomado', p_pt_screen: 'Ponto pela tela', p_pt_band: 'Ponto pela pulseira', p_pt_notif: 'Ponto pela notificação', p_bg_on: 'Partida com tela bloqueada',
     p_ace_screen: 'Ace pela tela', p_ace_band: 'Ace pela pulseira', p_undo: 'Desfazer ponto', p_hist: 'Abriu o histórico',
     p_hist_filter: 'Usou filtro do histórico', p_sum: 'Abriu resumo da partida', p_prof: 'Abriu perfis', p_stats: 'Viu estatísticas',
     p_share: 'Abriu Compartilhar', p_sh_rede: 'Compartilhou na Comunidade', p_sh_ig: 'Compartilhou no Instagram', p_sh_apps: 'Compartilhou em outros apps', p_sh_copy: 'Copiou imagem ou texto', p_sh_save: 'Salvou a imagem', p_band_conn: 'Conectou a pulseira', p_settings: 'Abriu Ajustes', p_login: 'Fez login',
@@ -259,7 +259,7 @@ ol.steps { text-align: left; color: var(--ink2); }
     var logged = ids.filter(function (w) { return !A.people[w].anon; }).length;
     var back = ids.filter(function (w) { return n(A.people[w].days) >= 2; }).length;
     var avg = A.days.reduce(function (s, d) { return s + n(A.per[d].logged) + n(A.per[d].anon); }, 0) / A.days.length;
-    var pts = T.p_pt_screen + T.p_pt_band + T.p_ace_screen + T.p_ace_band, band = T.p_pt_band + T.p_ace_band;
+    var pts = T.p_pt_screen + T.p_pt_band + (T.p_pt_notif || 0) + T.p_ace_screen + T.p_ace_band, band = T.p_pt_band + T.p_ace_band;
     var tiles = [
       ['Pessoas ativas', fmt(N), fmt(logged) + ' com conta · ' + fmt(N - logged) + ' sem conta'],
       ['Média por dia', avg >= 10 || avg === 0 ? fmt(avg) : avg.toFixed(1).replace('.', ','), 'pessoas ativas por dia'],
