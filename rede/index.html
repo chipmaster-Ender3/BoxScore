@@ -211,7 +211,7 @@ main .crow .cn b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 (function () {
   'use strict';
   BXMods.mark('rede');
-  var VERSION = '0.50.0';
+  var VERSION = '0.51.0';
   var FB_CFG = { apiKey: 'AIzaSyD_L90YxJAVRuTfPqwNbETJlbV9BYdnuYI', authDomain: 'boxsocore.firebaseapp.com', projectId: 'boxsocore', storageBucket: 'boxsocore.firebasestorage.app', messagingSenderId: '639383913161', appId: '1:639383913161:web:a9bb75fcf99f4b03378318' };
   var FB_VER = '10.12.2', FB_LIBS = ['app', 'auth', 'firestore'];
   var HOUR = 3600000;
@@ -698,7 +698,7 @@ main .crow .cn b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     return loadFB().then(function () {
       firebase.initializeApp(FB_CFG);
       S.auth = firebase.auth(); S.db = firebase.firestore();
-      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.30', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
+      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.31', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
       try { S.db.settings({ experimentalAutoDetectLongPolling: true, merge: true }); } catch (e) {}
       try { S.auth.getRedirectResult().catch(function () {}); } catch (e) {}
       S.auth.onAuthStateChanged(function (u) { S.user = u || null; paintGate(); if (u) { loadFriends(); loadFollows(); loadBlocks().then(reload); ensureProfile(); } });
@@ -1968,6 +1968,7 @@ main .crow .cn b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     return S.db.collection('groups').where('members', 'array-contains', uid).get().then(function (r) {
       var m = {}; r.docs.forEach(function (d) { var x = d.data(); x.id = d.id; m[d.id] = x; }); S.groups = m; S.gReqs = {};
       var adm = Object.keys(m).filter(function (k) { return (m[k].admins || []).indexOf(uid) >= 0; });
+      Object.keys(m).forEach(function (k) { gPriv(m[k], adm.indexOf(k) >= 0); });
       adm.forEach(function (k) { if (!cats(m[k]).length) { CX.cr[k] = []; return; } S.db.collection('groups').doc(k).collection('catReqs').get().then(function (sn) { CX.cr[k] = sn.docs.map(function (d) { var x = d.data(); x.uid = d.id; return x; }); }).catch(function () { CX.cr[k] = []; }).then(function () { paintTabs(); }); });
       return Promise.all(adm.map(function (k) { return S.db.collection('groups').doc(k).collection('reqs').get().then(function (sn) { S.gReqs[k] = sn.docs.map(function (d) { var x = d.data(); x.id = d.id; return x; }).filter(function (x) { return !S.blocks[x.uid]; }); }).catch(function () { S.gReqs[k] = []; }); }));
     }).then(function () { S.gLoaded = true; paint(); }).catch(function () { S.gLoaded = true; });
@@ -1982,6 +1983,15 @@ main .crow .cn b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
       var ids = Object.keys(m).filter(function (k) { return (m[k].members || []).indexOf(uid) < 0 && m[k].access === 'approval'; }).slice(0, 20);
       return Promise.all(ids.map(function (k) { return S.db.collection('groups').doc(k).collection('reqs').doc(uid).get().then(function (d) { if (d.exists) S.sentReq[k] = true; }).catch(function () {}); }));
     }).catch(function () {}).then(function () { S.discLoading = false; paint(); });
+  }
+  // 7.31 (segurança): o código de convite fica em groups/{id}/priv/inv, que só membros leem; grupos antigos migram quando um administrador abre
+  function gPriv(g, isAdm) {
+    var pr = S.db.collection('groups').doc(g.id).collection('priv').doc('inv'), old = g.code;
+    return pr.get().then(function (d) {
+      var c = d.exists && d.data().code;
+      if (c) { g.code = c; if (old && isAdm) S.db.collection('groups').doc(g.id).update({ code: fv().delete() }).catch(function () {}); return; }
+      if (old && isAdm) return pr.set({ code: old }).then(function () { return S.db.collection('groups').doc(g.id).update({ code: fv().delete() }); }).catch(function () {});
+    }).catch(function () {}).then(function () { if (g.code !== old) try { paint(); } catch (x) {} });
   }
   function memAdd(uid, name) { var u = { members: fv().arrayUnion(uid) }; u['memberNames.' + uid] = name; return u; }
   function afterJoin(g) { toast(Tf('joined', g.name)); S.gid = g.id; S.gtab = 'sum'; S.gf = 'mine'; S.tab = 'groups'; return loadGroups(); }
@@ -2074,14 +2084,15 @@ main .crow .cn b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   function createGroup(w) {
     tel('r_group_new');
     var uid = S.user.uid, nm = meName(), gr = S.db.collection('groups').doc(), code = genCode(), a = w.acc;
-    var doc = { name: w.n.trim().slice(0, 60), city: (w.c || '').trim().slice(0, 60), desc: '', access: a, listed: w.pub !== false, ownerUid: uid, admins: [uid], members: [uid], memberNames: {}, code: code, createdAt: Date.now() };
+    var doc = { name: w.n.trim().slice(0, 60), city: (w.c || '').trim().slice(0, 60), desc: '', access: a, listed: w.pub !== false, ownerUid: uid, admins: [uid], members: [uid], memberNames: {}, createdAt: Date.now() };
     doc.memberNames[uid] = nm;
+    var pr = gr.collection('priv').doc('inv');
     function mkCode(c, tries) {
-      return S.db.collection('groupCodes').doc(c).set({ gid: gr.id, name: doc.name, city: doc.city, access: a }).catch(function (e) {
-        if (tries <= 0) throw e; var c2 = genCode(); return gr.update({ code: c2 }).then(function () { return mkCode(c2, tries - 1); });
+      return pr.set({ code: c }).then(function () { return S.db.collection('groupCodes').doc(c).set({ gid: gr.id, name: doc.name, city: doc.city, access: a }); }).then(function () { code = c; }).catch(function (e) {
+        if (tries <= 0) throw e; return mkCode(genCode(), tries - 1);
       });
     }
-    return gr.set(doc).then(function () { return mkCode(code, 2); }).then(function () { doc.id = gr.id; return doc; });
+    return gr.set(doc).then(function () { return mkCode(code, 2); }).then(function () { doc.id = gr.id; doc.code = code; return doc; });
   }
   function shareInvite(g) {
     var url = BXMods.base + 'rede/#g=' + g.code, txt = Tf('inv_txt', g.name, url, g.code);
@@ -2089,7 +2100,7 @@ main .crow .cn b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     else if (navigator.clipboard) navigator.clipboard.writeText(txt).then(function () { toast(T('copied')); }, function () {});
   }
   function setAccess(g, a) {
-    S.db.collection('groups').doc(g.id).update({ access: a }).then(function () { g.access = a; return S.db.collection('groupCodes').doc(g.code).update({ access: a }).catch(function () {}); }).then(function () { S.discAt = 0; paint(); }).catch(failT);
+    S.db.collection('groups').doc(g.id).update({ access: a }).then(function () { g.access = a; return g.code ? S.db.collection('groupCodes').doc(g.code).update({ access: a }).catch(function () {}) : null; }).then(function () { S.discAt = 0; paint(); }).catch(failT);
   }
   function setListed(g, v) { S.db.collection('groups').doc(g.id).update({ listed: v }).then(function () { g.listed = v; S.discAt = 0; paint(); }).catch(failT); }
   function approveReq(g, r) {
@@ -2103,7 +2114,7 @@ main .crow .cn b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   }
   function leaveGroup(g) { var uid = S.user.uid, u = { members: fv().arrayRemove(uid) }; u['memberNames.' + uid] = fv().delete(); S.db.collection('groups').doc(g.id).update(u).then(function () { S.gid = ''; return loadGroups(); }).catch(failT); }
   function deleteGroup(g) {
-    S.db.collection('groupCodes').doc(g.code).delete().catch(function () {}).then(function () { return S.db.collection('groups').doc(g.id).delete(); }).then(function () { S.gid = ''; delete S.groups[g.id]; paint(); return loadGroups(); }).catch(failT);
+    (g.code ? S.db.collection('groupCodes').doc(g.code).delete() : Promise.resolve()).catch(function () {}).then(function () { return S.db.collection('groups').doc(g.id).collection('priv').doc('inv').delete().catch(function () {}); }).then(function () { return S.db.collection('groups').doc(g.id).delete(); }).then(function () { S.gid = ''; delete S.groups[g.id]; paint(); return loadGroups(); }).catch(failT);
   }
   function setAdmin(g, uid, on) { S.db.collection('groups').doc(g.id).update({ admins: on ? fv().arrayUnion(uid) : fv().arrayRemove(uid) }).then(function () { return loadGroups(); }).catch(failT); }
   function isAdm(g) { return (g.admins || []).indexOf(S.user.uid) >= 0; }
@@ -3646,7 +3657,8 @@ main .crow .cn b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     document.addEventListener('focusin', function (e) { var t = e.target; if (t && /^(INPUT|TEXTAREA)$/.test(t.tagName)) setTimeout(function () { try { t.scrollIntoView({ block: 'nearest' }); } catch (x) {} }, 250); });
   })();
   initFB();
-  window.__rede = { untag: untag, openResult: openResult, openComposer: openComposer, userMenu: userMenu, S: S, reload: reload, create: create, paint: paint, openChat: openChat };
+  var bxDbg = false; try { bxDbg = !!navigator.webdriver || localStorage.getItem("bxDebug") === "1"; } catch (x) {}
+  if (bxDbg) window.__rede = { untag: untag, openResult: openResult, openComposer: openComposer, userMenu: userMenu, S: S, reload: reload, create: create, paint: paint, openChat: openChat, createGroup: createGroup, loadGroups: loadGroups, joinCode: typeof joinByCode === "function" ? joinByCode : null };
   if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('../sw.js').catch(function () {});
 })();
 </script></body></html>

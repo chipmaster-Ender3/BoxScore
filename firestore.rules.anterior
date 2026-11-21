@@ -1,0 +1,555 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+
+    // dados privados de cada usuário
+    match /users/{uid}/{document=**} {
+      allow read, write: if signedIn() && request.auth.uid == uid;
+    }
+    // perfil público (nome, foto pequena, mão, raquete) e diretório de busca por nome
+    match /profiles/{uid} {
+      allow read: if signedIn();
+      allow write: if signedIn() && request.auth.uid == uid;
+    }
+    // dados liberados só para amigos (e para o próprio dono)
+    function pairDoc(a, b) { return a < b ? a + '_' + b : b + '_' + a; }
+    match /profFriends/{uid} {
+      allow write: if signedIn() && request.auth.uid == uid;
+      allow read: if signedIn() && (request.auth.uid == uid
+        || get(/databases/$(database)/documents/links/$(pairDoc(request.auth.uid, uid))).data.status == 'accepted');
+    }
+    match /directory/{uid} {
+      allow read: if signedIn();
+      allow write: if signedIn() && request.auth.uid == uid;
+    }
+    // código curto: criado uma vez, nunca alterado
+    match /codes/{code} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid;
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;   // 7.9: excluir conta
+    }
+    // amizades
+    match /links/{pair} {
+      allow read: if signedIn() && request.auth.uid in resource.data.members;
+      allow create: if signedIn() && request.auth.uid in request.resource.data.members
+                    && request.resource.data.from == request.auth.uid
+                    && request.resource.data.status == 'pending';
+      allow update: if signedIn() && request.auth.uid in resource.data.members
+                    && resource.data.from != request.auth.uid
+                    && request.resource.data.status == 'accepted';
+      allow delete: if signedIn() && request.auth.uid in resource.data.members;
+    }
+    // partidas compartilhadas
+    match /shared/{id} {
+      allow read: if signedIn() && request.auth.uid in resource.data.participants;
+      allow create: if signedIn() && request.resource.data.owner == request.auth.uid;
+      allow update: if signedIn() && (resource.data.owner == request.auth.uid
+                    || (request.auth.uid in resource.data.participants
+                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['responses'])));
+      allow delete: if signedIn() && resource.data.owner == request.auth.uid;
+    }
+    // jogos marcados na Rede (Marcar jogo)
+    match /games/{id} {
+      allow read: if signedIn() && (resource.data.hostUid == request.auth.uid
+                  || resource.data.visibility == 'open'
+                  || request.auth.uid in resource.data.audience
+                  || request.auth.uid in resource.data.invited
+                  || request.auth.uid in resource.data.accepted
+                  || request.auth.uid in resource.data.asked);
+      allow create: if signedIn() && request.resource.data.hostUid == request.auth.uid
+                    && request.resource.data.status == 'open'
+                    && request.resource.data.accepted == [request.auth.uid]
+                    && request.resource.data.asked == []
+                    && request.resource.data.declined == []
+                    && request.resource.data.visibility in ['invite', 'friends', 'open', 'group']
+                    && (request.resource.data.visibility != 'group'
+                        || (request.resource.data.get('groupId', '') is string && request.resource.data.get('groupId', '') != ''
+                            && request.auth.uid in get(/databases/$(database)/documents/groups/$(request.resource.data.groupId)).data.members))
+                    && (request.resource.data.get('groupId', '') == ''
+                        || request.auth.uid in get(/databases/$(database)/documents/groups/$(request.resource.data.groupId)).data.members)
+                    && (request.resource.data.get('catId', '') == ''
+                        || (request.resource.data.get('groupId', '') != ''
+                            && get(/databases/$(database)/documents/groups/$(request.resource.data.groupId)).data.get('catOf', {}).get(request.auth.uid, '') == request.resource.data.catId))
+                    && request.resource.data.kind == 'friendly'
+                    && request.resource.data.invited.size() <= 10
+                    && request.resource.data.mode in ['singles', 'doubles']
+                    && request.resource.data.slots is int
+                    && request.resource.data.slots >= 1 && request.resource.data.slots <= 3
+                    && request.resource.data.slotsLeft == request.resource.data.slots
+                    && request.resource.data.startAt is number
+                    && request.resource.data.place is string && request.resource.data.place.size() <= 80
+                    && request.resource.data.note.size() <= 120
+                    && request.resource.data.audience.size() <= 400
+                    && (request.resource.data.cost == null || request.resource.data.cost.total is number);
+      // o anfitrião altera o jogo; quem pede para entrar só mexe na própria entrada em "asked"/"askedInfo"
+      allow update: if signedIn() && (
+                    // anfitrião: altera o jogo, mas NÃO a confirmação do resultado, NÃO entra com participante que não pediu
+                    // e NÃO mexe no resultado de um jogo já fechado por lançamento manual
+                    (resource.data.hostUid == request.auth.uid && request.resource.data.hostUid == resource.data.hostUid
+                        && request.resource.data.get('manual', null) == resource.data.get('manual', null)
+                        && request.resource.data.get('resultSrc', '') == resource.data.get('resultSrc', '')
+                        && (resource.data.get('resultSrc', '') != 'manual'
+                            || (request.resource.data.get('result', '') == resource.data.get('result', '')
+                                && request.resource.data.status == resource.data.status))
+                        && request.resource.data.accepted.toSet().difference(resource.data.accepted.toSet()).difference(resource.data.asked.toSet()).size() == 0)
+                    || (resource.data.status == 'open'
+                        && !(request.auth.uid in resource.data.accepted)
+                        && !(request.auth.uid in resource.data.declined)
+                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['asked', 'askedInfo', 'updatedAt'])
+                        && request.resource.data.asked.size() <= 20
+                        && request.resource.data.asked.toSet().difference(resource.data.asked.toSet()).hasOnly([request.auth.uid])
+                        && resource.data.asked.toSet().difference(request.resource.data.asked.toSet()).hasOnly([request.auth.uid])
+                        && request.resource.data.askedInfo.diff(resource.data.askedInfo).affectedKeys().hasOnly([request.auth.uid]))
+                    // convidado aceita: entra em accepted (+1), ocupa uma vaga e escreve só o próprio dado em players
+                    || (resource.data.status == 'open' && invitedTo(resource.data)
+                        && !(request.auth.uid in resource.data.accepted) && !(request.auth.uid in resource.data.declined)
+                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['accepted', 'players', 'slotsLeft', 'status', 'updatedAt'])
+                        && request.auth.uid in request.resource.data.accepted
+                        && request.resource.data.accepted.size() == resource.data.accepted.size() + 1
+                        && request.resource.data.slotsLeft == resource.data.slotsLeft - 1
+                        && request.resource.data.slotsLeft >= 0
+                        && request.resource.data.status == (request.resource.data.slotsLeft == 0 ? 'full' : 'open')
+                        && request.resource.data.players.diff(resource.data.players).affectedKeys().hasOnly([request.auth.uid]))
+                    // participante (não anfitrião) sai: libera a vaga, entra em declined e registra left/leftInfo
+                    || ((resource.data.status == 'open' || resource.data.status == 'full')
+                        && request.auth.uid in resource.data.accepted && request.auth.uid != resource.data.hostUid
+                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['accepted', 'declined', 'players', 'slotsLeft', 'status', 'left', 'leftInfo', 'updatedAt'])
+                        && !(request.auth.uid in request.resource.data.accepted)
+                        && request.resource.data.accepted.size() == resource.data.accepted.size() - 1
+                        && request.auth.uid in request.resource.data.declined
+                        && request.resource.data.slotsLeft == resource.data.slotsLeft + 1
+                        && request.resource.data.status == 'open'
+                        && request.resource.data.players.diff(resource.data.players).affectedKeys().hasOnly([request.auth.uid])
+                        && request.resource.data.leftInfo.diff(resource.data.get('leftInfo', {})).affectedKeys().hasOnly([request.auth.uid]))
+                    // resultado manual: um jogador lança (pending); alguém do lado oposto confirma ou contesta
+                    || ((resource.data.status == 'open' || resource.data.status == 'full' || resource.data.status == 'started')
+                        && request.auth.uid in resource.data.accepted
+                        && (resource.data.get('manual', null) == null || resource.data.manual.status == 'contested'
+                            || (resource.data.manual.status == 'pending' && resource.data.manual.by == request.auth.uid))
+                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['manual', 'updatedAt'])
+                        && request.resource.data.manual.by == request.auth.uid
+                        && request.resource.data.manual.status == 'pending'
+                        && request.auth.uid in request.resource.data.manual.sideOf
+                        && request.resource.data.manual.sideOf.keys().toSet().difference(resource.data.accepted.toSet()).size() == 0
+                        && request.resource.data.manual.sideOf.keys().size() >= 2 && request.resource.data.manual.sideOf.keys().size() <= 4
+                        && request.resource.data.manual.sideOf.values().toSet().size() == 2
+                        && request.resource.data.manual.sets.size() >= 1 && request.resource.data.manual.sets.size() <= 5
+                        && request.resource.data.manual.text.size() <= 160)
+                    || ((resource.data.status == 'open' || resource.data.status == 'full' || resource.data.status == 'started')
+                        && request.auth.uid in resource.data.accepted
+                        && resource.data.get('manual', null) != null && resource.data.manual.status == 'pending'
+                        && request.auth.uid in resource.data.manual.sideOf
+                        && resource.data.manual.sideOf[request.auth.uid] != resource.data.manual.sideOf[resource.data.manual.by]
+                        && request.resource.data.manual.by == resource.data.manual.by
+                        && request.resource.data.manual.sets == resource.data.manual.sets
+                        && request.resource.data.manual.text == resource.data.manual.text
+                        && request.resource.data.manual.sideOf == resource.data.manual.sideOf
+                        && ((request.resource.data.manual.status == 'confirmed'
+                              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['manual', 'status', 'result', 'resultSrc', 'finishedAt', 'updatedAt'])
+                              && request.resource.data.status == 'finished'
+                              && request.resource.data.result == resource.data.manual.text
+                              && request.resource.data.resultSrc == 'manual')
+                            || (request.resource.data.manual.status == 'contested'
+                              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['manual', 'updatedAt']))))
+                    // 7.20: quem está confirmado pode iniciar a partida (só muda o status para 'started')
+                    || ((resource.data.status == 'open' || resource.data.status == 'full')
+                        && request.auth.uid in resource.data.accepted
+                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt'])
+                        && request.resource.data.status == 'started')
+                    // convidado recusa
+                    || (resource.data.status == 'open' && invitedTo(resource.data)
+                        && !(request.auth.uid in resource.data.accepted) && !(request.auth.uid in resource.data.declined)
+                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['declined', 'updatedAt'])
+                        && request.auth.uid in request.resource.data.declined
+                        && request.resource.data.declined.size() == resource.data.declined.size() + 1));
+      allow delete: if signedIn() && resource.data.hostUid == request.auth.uid;
+    }
+
+    // convidado de um jogo: lista de convidados ou, em jogo de grupo, qualquer membro avisado em audience
+    function invitedTo(g) {
+      return request.auth.uid in g.invited || (g.get('visibility', '') == 'group' && request.auth.uid in g.audience);
+    }
+
+    // conversas diretas entre jogadores (id = par de uids ordenado)
+    function inGame(gid, u) {
+      let g = get(/databases/$(database)/documents/games/$(gid)).data;
+      return g.hostUid == u || u in g.invited || u in g.accepted || u in g.asked
+        || (g.get('visibility', '') == 'group' && u in g.audience);
+    }
+    function otherOf(members) { return members[0] == request.auth.uid ? members[1] : members[0]; }
+    function blockedBy(other) { return exists(/databases/$(database)/documents/users/$(other)/blocks/$(request.auth.uid)); }
+    match /chats/{id} {
+      allow read: if signedIn() && (resource == null || request.auth.uid in resource.data.members);
+      allow create: if signedIn() && request.auth.uid in request.resource.data.members
+                    && request.resource.data.members.size() == 2
+                    && !blockedBy(otherOf(request.resource.data.members))
+                    && id == pairDoc(request.resource.data.members[0], request.resource.data.members[1])
+                    && request.resource.data.last is string && request.resource.data.last.size() <= 80
+                    && ((exists(/databases/$(database)/documents/links/$(id))
+                         && get(/databases/$(database)/documents/links/$(id)).data.status == 'accepted')
+                        || (request.resource.data.get('gameId', '') is string && request.resource.data.get('gameId', '') != ''
+                            && inGame(request.resource.data.gameId, request.resource.data.members[0])
+                            && inGame(request.resource.data.gameId, request.resource.data.members[1])));
+      allow update: if signedIn() && request.auth.uid in resource.data.members
+                    && !blockedBy(otherOf(resource.data.members))
+                    && request.resource.data.members == resource.data.members
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['last', 'lastAt', 'lastFrom', 'reads', 'names', 'gameId'])
+                    && request.resource.data.last.size() <= 80;
+      match /msgs/{mid} {
+        allow read: if signedIn() && request.auth.uid in get(/databases/$(database)/documents/chats/$(id)).data.members;
+        allow create: if signedIn() && request.resource.data.from == request.auth.uid
+                      && request.auth.uid in get(/databases/$(database)/documents/chats/$(id)).data.members
+                      && !blockedBy(otherOf(get(/databases/$(database)/documents/chats/$(id)).data.members))
+                      && request.resource.data.keys().hasOnly(['from', 'text', 'at'])
+                      && request.resource.data.text is string
+                      && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 500
+                      && request.resource.data.at is number;
+        allow delete: if signedIn() && resource.data.from == request.auth.uid;
+      }
+    }
+
+    // denúncias: qualquer usuário cria; leitura só pelo console (administrador)
+    match /reports/{id} {
+      allow create: if signedIn() && request.resource.data.by == request.auth.uid
+                    && request.resource.data.target is string
+                    && request.resource.data.reason in ['spam', 'abuse', 'fake', 'other']
+                    && request.resource.data.get('text', '').size() <= 300;
+    }
+
+
+    // grupos (Beta 5.15): acesso aberto, por aprovação ou só convidado
+    function grpData(gid) { return get(/databases/$(database)/documents/groups/$(gid)).data; }
+    function isGAdmin(gid) { return request.auth.uid in grpData(gid).admins; }
+    match /groups/{gid} {
+      allow read: if signedIn() && (resource.data.listed == true || request.auth.uid in resource.data.members);
+      allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid
+                    && request.resource.data.admins == [request.auth.uid] && request.resource.data.members == [request.auth.uid]
+                    && request.resource.data.access in ['open', 'approval', 'invite']
+                    && request.resource.data.listed is bool
+                    && request.resource.data.name is string && request.resource.data.name.size() >= 2 && request.resource.data.name.size() <= 60
+                    && request.resource.data.city.size() <= 60 && request.resource.data.desc.size() <= 200
+                    && request.resource.data.code is string && request.resource.data.code.size() >= 4 && request.resource.data.code.size() <= 8;
+      allow update: if signedIn() && (
+                    // administrador edita dados e acesso
+                    (request.auth.uid in resource.data.admins
+                      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'city', 'desc', 'access', 'listed', 'code', 'rank', 'photo', 'cats', 'catOf', 'catAt', 'rkPaid'])
+                      && request.resource.data.get('cats', []).size() <= 8
+                      && request.resource.data.get('catOf', {}) is map
+                      && request.resource.data.get('catAt', {}) is map
+                      && request.resource.data.get('rkPaid', {}) is map
+                      && request.resource.data.get('photo', '').size() <= 40000
+                      && (request.resource.data.get('rank', null) == null
+                          || (request.resource.data.rank.keys().hasOnly(['win', 'loss', 'days', 'from', 'to', 'woW', 'woL', 'setW', 'setL', 'gmW', 'gmL', 'fmt', 'gen', 'ageMin', 'ageMax', 'fee', 'max', 'by', 'rules', 'mode', 'rep', 'rdFrom'])
+                              && request.resource.data.rank.get('mode', 'free') in ['free', 'rounds']
+                              && request.resource.data.rank.get('rep', 3) in [0, 2, 3, 4, -1]
+                              && request.resource.data.rank.get('rules', '').size() <= 600
+                              && request.resource.data.rank.win is int && request.resource.data.rank.win >= 0 && request.resource.data.rank.win <= 1000
+                              && request.resource.data.rank.loss is int && request.resource.data.rank.loss >= 0 && request.resource.data.rank.loss <= 1000
+                              && request.resource.data.rank.days in [0, 30, 90, 180, 365]))
+                      && request.resource.data.access in ['open', 'approval', 'invite']
+                      && request.resource.data.listed is bool
+                      && request.resource.data.name.size() >= 2 && request.resource.data.name.size() <= 60
+                      && request.resource.data.desc.size() <= 200)
+                    // entrar sozinho em grupo aberto
+                    || (resource.data.access == 'open' && joinOnly())
+                    // entrar sozinho com código de convite (doc em joins criado antes)
+                    || (exists(/databases/$(database)/documents/groups/$(gid)/joins/$(request.auth.uid)) && joinOnly())
+                    // administrador aprova um pedido (adiciona 1 membro)
+                    || (request.auth.uid in resource.data.admins && addOne())
+                    // sair do grupo (menos o dono)
+                    || (resource.data.ownerUid != request.auth.uid
+                      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members', 'memberNames'])
+                      && resource.data.members.toSet().difference(request.resource.data.members.toSet()).hasOnly([request.auth.uid])
+                      && request.resource.data.members.toSet().difference(resource.data.members.toSet()).size() == 0)
+                    // administrador remove 1 membro comum
+                    || (request.auth.uid in resource.data.admins
+                      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members', 'memberNames'])
+                      && resource.data.members.toSet().difference(request.resource.data.members.toSet()).size() == 1
+                      && request.resource.data.members.toSet().difference(resource.data.members.toSet()).size() == 0
+                      && request.resource.data.members.hasAll(resource.data.admins))
+                    // dono muda administradores
+                    || (resource.data.ownerUid == request.auth.uid
+                      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['admins'])
+                      && request.resource.data.admins.hasAll([resource.data.ownerUid])
+                      && request.resource.data.admins.toSet().difference(resource.data.members.toSet()).size() == 0));
+      allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
+
+      match /reqs/{rid} {
+        allow read: if signedIn() && (rid == request.auth.uid || isGAdmin(gid));
+        allow create: if signedIn() && rid == request.auth.uid && request.resource.data.uid == request.auth.uid
+                      && grpData(gid).access == 'approval' && !(request.auth.uid in grpData(gid).members)
+                      && request.resource.data.get('msg', '').size() <= 200 && request.resource.data.name.size() <= 80;
+        allow delete: if signedIn() && (rid == request.auth.uid || isGAdmin(gid));
+      }
+      // resultados confirmados de jogos do grupo (base do ranking): cópia fiel do resultado confirmado pelos dois lados
+      match /results/{rid} {
+        // membros e, em grupo público (listed), quem só acompanha
+        allow read: if signedIn() && (request.auth.uid in grpData(gid).members || grpData(gid).listed == true);
+        allow create: if signedIn() && ((request.auth.uid in grpData(gid).members && resultOk(gid, rid)) || (isGAdmin(gid) && adminResOk(gid)));
+        // o administrador corrige o ranking removendo um resultado
+        allow delete: if signedIn() && isGAdmin(gid);
+        allow update: if false;
+      }
+      // pedido de categoria (o administrador aprova ao definir catOf no grupo)
+      match /catReqs/{cid} {
+        allow read: if signedIn() && (cid == request.auth.uid || isGAdmin(gid));
+        allow create, update: if signedIn() && cid == request.auth.uid && request.auth.uid in grpData(gid).members
+                              && request.resource.data.keys().hasOnly(['cat', 'name', 'at'])
+                              && request.resource.data.cat is string && request.resource.data.name.size() <= 80;
+        allow delete: if signedIn() && (cid == request.auth.uid || isGAdmin(gid));
+      }
+      // duplas fixas do ranking de duplas: um convida (ok=false), o parceiro aceita (ok=true); qualquer um dos dois ou o admin desfaz
+      match /teams/{tid} {
+        allow read: if signedIn() && (request.auth.uid in grpData(gid).members || grpData(gid).listed == true);
+        allow create: if signedIn() && request.resource.data.keys().hasOnly(['cat', 'a', 'b', 'names', 'ok', 'by', 'at', 'okAt'])
+                      && request.resource.data.cat is string && request.resource.data.a is string && request.resource.data.b is string
+                      && request.resource.data.a < request.resource.data.b
+                      && tid == request.resource.data.cat + '_' + request.resource.data.a + '_' + request.resource.data.b
+                      && request.resource.data.a in grpData(gid).members && request.resource.data.b in grpData(gid).members
+                      && request.resource.data.by == request.auth.uid && request.resource.data.names.size() <= 2
+                      && ((request.auth.uid in [request.resource.data.a, request.resource.data.b] && request.resource.data.ok == false) || isGAdmin(gid));
+        // aceitar: só o convidado (quem não criou), só ok/okAt
+        allow update: if signedIn() && request.auth.uid in [resource.data.a, resource.data.b] && request.auth.uid != resource.data.by
+                      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ok', 'okAt']) && request.resource.data.ok == true;
+        allow delete: if signedIn() && (request.auth.uid in [resource.data.a, resource.data.b] || isGAdmin(gid));
+      }
+      // rodadas sorteadas pelo administrador (modo "rodadas" do ranking)
+      match /rounds/{rid} {
+        allow read: if signedIn() && (request.auth.uid in grpData(gid).members || grpData(gid).listed == true);
+        allow create: if signedIn() && isGAdmin(gid)
+                      && request.resource.data.keys().hasOnly(['cat', 'season', 'n', 'at', 'due', 'k', 'pairs', 'byes', 'by'])
+                      && request.resource.data.by == request.auth.uid
+                      && request.resource.data.cat is string && request.resource.data.n is int && request.resource.data.n >= 1
+                      && request.resource.data.k in [1, 2, 3]
+                      && request.resource.data.pairs is list && request.resource.data.pairs.size() <= 300
+                      && request.resource.data.byes is list && request.resource.data.byes.size() <= 300;
+        allow delete: if signedIn() && isGAdmin(gid);
+        allow update: if false;
+      }
+      // classificação final de cada temporada encerrada (histórico)
+      match /seasons/{sid} {
+        allow read: if signedIn() && (request.auth.uid in grpData(gid).members || grpData(gid).listed == true);
+        allow create: if signedIn() && isGAdmin(gid) && request.resource.data.rows.size() <= 30;
+        allow update, delete: if false;
+      }
+      // torneios do grupo (somente administradores criam; jogadores se inscrevem e lançam resultado)
+      match /tournaments/{tid} {
+        allow read: if signedIn() && (request.auth.uid in grpData(gid).members || grpData(gid).listed == true);
+        allow create, update: if signedIn() && isGAdmin(gid) && tourOk();
+        allow delete: if signedIn() && isGAdmin(gid);
+        match /entries/{eid} {
+          allow read: if signedIn() && (request.auth.uid in grpData(gid).members || grpData(gid).listed == true);
+          allow create: if signedIn() && eid == request.auth.uid && request.auth.uid in grpData(gid).members
+                        && request.resource.data.keys().hasOnly(['uid', 'name', 'st', 'paid', 'at', 'p', 'pn', 'pok'])
+                        && request.resource.data.uid == request.auth.uid && request.resource.data.paid == false
+                        && (request.resource.data.get('p', '') == '' || (request.resource.data.p in grpData(gid).members && request.resource.data.p != request.auth.uid
+                            && request.resource.data.pok == false && request.resource.data.get('pn', '').size() <= 80))
+                        && request.resource.data.name.size() <= 80
+                        && tourDoc(gid, tid).status == 'enroll'
+                        && (tourDoc(gid, tid).cat == '' || grpData(gid).get('catOf', {}).get(request.auth.uid, '') == tourDoc(gid, tid).cat)
+                        && (request.resource.data.st == 'req' || (request.resource.data.st == 'ok' && tourDoc(gid, tid).get('auto', false) == true && tourDoc(gid, tid).fee == 0));
+          // dupla: o parceiro convidado aceita (só pok -> true) ou recusa/sai (apaga)
+          allow update: if signedIn() && (isGAdmin(gid) || (request.auth.uid == resource.data.get('p', '') && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pok']) && request.resource.data.pok == true));
+          allow delete: if signedIn() && (isGAdmin(gid) || ((eid == request.auth.uid || request.auth.uid == resource.data.get('p', '')) && tourDoc(gid, tid).status == 'enroll'));
+        }
+        match /matches/{mid} {
+          allow read: if signedIn() && (request.auth.uid in grpData(gid).members || grpData(gid).listed == true);
+          allow create, delete: if signedIn() && isGAdmin(gid);
+          allow update: if signedIn() && (isGAdmin(gid) || (request.auth.uid in grpData(gid).members && matchPlayerOk()));
+        }
+      }
+      match /joins/{jid} {
+        allow read: if signedIn() && jid == request.auth.uid;
+        allow create: if signedIn() && jid == request.auth.uid && request.resource.data.code == grpData(gid).code;
+        allow delete: if signedIn() && jid == request.auth.uid;
+      }
+    }
+    function tourDoc(gid, tid) { return get(/databases/$(database)/documents/groups/$(gid)/tournaments/$(tid)).data; }
+    function tourOk() {
+      let r = request.resource.data;
+      return r.keys().hasOnly(['name', 'cat', 'catName', 'start', 'time', 'end', 'venue', 'fee', 'cur', 'pay', 'auto', 'max', 'status', 'size', 'createdBy', 'createdAt', 'mode', 'champ', 'kind', 'p3', 'vice', 'third'])
+          && r.get('kind', 'singles') in ['singles', 'doubles']
+          && r.name is string && r.name.size() >= 2 && r.name.size() <= 80
+          && r.status in ['enroll', 'run', 'done'] && r.fee is number && r.fee >= 0 && r.max in [8, 16, 32]
+          && r.get('venue', '').size() <= 80 && r.get('pay', '').size() <= 120;
+    }
+    // jogador (não administrador): propor, confirmar ou contestar resultado; nunca altera jogo já confirmado
+    function matchPlayerOk() {
+      let r = request.resource.data;
+      let o = resource.data;
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['sets', 'prop', 'ok', 'win', 'wo', 'mid', 'src'])
+          && request.resource.data.get('src', '') in ['', 'placar']
+          && request.resource.data.get('mid', '') is string && request.resource.data.get('mid', '').size() <= 40
+          && o.get('ok', false) == false
+          && (
+            (r.ok == false && r.prop == request.auth.uid && r.sets.size() >= 1 && r.sets.size() <= 3)
+            || (r.ok == true && o.get('prop', '') != '' && o.prop != request.auth.uid && r.prop == o.prop && r.sets == o.sets && r.win == o.win)
+            || (r.ok == false && r.prop == '' && r.sets.size() == 0)
+          );
+    }
+    // resultado lançado pelo administrador (vale sem confirmação): só membros do grupo, placar ou W.O.
+    function adminResOk(gid) {
+      let r = request.resource.data;
+      return r.keys().hasOnly(['gid', 'sets', 'sideOf', 'at', 'names', 'cat', 'season', 'src', 'by', 'wo'])
+          && r.src == 'admin' && r.by == request.auth.uid && r.gid == gid
+          && r.sideOf is map && r.sideOf.size() >= 2 && r.sideOf.size() <= 4
+          && r.sideOf.keys().toSet().difference(grpData(gid).members.toSet()).size() == 0
+          && r.sets is list && r.sets.size() <= 5 && r.names.size() <= 4 && r.at is int
+          && (r.get('wo', null) == null || r.wo in [0, 1]) && (r.sets.size() > 0 || r.get('wo', null) != null);
+    }
+    function resultOk(gid, rid) {
+      let g = get(/databases/$(database)/documents/games/$(rid)).data;
+      let r = request.resource.data;
+      return g.get('groupId', '') == gid && g.status == 'finished' && g.get('resultSrc', '') == 'manual'
+          && g.manual.status == 'confirmed' && request.auth.uid in g.accepted
+          && r.keys().hasOnly(['gid', 'sets', 'sideOf', 'at', 'names', 'cat', 'season'])
+          && r.get('cat', '') == g.get('catId', '') && r.get('season', 0) == g.get('season', 0)
+          && r.gid == gid && r.sets == g.manual.sets && r.sideOf == g.manual.sideOf && r.at == g.finishedAt
+          && r.names.size() <= 4;
+    }
+    // adiciona só o próprio uid (e o próprio nome)
+    function joinOnly() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members', 'memberNames'])
+          && request.resource.data.members.toSet().difference(resource.data.members.toSet()).hasOnly([request.auth.uid])
+          && resource.data.members.toSet().difference(request.resource.data.members.toSet()).size() == 0
+          && request.resource.data.members.size() <= 300;
+    }
+    function addOne() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members', 'memberNames'])
+          && request.resource.data.members.toSet().difference(resource.data.members.toSet()).size() == 1
+          && resource.data.members.toSet().difference(request.resource.data.members.toSet()).size() == 0
+          && request.resource.data.members.size() <= 300;
+    }
+    // código de convite: só leitura direta (get), nunca listagem
+    match /groupCodes/{code} {
+      allow get: if signedIn();
+      allow create: if signedIn() && !exists(/databases/$(database)/documents/groupCodes/$(code))
+                    && request.resource.data.gid is string && isGAdmin(request.resource.data.gid)
+                    && grpData(request.resource.data.gid).code == code;
+      allow update: if signedIn() && isGAdmin(resource.data.gid) && request.resource.data.gid == resource.data.gid;
+      allow delete: if signedIn() && isGAdmin(resource.data.gid);
+    }
+
+    // seguir (Beta 5.14): só afeta ranking e filtro; não concede acesso a nada
+    match /follows/{id} {
+      allow read: if signedIn() && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
+      allow create: if signedIn() && request.resource.data.from == request.auth.uid
+                    && request.resource.data.to is string && request.resource.data.to != request.auth.uid
+                    && id == request.auth.uid + '_' + request.resource.data.to
+                    && request.resource.data.get('toName', '').size() <= 80;
+      allow delete: if signedIn() && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);   // 7.9: quem é seguido pode apagar ao excluir a conta
+    }
+
+    // feed de partidas: autor + audience (lista de uids que podem ver)
+    function postData(pid) { return get(/databases/$(database)/documents/posts/$(pid)).data; }
+    function canSee(pid) { return postData(pid).authorUid == request.auth.uid || request.auth.uid in postData(pid).audience || postData(pid).vis == 'public'; }
+    match /posts/{id} {
+      allow read: if signedIn() && (resource.data.authorUid == request.auth.uid || request.auth.uid in resource.data.audience || resource.data.vis == 'public');
+      allow create: if signedIn() && request.resource.data.authorUid == request.auth.uid
+                    && (request.resource.data.gameId == ''
+                        ? (request.resource.data.vis in ['friends', 'public'] && (request.resource.data.hasPhoto == true || request.resource.data.caption.size() > 0))
+                        : id == request.resource.data.gameId + '_' + request.auth.uid)
+                    && request.resource.data.vis in ['friends', 'players', 'public']
+                    && (request.resource.data.vis != 'public' || (request.resource.data.get('pubDay', '') is string && request.resource.data.get('pubDay', '').size() == 10))
+                    && request.resource.data.audience.size() <= 400
+                    && request.resource.data.get('tags', []).size() <= 10
+                    && request.resource.data.place.size() <= 80
+                    && request.resource.data.caption.size() <= 280
+                    && request.resource.data.result.size() <= 160
+                    && request.resource.data.likes.size() == 0 && request.resource.data.cN == 0;
+      allow update: if signedIn() && (
+                    (resource.data.authorUid == request.auth.uid && request.resource.data.authorUid == resource.data.authorUid
+                      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['caption', 'vis', 'audience', 'hasPhoto'])
+                      && request.resource.data.caption.size() <= 280 && request.resource.data.audience.size() <= 400)
+                    || (request.auth.uid in resource.data.get('tags', [])
+                      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tags'])
+                      && resource.data.tags.toSet().difference(request.resource.data.tags.toSet()).hasOnly([request.auth.uid])
+                      && request.resource.data.tags.toSet().difference(resource.data.tags.toSet()).size() == 0)
+                    || ((resource.data.authorUid == request.auth.uid || request.auth.uid in resource.data.audience || resource.data.vis == 'public')
+                      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes'])
+                      && request.resource.data.likes.size() <= 400
+                      && request.resource.data.likes.toSet().difference(resource.data.likes.toSet()).hasOnly([request.auth.uid])
+                      && resource.data.likes.toSet().difference(request.resource.data.likes.toSet()).hasOnly([request.auth.uid]))
+                    || ((resource.data.authorUid == request.auth.uid || request.auth.uid in resource.data.audience || resource.data.vis == 'public')
+                      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['cN'])
+                      && request.resource.data.cN == resource.data.cN + 1)
+                    || ((resource.data.authorUid == request.auth.uid || request.auth.uid in resource.data.audience || resource.data.vis == 'public')
+                      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reporters'])
+                      && request.resource.data.reporters.size() <= 50
+                      && request.resource.data.reporters.toSet().difference(resource.data.get('reporters', []).toSet()).hasOnly([request.auth.uid])
+                      && resource.data.get('reporters', []).toSet().difference(request.resource.data.reporters.toSet()).size() == 0));
+      allow delete: if signedIn() && resource.data.authorUid == request.auth.uid;
+      match /media/{m} {
+        allow read: if signedIn() && canSee(id);
+        allow create, update: if signedIn() && postData(id).authorUid == request.auth.uid
+                              && request.resource.data.data is string && request.resource.data.data.size() <= 250000;
+        allow delete: if signedIn() && postData(id).authorUid == request.auth.uid;
+      }
+      match /comments/{cid} {
+        allow read: if signedIn() && canSee(id);
+        allow create: if signedIn() && canSee(id)
+                      && request.resource.data.from == request.auth.uid
+                      && !exists(/databases/$(database)/documents/users/$(postData(id).authorUid)/blocks/$(request.auth.uid))
+                      && request.resource.data.keys().hasOnly(['from', 'name', 'text', 'at'])
+                      && request.resource.data.text is string
+                      && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 200
+                      && request.resource.data.at is number;
+        // 7.9: o autor do comentário ou o autor da publicação podem apagar (excluir conta / apagar post)
+        allow delete: if signedIn() && (resource.data.from == request.auth.uid || postData(id).authorUid == request.auth.uid);
+      }
+    }
+
+    // Beta 7.8 — telemetria de uso: só contagens por dia (shared/telemetry.js). Só a equipe lê (painel/, Beta 7.10).
+    // id = {uid}_{AAAAMMDD} (com login) ou a_{16 letras do aparelho}_{AAAAMMDD} (sem login). Lista fechada de contadores.
+    function telKeys() { return ['p_open', 'p_start', 'p_doubles', 'p_warm', 'p_rest', 'p_limit', 'p_voice', 'p_preset', 'p_from_game', 'p_end', 'p_min', 'p_dur_n', 'p_end_tb', 'p_end_now', 'p_later', 'p_abandon', 'p_resume', 'p_pt_screen', 'p_pt_band', 'p_ace_screen', 'p_ace_band', 'p_undo', 'p_hist', 'p_hist_filter', 'p_sum', 'p_prof', 'p_stats', 'p_share', 'p_sh_rede', 'p_sh_ig', 'p_sh_apps', 'p_sh_copy', 'p_sh_save', 'p_band_conn', 'p_settings', 'p_login', 'r_open', 'r_tab_feed', 'r_tab_find', 'r_tab_neu', 'r_tab_groups', 'r_tab_notif', 'r_game_new', 'r_game_accept', 'r_post', 'r_post_photo', 'r_like', 'r_comment', 'r_msg', 'r_follow', 'r_group_new', 'r_group_join', 'r_result', 'r_tour_new', 'r_tour_join', 'r_settings']; }
+    function telShape(id) {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['d', 'v', 'anon', 'plat', 'build', 'lang', 'c'])
+        && d.d is string && d.d.matches('^[0-9]{8}$') && id.matches('^.+_' + d.d + '$')
+        && d.v == 1 && d.anon is bool
+        && d.plat is string && d.plat.size() <= 12 && d.build is string && d.build.size() <= 12 && d.lang is string && d.lang.size() <= 8
+        && d.c is map && d.c.size() <= 80 && d.c.keys().hasOnly(telKeys());
+    }
+    function telWho(id) {
+      return (request.auth != null && id.matches('^' + request.auth.uid + '_[0-9]{8}$') && request.resource.data.anon == false)
+        || (id.matches('^a_[A-Za-z0-9]{16}_[0-9]{8}$') && request.resource.data.anon == true);
+    }
+    // Beta 7.10 — equipe: documento staff/{uid} criado à mão no Console (o app nunca escreve). Dá acesso ao painel "Uso do app".
+    function isStaff() { return request.auth != null && exists(/databases/$(database)/documents/staff/$(request.auth.uid)); }
+    match /staff/{uid} {
+      allow get: if request.auth != null && request.auth.uid == uid;
+      allow list, write: if false;
+    }
+    match /telemetry/{id} {
+      allow read: if isStaff();   // 7.10: só a equipe, pelo painel/
+      allow delete: if request.auth != null && id.matches('^' + request.auth.uid + '_[0-9]{8}$');   // 7.9: excluir conta
+      allow create: if telWho(id) && telShape(id);
+      allow update: if telWho(id) && telShape(id) && request.resource.data.d == resource.data.d;
+    }
+
+    // Beta 7.9 — Fale conosco: qualquer pessoa (com ou sem login) envia; ninguém lê pelo app (só o console / extensão de e-mail).
+    match /contact/{id} {
+      allow read, update, delete: if false;
+      allow create: if request.resource.data.keys().hasOnly(['topic', 'msg', 'email', 'uid', 'name', 'lang', 'build', 'plat', 'at'])
+        && request.resource.data.topic in ['duvida', 'problema', 'sugestao', 'privacidade', 'excluir', 'denuncia', 'outro']
+        && request.resource.data.msg is string && request.resource.data.msg.size() >= 10 && request.resource.data.msg.size() <= 2000
+        && request.resource.data.email is string && request.resource.data.email.size() <= 120
+        && (request.auth == null ? request.resource.data.uid == null : request.resource.data.uid == request.auth.uid)
+        && request.resource.data.name is string && request.resource.data.name.size() <= 80
+        && request.resource.data.lang is string && request.resource.data.lang.size() <= 8
+        && request.resource.data.build is string && request.resource.data.build.size() <= 12
+        && request.resource.data.plat is string && request.resource.data.plat.size() <= 12
+        && request.resource.data.at == request.time;
+    }
+    // Beta 7.9 — registro de exclusão de conta (o que o app não conseguiu apagar fica em "manual" para a equipe concluir).
+    match /deletions/{uid} {
+      allow read, delete: if false;
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['uid', 'email', 'at', 'ok', 'manual', 'errs'])
+        && request.resource.data.uid == uid && request.resource.data.email is string && request.resource.data.email.size() <= 120
+        && request.resource.data.ok is bool && request.resource.data.manual is list && request.resource.data.manual.size() <= 50
+        && request.resource.data.errs is list && request.resource.data.errs.size() <= 50 && request.resource.data.at == request.time;
+    }
+  }
+}

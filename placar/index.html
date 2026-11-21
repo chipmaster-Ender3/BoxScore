@@ -1033,7 +1033,7 @@ html.nfy .bar { padding-right: max(230px, env(safe-area-inset-right, 0px)); }
       <div class="actions"><button class="btn" type="button" id="sManage">Gerenciar dados salvos</button></div>
       <label class="check srow"><span class="sic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><input type="checkbox" id="sTel"> Enviar estatísticas de uso</label>
       <span class="hint" id="sTelHint">Só contagens anônimas de uso dos recursos (ex.: quantas partidas, se usou a pulseira), para melhorar o app. Nunca nomes, placares, mensagens, fotos ou local.</span>
-      <p class="note" id="verNote">BoxScore Beta 7.30 · Placar 4.40.0</p>
+      <p class="note" id="verNote">BoxScore Beta 7.31 · Placar 4.41.0</p>
     </div>
     <div class="actions"><button class="btn primary" type="button" data-close>Pronto</button></div>
   </div>
@@ -2054,9 +2054,10 @@ try { I18N.applyDom(); } catch (e) {}
 
   /* ---------- exibição ---------- */
   function setText(r) {
-    if (r.kind === 'super') return '[' + r.tb[0] + '-' + r.tb[1] + ']';
-    if (r.tb) return r.games[0] + '-' + r.games[1] + '(' + Math.min(r.tb[0], r.tb[1]) + ')';
-    return r.games[0] + '-' + r.games[1];
+    var n = function (x) { return +x | 0; }, g = r.games || [0, 0];   // 7.31: só números (partida importada pode vir adulterada)
+    if (r.kind === 'super' && r.tb) return '[' + n(r.tb[0]) + '-' + n(r.tb[1]) + ']';
+    if (r.tb) return n(g[0]) + '-' + n(g[1]) + '(' + Math.min(n(r.tb[0]), n(r.tb[1])) + ')';
+    return n(g[0]) + '-' + n(g[1]);
   }
 
   function initials(n) { return String(n || '?').trim().charAt(0) || '?'; }
@@ -4817,7 +4818,7 @@ try { I18N.applyDom(); } catch (e) {}
     b.disabled = true; err.textContent = '';
     var doc = { topic: $('ctTopic').value, msg: msg.slice(0, 2000), email: em.slice(0, 120), uid: sy.user ? sy.user.uid : null,
       name: String((P.sync.acct && P.sync.acct.name) || '').slice(0, 80), lang: String(P.settings.lang || 'pt-BR').slice(0, 8),
-      build: '7.30', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
+      build: '7.31', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
     sy.db.collection('contact').add(doc).then(function () {
       b.disabled = false; $('ctMsg').value = ''; closeSheets(); showToast(T("Mensagem enviada. Obrigado! Responderemos pelo e-mail informado."));
     }, function (e) { b.disabled = false; err.textContent = Tf("Não foi possível enviar ({0}). Tente de novo.", (e && e.code) || T("erro")); });
@@ -5054,46 +5055,103 @@ try { I18N.applyDom(); } catch (e) {}
       sy.links.forEach(function (l) { if (l.status === 'accepted') sy.friends[linkOther(l)] = l; });
     });
   }
+  // 7.31 (segurança): partida vinda de outra conta é limpa antes de entrar no histórico
+  var SH_BAD = { __proto__: 1, constructor: 1, prototype: 1 };
+  function shClean(v, dep) {
+    if (dep > 8) return null;
+    if (typeof v === 'string') return v.replace(/[<>"`]/g, '').slice(0, 2000);
+    if (typeof v === 'number') return isFinite(v) ? v : 0;
+    if (typeof v === 'boolean' || v === null) return v;
+    if (Array.isArray(v)) return v.slice(0, 5000).map(function (x) { return shClean(x, dep + 1); });
+    if (typeof v === 'object') { var o = {}; Object.keys(v).forEach(function (k) { if (!SH_BAD[k] && !/^__/.test(k) && k.length <= 40) o[k] = shClean(v[k], dep + 1); }); return o; }
+    return null;
+  }
+  function shNum(x) { x = +x; return isFinite(x) ? x : 0; }
+  function shSet(r) {
+    if (!r || typeof r !== 'object') return null;
+    var o = { games: [shNum((r.games || [])[0]) | 0, shNum((r.games || [])[1]) | 0] };
+    if (r.kind === 'super') o.kind = 'super';
+    if (r.tb) o.tb = [shNum(r.tb[0]) | 0, shNum(r.tb[1]) | 0];
+    Object.keys(r).forEach(function (k) { if (!(k in o) && k !== 'kind' && k !== 'tb' && k !== 'games') o[k] = r[k]; });
+    return o;
+  }
   function importShared(d) {
-    var e; try { e = JSON.parse(d.json); } catch (x) { return false; }
+    var e; try { e = shClean(JSON.parse(d.json), 0); } catch (x) { return false; }
+    if (!e || typeof e !== 'object' || Array.isArray(e) || typeof d.id !== 'string') return false;
+    e.id = d.id;
+    var idx = -1; P.history.forEach(function (x, k) { if (x.id === e.id) idx = k; });
+    if (idx >= 0 && P.history[idx].sharedFrom !== d.owner) return false;   // nunca sobrescreve partida minha ou de outra pessoa
+    e.sets = Array.isArray(e.sets) ? e.sets.map(shSet).filter(Boolean) : [];
+    if (e.winner !== null && e.winner !== undefined) e.winner = e.winner === 1 ? 1 : e.winner === 0 ? 0 : null;
+    if (Array.isArray(e.setsWon)) e.setsWon = [shNum(e.setsWon[0]) | 0, shNum(e.setsWon[1]) | 0];
+    ['startedAt', 'playStart', 'endedAt'].forEach(function (k) { if (k in e) e[k] = shNum(e[k]); });
     var mp = me();
     if (!mp) { mp = newPlayer((sy.user.displayName || T("Eu")), 'me'); P.meId = mp.id; mp.linkedUserId = myUid(); }
     var pids = [[], []], players = [[], []];
-    (d.slots || []).forEach(function (s) {
-      var pl;
-      if (s.uid === myUid()) pl = mp;
-      else if (s.uid) { pl = playerByUid(s.uid); if (!pl) { pl = newPlayer(s.name, 'user'); pl.linkedUserId = s.uid; } }
-      else pl = findByName(s.name) || newPlayer(s.name, 'guest');
+    (Array.isArray(d.slots) ? d.slots.slice(0, 4) : []).forEach(function (s) {
+      if (!s || (s.team !== 0 && s.team !== 1) || (s.pos !== 0 && s.pos !== 1)) return;
+      var nm = shClean(String(s.name || ''), 0).slice(0, 60), uid = typeof s.uid === 'string' ? s.uid : null, pl;
+      if (uid === myUid()) pl = mp;
+      else if (uid) { pl = playerByUid(uid); if (!pl) { pl = newPlayer(nm, 'user'); pl.linkedUserId = uid; } }
+      else pl = findByName(nm) || newPlayer(nm, 'guest');
       pids[s.team][s.pos] = pl.id; players[s.team][s.pos] = pl.name;
     });
     e.pids = pids; e.players = players; e.names = players.map(teamName);
-    e.sharedFrom = d.owner; e.sharedFromName = d.ownerName || ''; e.ownerId = P.meId; e.resume = null; e.updatedAt = d.updatedAt;
-    var idx = -1; P.history.forEach(function (x, k) { if (x.id === e.id) idx = k; });
+    e.sharedFrom = d.owner; e.sharedFromName = shClean(String(d.ownerName || ''), 0).slice(0, 80); e.ownerId = P.meId; e.resume = null; e.updatedAt = shNum(d.updatedAt);
     if (idx >= 0) P.history[idx] = e; else P.history.push(e);
-    P.sync.impK[e.id] = d.updatedAt;
+    P.sync.impK[e.id] = e.updatedAt;
     return true;
+  }
+  // 7.31: aceite automático só quando dá para comprovar no servidor que jogamos juntos (amigo, mesmo jogo da Rede ou mesma partida de torneio)
+  function sharedProof(d) {
+    if (sy.friends && sy.friends[d.owner]) return Promise.resolve(true);
+    var me_ = myUid(), gid = d.gameId, tr = d.tour;
+    if (!gid || !tr) { try { var j = JSON.parse(d.json); gid = gid || (typeof j.gameId === 'string' ? j.gameId : ''); tr = tr || j.tour; } catch (x) {} }
+    if (gid && typeof gid === 'string') return sy.db.collection('games').doc(gid).get().then(function (g) {
+      if (!g.exists) return false; g = g.data(); var acc = g.accepted || [];
+      return acc.indexOf(me_) >= 0 && (g.hostUid === d.owner || acc.indexOf(d.owner) >= 0);
+    }).catch(function () { return false; });
+    if (tr && typeof tr.gid === 'string' && typeof tr.tid === 'string' && typeof tr.mid === 'string') return sy.db.collection('groups').doc(tr.gid).collection('tournaments').doc(tr.tid).collection('matches').doc(tr.mid).get().then(function (m) {
+      if (!m.exists) return false; m = m.data();
+      if (m.mid !== d.id || m.prop !== d.owner) return false;
+      var us = [].concat((m.a && (m.a.us || [m.a.uid])) || [], (m.b && (m.b.us || [m.b.uid])) || []);
+      return m.r !== 1 || us.indexOf(me_) >= 0;
+    }).catch(function () { return false; });
+    return Promise.resolve(false);
   }
   function pullShared() {
     return sy.db.collection('shared').where('participants', 'array-contains', myUid()).get().then(function (snap) {
-      var S = P.sync, changed = false; sy.pendingShared = [];
-      snap.docs.forEach(function (doc) {
-        var d = doc.data(); if (d.owner === myUid()) return;
-        var resp = (d.responses || {})[myUid()], idx = -1;
-        P.history.forEach(function (x, k) { if (x.id === d.id) idx = k; });
-        if (d.deleted) { if (idx >= 0 && P.history[idx].sharedFrom) { P.history.splice(idx, 1); changed = true; } delete S.impK[d.id]; return; }
-        if (resp === 'pending') { sy.pendingShared.push(d); return; }
-        if (resp !== 'accepted') return;
+      var S = P.sync, changed = false, me_ = myUid(), waits = []; sy.pendingShared = [];
+      function take(d, idx) {
         if (S.impK[d.id]) { if (idx < 0) return; if (S.impK[d.id] >= d.updatedAt) return; }     // apaguei do meu histórico: o "ocultar" vai para a nuvem
         if (importShared(d)) {
           changed = true;
           var ie = P.history.filter(function (x) { return x.id === d.id; })[0];   // chegou a partida completa: sai a cópia manual do mesmo jogo
           if (ie && ie.gameId) P.history = P.history.filter(function (x) { return !(x.manual && x.gameId === ie.gameId && x.id !== ie.id); });
         }
-      });
-      if (changed) {
-        P.history.sort(function (a, b) { return (b.playStart || b.startedAt || 0) - (a.playStart || a.startedAt || 0); });
-        try { render(); if (!$('shHist').hidden) renderHistory(); } catch (e) {}
       }
+      snap.docs.forEach(function (doc) {
+        var d = doc.data(); if (d.owner === me_ || typeof d.owner !== 'string') return;
+        d.id = doc.id;
+        var resp = (d.responses || {})[me_], idx = -1;
+        P.history.forEach(function (x, k) { if (x.id === d.id) idx = k; });
+        if (d.deleted) { if (idx >= 0 && P.history[idx].sharedFrom === d.owner) { P.history.splice(idx, 1); changed = true; } delete S.impK[d.id]; return; }
+        if (resp === 'accepted') { take(d, idx); return; }
+        if (resp !== undefined && resp !== 'pending') return;            // recusada ou ocultada
+        var pk = d.id + ':' + d.updatedAt; sy.proofNo = sy.proofNo || {};
+        if (sy.proofNo[pk] && !(sy.friends && sy.friends[d.owner])) { sy.pendingShared.push(d); return; }
+        waits.push(sharedProof(d).then(function (ok) {
+          if (!ok) { sy.proofNo[pk] = 1; sy.pendingShared.push(d); return; }
+          var r = {}; r[me_] = 'accepted';
+          return sy.db.collection('shared').doc(d.id).set({ responses: r }, { merge: true }).then(function () { take(d, idx); }, function () { sy.pendingShared.push(d); });
+        }));
+      });
+      return Promise.all(waits).then(function () {
+        if (changed) {
+          P.history.sort(function (a, b) { return (b.playStart || b.startedAt || 0) - (a.playStart || a.startedAt || 0); });
+          try { render(); if (!$('shHist').hidden) renderHistory(); } catch (e) {}
+        }
+      });
     });
   }
   // Beta 5.12: resultado lançado à mão (e confirmado) num jogo da Rede entra no histórico, sem estatística de pontos
@@ -5162,7 +5220,9 @@ try { I18N.applyDom(); } catch (e) {}
         var pub = JSON.parse(JSON.stringify(e)); pub.resume = null; pub.ownerId = null; pub.deviceId = null; var v1 = toV1(e);
         var data = { id: e.id, owner: me_, ownerName: (me() && me().name) || (sy.user.displayName || ''), participants: [me_].concat(t), updatedAt: ts(e), deleted: false, json: JSON.stringify(pub), slots: slots, summary: e.names.join(' x ') + ' · ' + setsLine(e) };
         if (v1) data.v1 = v1;
-        if (done === undefined) { data.responses = {}; data.responses[me_] = 'accepted'; t.forEach(function (u) { data.responses[u] = sy.friends && sy.friends[u] ? 'accepted' : 'pending'; }); }
+        if (e.gameId) data.gameId = String(e.gameId);
+        if (e.tour && e.tour.gid && e.tour.tid && e.tour.mid) data.tour = { gid: String(e.tour.gid), tid: String(e.tour.tid), mid: String(e.tour.mid) };
+        if (done === undefined) { data.responses = {}; data.responses[me_] = 'accepted'; }   // 7.31: cada um grava só a própria resposta
         ops.push({ ref: ref, data: data, opts: { merge: true }, done: function () { S.shK[e.id] = ts(e); } });
       }
     });
@@ -5223,15 +5283,11 @@ try { I18N.applyDom(); } catch (e) {}
             if (g.status === 'finished' || (g.manual && g.manual.status !== 'contested')) { done(); return; }
             var mm = placarManual(e, g);
             if (!mm) { done(); return; }              // não deu para montar (jogador sem conta no jogo): fica para lançar à mão na Rede
-            var rs0 = {}; (g.accepted || []).forEach(function (u) { if (u !== me_) rs0[u] = 'accepted'; });
             var jobs0 = [gref.update({ manual: mm, updatedAt: Date.now() })];
-            if (Object.keys(rs0).length && P.sync.shK[e.id] > 0) jobs0.push(sy.db.collection('shared').doc(e.id).set({ responses: rs0 }, { merge: true }).catch(function () {}));
             return Promise.all(jobs0).then(function () { done(); showToast(T("Resultado enviado ao ranking do grupo. Falta o adversário confirmar na Rede.")); });
           }
           var sum = (e.names || []).join(' x ') + ' · ' + setsLine(e), now = Date.now();
           var jobs = [gref.update({ status: 'finished', matchId: e.id, result: sum.slice(0, 160), finishedAt: e.endedAt || now, updatedAt: now })];
-          var rs = {}; (g.accepted || []).forEach(function (u) { if (u !== me_) rs[u] = 'accepted'; });
-          if (Object.keys(rs).length && P.sync.shK[e.id] > 0) jobs.push(sy.db.collection('shared').doc(e.id).set({ responses: rs }, { merge: true }).catch(function () {}));
           return Promise.all(jobs).then(done);
         }).catch(function (x) { var c = x && x.code || ''; if (/permission-denied|not-found/.test(c)) done(); });
       });
@@ -5259,7 +5315,6 @@ try { I18N.applyDom(); } catch (e) {}
           if (!sets.length || sets.length > 3 || sets.some(function (x) { return x.a === x.b || x.a > 99 || x.b > 99; })) { done(); return; }
           var wa = sets.filter(function (x) { return x.a > x.b; }).length, wb = sets.length - wa; if (wa === wb) { done(); return; }
           var jobs = [mref.update({ sets: sets, prop: me_, ok: false, win: wa > wb ? a : b, wo: false, mid: e.id, src: 'placar' })];
-          var opp = aus.indexOf(me_) >= 0 ? b : a; if (P.sync.shK[e.id] > 0) { var rs = {}; aus.concat(bus).forEach(function (u) { if (u !== me_) rs[u] = 'accepted'; }); jobs.push(sy.db.collection('shared').doc(e.id).set({ responses: rs }, { merge: true }).catch(function () {})); }
           return Promise.all(jobs).then(function () { done(); showToast(T("Resultado enviado para a chave do torneio. Falta o adversário confirmar na Rede.")); });
         }).catch(function (x) { var c = x && x.code || ''; if (/permission-denied|not-found/.test(c)) done(); });
       });
@@ -5592,7 +5647,7 @@ try { I18N.applyDom(); } catch (e) {}
   // Beta 7.8: telemetria de uso (shared/telemetry.js) e versão da ponte do app nativo na linha de versão
   try {
     if (window.BXTel) {
-      BXTel.init({ module: 'placar', build: '7.30', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
+      BXTel.init({ module: 'placar', build: '7.31', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
       tel('p_open');
       $('sTel').checked = BXTel.isOn();
       $('sTel').addEventListener('change', function () { BXTel.setOn(this.checked); showToast(this.checked ? T("Estatísticas de uso ligadas. Obrigado!") : T("Estatísticas de uso desligadas.")); });
@@ -5623,7 +5678,8 @@ try { I18N.applyDom(); } catch (e) {}
       }).catch(function () {});
     }, 4000);
   } else $('fMods').hidden = true;
-  window.__placar = { pullManualGames: pullManualGames, toV1: toV1, swapSides: swapSides, openFriends: openFriends, doSearch: doSearch, showUserProfile: showUserProfile, useUser: useUser, friendAction: friendAction, pullSocial: pullSocial, statsFor: statsFor, profSig: profSig, syncNow: syncNow, dirtyCount: dirtyCount, sy: sy, onUser: onUser, planWarm: planWarm, spokenDur: spokenDur, get warm() { return G.meta.warm; }, openMatch: openMatch, get game() { return G; }, get P() { return P; }, statsFor: statsFor, renderProf: renderProf, saveField: saveField, point: point, undo: undo, ui: ui, analyze: analyze, h2h: h2h, openSummary: openSummary, drawCard: drawCard, alertInfo: alertInfo, gamesSeq: gamesSeq, applyCfg: applyCfg, curCfg: curCfg, decideWinner: decideWinner, openClose: openClose, resumeEntry: resumeEntry, limTick: limTick, startWarm: startWarm, restartWarm: restartWarm, saveLater: saveLater, closeMatch: closeMatch, startQuickTb: startQuickTb, openNew: openNew, startNew: startNew, entryFrom: entryFrom };   // facilita testes
+  var bxDbg = false; try { bxDbg = !!navigator.webdriver || localStorage.getItem("bxDebug") === "1"; } catch (x) {}
+  if (bxDbg) window.__placar = { pullManualGames: pullManualGames, toV1: toV1, swapSides: swapSides, openFriends: openFriends, doSearch: doSearch, showUserProfile: showUserProfile, useUser: useUser, friendAction: friendAction, pullSocial: pullSocial, statsFor: statsFor, profSig: profSig, syncNow: syncNow, dirtyCount: dirtyCount, sy: sy, onUser: onUser, planWarm: planWarm, spokenDur: spokenDur, get warm() { return G.meta.warm; }, openMatch: openMatch, get game() { return G; }, get P() { return P; }, statsFor: statsFor, renderProf: renderProf, saveField: saveField, point: point, undo: undo, ui: ui, analyze: analyze, h2h: h2h, openSummary: openSummary, drawCard: drawCard, alertInfo: alertInfo, gamesSeq: gamesSeq, applyCfg: applyCfg, curCfg: curCfg, decideWinner: decideWinner, openClose: openClose, resumeEntry: resumeEntry, limTick: limTick, startWarm: startWarm, restartWarm: restartWarm, saveLater: saveLater, closeMatch: closeMatch, startQuickTb: startQuickTb, openNew: openNew, startNew: startNew, entryFrom: entryFrom, sharedOps: sharedOps, importShared: importShared };   // facilita testes
 })();
 </script>
 
