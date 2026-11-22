@@ -1,9 +1,9 @@
-{"schema":1,"build":"7.49","modules":[
+{"schema":1,"build":"7.50","modules":[
 {"id":"shell","name":"Casca","version":"1.2.2","core":true,"hidden":true,"path":"","files":["./","index.html","manifest.webmanifest","icons/icon-192.png","icons/icon-512.png","icons/icon-maskable-512.png","fonts/fonts.css","fonts/BigShouldersDisplay-latin.woff2","fonts/BigShouldersDisplay-latin-ext.woff2","fonts/PublicSans-latin.woff2","fonts/PublicSans-latin-ext.woff2"]},
-{"id":"shared","name":"Compartilhado","version":"1.9.0","core":true,"hidden":true,"path":"shared/","files":["shared/engine.js","shared/live.js","shared/qr.js","shared/bgcore.js","shared/bgi18n.js","shared/modules.js","shared/match-v1.js","shared/profile-view.js","shared/telemetry.js","shared/heroes.js","shared/sharecard.js"]},
+{"id":"shared","name":"Compartilhado","version":"1.10.0","core":true,"hidden":true,"path":"shared/","files":["shared/engine.js","shared/live.js","shared/qr.js","shared/bgcore.js","shared/bgi18n.js","shared/modules.js","shared/match-v1.js","shared/profile-view.js","shared/telemetry.js","shared/heroes.js","shared/sharecard.js"]},
 {"id":"legal","name":"Privacidade e termos","version":"1.1.1","core":true,"hidden":true,"path":"legal/","files":["legal/privacidade.html","legal/termos.html","legal/excluir-conta.html","legal/config.js","legal/legal.js","legal/legal.css"]},
-{"id":"placar","name":"Placar","version":"4.53.0","core":true,"path":"placar/","files":["placar/","placar/index.html"]},
-{"id":"aovivo","name":"Ao vivo","version":"1.0.0","hidden":true,"path":"aovivo/","files":["aovivo/","aovivo/index.html"]},
+{"id":"placar","name":"Placar","version":"4.53.1","core":true,"path":"placar/","files":["placar/","placar/index.html"]},
+{"id":"aovivo","name":"Ao vivo","version":"1.1.0","hidden":true,"path":"aovivo/","files":["aovivo/","aovivo/index.html"]},
 {"id":"painel","name":"Uso do app","version":"1.0.6","hidden":true,"path":"painel/","files":["painel/","painel/index.html"]},
 {"id":"rede","name":"Comunidade","version":"0.55.0","path":"rede/","files":["rede/","rede/index.html"]},
 {"id":"clube","name":"Clube","version":"0.1.0","hidden":true,"path":"clube/","files":["clube/","clube/index.html"]}

@@ -173,13 +173,28 @@
      O mesmo formato que o Placar grava (ver shared/live.js). base = { owner, ownerName, ann, aud[], startedAt, endedAt }.
      Com a tela bloqueada, o nativo pede sessionLive() a cada ponto e grava pelo Firestore REST (o corpo já sai no formato REST). */
   var LIVE_MS = 6 * 3600e3, AFTER_MS = 3 * 3600e3;
+  // 7.50: números da partida a partir do registro ponto a ponto (o mesmo que o Placar usa nas estatísticas)
+  function liveStats(m) {
+    var L = m.plog, z = function () { return [0, 0]; }, st = { pts: z(), ace: z(), sp: z(), spw: z(), rp: z(), rpw: z(), bpO: z(), bpC: z() };
+    if (!L || !L.length) return { st: st, last: null };
+    L.forEach(function (x) {
+      var w = x[0], sv = x[1], rc = 1 - sv; if ((w !== 0 && w !== 1) || (sv !== 0 && sv !== 1)) return;
+      st.pts[w]++; st.sp[sv]++; st.rp[rc]++;
+      if (w === sv) { st.spw[sv]++; if (x[11]) st.ace[sv]++; } else st.rpw[rc]++;
+      if (x[7]) { st.bpO[rc]++; if (w === rc) st.bpC[rc]++; }
+    });
+    var l = L[L.length - 1];
+    return { st: st, last: { w: l[0], ace: !!l[11], n: L.length } };
+  }
   function liveDoc(base, G, now, ins) {
-    var s = G.state, m = G.meta, d = E().display(s), over = s.winner !== null, ended = over ? (base.endedAt || now) : 0;
+    var s = G.state, m = G.meta, d = E().display(s), over = s.winner !== null, ended = over ? (base.endedAt || now) : 0, ls = liveStats(m);
     return {
       owner: String(base.owner || ''), ownerName: String(base.ownerName || '').slice(0, 80), on: true, ann: !!base.ann,
       audience: base.ann ? (base.aud || []).slice(0, 400) : [], names: [String(m.names[0] || '').slice(0, 80), String(m.names[1] || '').slice(0, 80)],
       mode: s.cfg.mode === 'doubles' ? 'doubles' : 'singles', place: String(m.place || '').slice(0, 80),
-      sc: { sets: (s.sets || []).map(setText), g: s.games.slice(), p: over ? ['', ''] : [String(d.points[0]), String(d.points[1])], srv: over ? -1 : d.server, tb: !!d.tiebreak, w: over ? s.winner : -1, sw: s.setsWon.slice() },
+      sc: { sets: (s.sets || []).map(setText), g: s.games.slice(), p: over ? ['', ''] : [String(d.points[0]), String(d.points[1])], srv: over ? -1 : d.server, tb: !!d.tiebreak, w: over ? s.winner : -1, sw: s.setsWon.slice(),
+        st: ls.st, last: ls.last || { w: -1, ace: false, n: 0 } },
+      sport: 'tennis', surf: String(m.surface || '').slice(0, 20), playAt: m.playStart || m.startedAt || base.startedAt || now,
       ins: over ? (ins || []) : [], startedAt: base.startedAt || now, updatedAt: now, endedAt: ended,
       expAt: over ? ended + AFTER_MS : now + LIVE_MS
     };
