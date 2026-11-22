@@ -540,7 +540,7 @@ html.nfy .bar { padding-right: max(230px, env(safe-area-inset-right, 0px)); }
 .cmp-bar .a { background: var(--p1); }
 .cmp-bar .b { background: var(--p2); }
 .sumIns{margin:0 0 12px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--bg)}.sumInsH{display:flex;align-items:center;gap:8px;margin-bottom:6px}.sumInsH .ico{width:20px;height:20px}.sumIns ul{margin:0;padding-left:20px;font-size:14px;line-height:1.45}.sumIns li+li{margin-top:4px}.sumTip{margin:8px 0 0;padding-top:8px;border-top:1px dashed var(--line);font-size:14px;line-height:1.4;color:var(--muted)}.endIns{margin-top:12px;text-align:left}
-.tourFmt{grid-column:1/-1;margin:0 0 4px;padding:10px 12px;border-radius:12px;background:var(--bg);border:1px solid var(--line);color:var(--ink);font-weight:600}#shNew .seg button:disabled,#shNew input:disabled{opacity:.45;cursor:not-allowed}
+#shNew .seg button:disabled,#shNew input:disabled{opacity:.45;cursor:not-allowed}
 .liveTag{display:inline-flex;align-items:center;gap:6px;align-self:center;margin:0 auto 4px;padding:4px 10px;border-radius:999px;border:0;background:#D92D20;color:#fff;font:800 12px/1 var(--ui, system-ui);letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
 .liveTag i{width:8px;height:8px;border-radius:50%;background:#fff;animation:livePulse 1.4s ease-in-out infinite}.liveTag.ended{background:var(--muted)}.liveTag.ended i{animation:none}
 @keyframes livePulse{0%,100%{opacity:1}50%{opacity:.25}}
@@ -871,7 +871,7 @@ html.nfy .bar { padding-right: max(230px, env(safe-area-inset-right, 0px)); }
       </div>
       </div>
       <div class="npane" data-npane="fmt" hidden>
-      <p class="hint tourFmt" id="ngTourFmt" role="note" hidden></p>
+      <span class="hint" id="ngTourFmt" role="note" style="grid-column:1/-1" hidden></span>
       <div class="field pcard"><div class="ph"><span class="opt-ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6c3 2.5 3 10.3 0 12.8M18.4 5.6c-3 2.5-3 10.3 0 12.8"/></svg></span><span class="opt-t"><b>Partida</b></span></div>
         <div class="seg" data-key="bestOf"><button type="button" data-v="1">1 set</button><button type="button" data-v="3">Melhor de 3</button><button type="button" data-v="5">Melhor de 5</button></div>
       </div>
@@ -1072,7 +1072,7 @@ html.nfy .bar { padding-right: max(230px, env(safe-area-inset-right, 0px)); }
       <div class="actions"><button class="btn" type="button" id="sManage">Gerenciar dados salvos</button></div>
       <label class="check srow"><span class="sic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><input type="checkbox" id="sTel"> Enviar estatísticas de uso</label>
       <span class="hint" id="sTelHint">Só contagens anônimas de uso dos recursos (ex.: quantas partidas, se usou a pulseira), para melhorar o app. Nunca nomes, placares, mensagens, fotos ou local.</span>
-      <p class="note" id="verNote">BoxScore Beta 7.57 · Placar 4.56.0</p>
+      <p class="note" id="verNote">BoxScore Beta 7.58 · Placar 4.56.1</p>
     </div>
     <div class="actions"><button class="btn primary" type="button" data-close>Pronto</button></div>
   </div>
@@ -1746,7 +1746,7 @@ try { I18N.applyDom(); } catch (e) {}
       .sort(function (a, b) { return a[0] - b[0]; });
     var hh = function (t) { var d = new Date(t), z = function (n) { return (n < 10 ? '0' : '') + n; }; return z(d.getDate()) + '/' + z(d.getMonth() + 1) + ' ' + z(d.getHours()) + ':' + z(d.getMinutes()) + ':' + z(d.getSeconds()); };
     var ua = (navigator.userAgent || '').replace(/^.*?\(([^)]*)\).*$/, '$1');
-    return ['BoxScore 7.57 · ' + ua].concat(rows.map(function (r) {
+    return ['BoxScore 7.58 · ' + ua].concat(rows.map(function (r) {
       return hh(r[0]) + ' ' + r[1] + (r[1] === 'tick' ? ' x' + r[2] + ' até ' + hh(r[3]).slice(6) : (r[2] ? ' ' + r[2] : ''));
     })).join('\n');
   }
@@ -4947,7 +4947,7 @@ try { I18N.applyDom(); } catch (e) {}
     b.disabled = true; err.textContent = '';
     var doc = { topic: $('ctTopic').value, msg: msg.slice(0, 2000), email: em.slice(0, 120), uid: sy.user ? sy.user.uid : null,
       name: String((P.sync.acct && P.sync.acct.name) || '').slice(0, 80), lang: String(P.settings.lang || 'pt-BR').slice(0, 8),
-      build: '7.57', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
+      build: '7.58', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
     sy.db.collection('contact').add(doc).then(function () {
       b.disabled = false; $('ctMsg').value = ''; closeSheets(); showToast(T("Mensagem enviada. Obrigado! Responderemos pelo e-mail informado."));
     }, function (e) { b.disabled = false; err.textContent = Tf("Não foi possível enviar ({0}). Tente de novo.", (e && e.code) || T("erro")); });
@@ -5776,7 +5776,7 @@ try { I18N.applyDom(); } catch (e) {}
   // Beta 7.8: telemetria de uso (shared/telemetry.js) e versão da ponte do app nativo na linha de versão
   try {
     if (window.BXTel) {
-      BXTel.init({ module: 'placar', build: '7.57', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
+      BXTel.init({ module: 'placar', build: '7.58', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
       tel('p_open');
       $('sTel').checked = BXTel.isOn();
       $('sTel').addEventListener('change', function () { BXTel.setOn(this.checked); showToast(this.checked ? T("Estatísticas de uso ligadas. Obrigado!") : T("Estatísticas de uso desligadas.")); });
