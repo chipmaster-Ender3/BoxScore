@@ -9,7 +9,7 @@
 <link rel="icon" href="../icons/icon-192.png">
 <link rel="stylesheet" href="../fonts/fonts.css">
 <style>
-/* BoxScore — Placar ao vivo (aovivo 1.1.0, Beta 7.50). Página pública: abre pelo link, sem login, e acompanha live/{id}. */
+/* BoxScore — Placar ao vivo (aovivo 1.2.0, Beta 7.53). Página pública: abre pelo link, sem login, e acompanha live/{id}. */
 :root { --bg: #0E1A21; --card: #14252E; --ink: #F4F7F5; --ink2: #B9C6CC; --muted: #8FA3AC; --line: #24404D; --live: #D92D20; --ball: #D7F24A; --win: #D7F24A;
   --dsp: 'Big Shoulders Display', 'Arial Narrow', system-ui, sans-serif; --ui: 'Public Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
 @media (prefers-color-scheme: light) { :root { --bg: #F3F5F4; --card: #FFFFFF; --ink: #0B1418; --ink2: #3D4B52; --muted: #5E6E75; --line: #DCE3E2; --win: #2E6B00; } }
@@ -72,19 +72,63 @@ html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.4
 .msg b { display: block; color: var(--ink); font: 800 26px/1.2 var(--dsp); text-transform: uppercase; margin-bottom: 8px; }
 .foot { margin-top: 22px; text-align: center; color: var(--muted); font-size: 14px; }
 .foot a { color: var(--ink2); }
+/* 7.53: modo TV — placar grande que ocupa a tela toda (TV, computador ligado na TV ou celular espelhado) */
+.tvb { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,.55); background: rgba(6,14,20,.45); color: #fff; font: 700 clamp(13px, 1.5vw, 15px)/1 var(--ui); cursor: pointer; }
+.tvb svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.tvb:focus-visible, .tvc button:focus-visible { outline: 3px solid var(--ball); outline-offset: 2px; }
+.topR { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+.tvc, .tvq, .tvst { display: none; }
+body.tv { --bg: #0B151B; --card: #12222B; --ink: #F4F7F5; --ink2: #B9C6CC; --muted: #8FA3AC; --line: #24404D; --win: #D7F24A; overflow: hidden; }
+body.tv.idle { cursor: none; }
+body.tv .wrap { max-width: none; height: 100vh; height: 100dvh; display: flex; flex-direction: column; padding: 3vh 3.5vw; }
+body.tv .hero { min-height: 0; background: none; padding: 0; margin: 0 0 2.5vh; border-radius: 0; flex-direction: row; align-items: center; justify-content: space-between; gap: 2vw; overflow: visible; }
+body.tv .hero::before { display: none; }
+body.tv .hero > div:last-child { order: -1; display: flex; align-items: baseline; gap: 1.6vw; min-width: 0; }
+body.tv .ht { font-size: min(5.4vh, 4vw); margin: 0; white-space: nowrap; }
+body.tv .hs { font-size: min(3.2vh, 2.4vw); opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.tv .brand { font-size: min(3.6vh, 2.6vw); }
+body.tv .pill { font-size: min(2.8vh, 2vw); padding: 1vh 1.4vw; } body.tv .pill i { width: 1.4vh; height: 1.4vh; }
+body.tv .tvb, body.tv .foot, body.tv .ins, body.tv .stats, body.tv .facts { display: none; }
+body.tv main { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
+body.tv main > .card:first-child { border-radius: 3vh; padding: 3vh 3vw; }
+body.tv .who { padding: calc(3.2vh * var(--k, 1)) 0; gap: 1.6vw; }
+body.tv .srv { width: min(3.4vh, 2.4vw); height: min(3.4vh, 2.4vw); }
+body.tv .nm { font-size: calc(min(13vh, 8.4vw) * var(--k, 1)); line-height: 1; overflow-wrap: normal; }
+body.tv .nm .pn { display: block; } body.tv .nm .sl { display: none; }
+body.tv .cells { gap: 2.4vw; padding-left: 2vw; }
+body.tv .c { font-size: calc(min(12vh, 7.4vw) * var(--k, 1)); min-width: calc(min(9vh, 6vw) * var(--k, 1)); }
+body.tv .c.pt { font-size: calc(min(16vh, 10vw) * var(--k, 1)); min-width: calc(min(26vh, 17vw) * var(--k, 1)); padding: 1.2vh 1vw; border-radius: 2vh; }
+body.tv .aceF { font-size: min(6vh, 4vw); padding: .8vh 1.2vw; border-radius: 1.4vh; margin-left: 1.4vw; }
+body.tv .flag { font: 800 min(6vh, 4.4vw)/1.1 var(--dsp); text-transform: uppercase; letter-spacing: .03em; margin-top: 2.4vh; }
+body.tv .meta { font-size: min(2.8vh, 2vw); }
+body.tv .tvst { display: flex; flex-wrap: wrap; gap: 1vh 3vw; margin-top: 2.6vh; color: var(--ink2); font: 600 min(3vh, 2.2vw)/1.2 var(--ui); }
+body.tv .tvst b { color: var(--ink); font: 800 1.25em/1 var(--dsp); margin-left: .4em; letter-spacing: .02em; }
+body.tv .tvBot { display: flex; align-items: flex-end; justify-content: space-between; gap: 2vw; margin-top: 2.5vh; }
+body.tv .tvf { display: flex; flex-wrap: wrap; gap: 1vh 3vw; color: var(--ink2); font: 600 min(3vh, 2.2vw)/1.2 var(--ui); }
+body.tv .tvf b { color: var(--ink); margin-left: .4em; }
+body.tv .tvq { display: flex; align-items: center; gap: 1.2vw; color: var(--ink2); font: 600 min(2.4vh, 1.8vw)/1.25 var(--ui); text-align: right; }
+body.tv .tvq svg { width: min(15vh, 11vw); height: auto; border-radius: 1vh; display: block; }
+.tvBot { display: none; }
+body.tv .tvc { display: flex; gap: 10px; position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 5; opacity: 0; transition: opacity .3s; pointer-events: none; }
+body.tv .tvc.show { opacity: 1; pointer-events: auto; }
+.tvc button { padding: 10px 16px; border-radius: 999px; border: 0; background: rgba(255,255,255,.92); color: #0B1418; font: 700 15px/1 var(--ui); cursor: pointer; }
+@media (prefers-reduced-motion: reduce) { body.tv .tvc { transition: none; } }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="hero" id="hero">
-    <div class="top"><a class="brand" href="../" id="brand">BoxScore</a><span class="pill" id="pill" hidden><i aria-hidden="true"></i><span id="pillT"></span></span></div>
+    <div class="top"><a class="brand" href="../" id="brand">BoxScore</a><span class="topR"><button type="button" class="tvb" id="tvBtn" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg><span id="tvBtnT"></span></button><span class="pill" id="pill" hidden><i aria-hidden="true"></i><span id="pillT"></span></span></span></div>
     <div><div class="ht" id="ht"></div><div class="hs" id="hs"></div></div>
   </header>
   <main id="main" aria-live="polite"><div class="card msg" id="loading"></div></main>
+  <div class="tvBot" id="tvBot"><div class="tvf" id="tvf"></div><div class="tvq" id="tvq"></div></div>
   <p class="foot" id="foot"></p>
 </div>
+<div class="tvc" id="tvc"><button type="button" id="tvFull"></button><button type="button" id="tvExit"></button></div>
 <script src="../shared/live.js"></script>
 <script src="../shared/heroes.js"></script>
+<script src="../shared/qr.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="../shared/telemetry.js"></script>
@@ -122,6 +166,16 @@ html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.4
     de: { ago: 'vor {0}', tennis: 'Tennis', singles: 'Einzel', doubles2: 'Doppel', place: 'Ort', surf: 'Belag', start: 'Beginn', dur: 'Spielzeit', upd2: 'Aktualisierung', stats: 'Statistik', pts: 'Gewonnene Punkte', aces: 'Asse', sp: 'Punkte beim Aufschlag', rp: 'Punkte beim Return', bp: 'Genutzte Breakbälle', saibro: 'Sand', rapida: 'Hartplatz', grama: 'Rasen', carpete: 'Teppich', outro: 'Anderer Belag', ace: 'ASS', h: '{0} Std. {1} Min.', mn: '{0} Min.', today: 'heute' }
   };
   Object.keys(D2).forEach(function (l) { for (var k in D2[l]) D[l][k] = D2[l][k]; });
+  // 7.53: modo TV
+  var D3 = {
+    'pt-BR': { tv: 'Modo TV', full: 'Tela cheia', tvx: 'Sair do modo TV', tvq: 'Acompanhe<br>no celular' },
+    'pt-PT': { tv: 'Modo TV', full: 'Ecrã inteiro', tvx: 'Sair do modo TV', tvq: 'Acompanhe<br>no telemóvel' },
+    en: { tv: 'TV mode', full: 'Full screen', tvx: 'Exit TV mode', tvq: 'Follow on<br>your phone' },
+    es: { tv: 'Modo TV', full: 'Pantalla completa', tvx: 'Salir del modo TV', tvq: 'Síguelo<br>en el móvil' },
+    fr: { tv: 'Mode TV', full: 'Plein écran', tvx: 'Quitter le mode TV', tvq: 'Suivez sur<br>votre téléphone' },
+    de: { tv: 'TV-Modus', full: 'Vollbild', tvx: 'TV-Modus beenden', tvq: 'Auf dem Handy<br>verfolgen' }
+  };
+  Object.keys(D3).forEach(function (l) { for (var k in D3[l]) D[l][k] = D3[l][k]; });
   var nl = String((navigator.languages && navigator.languages[0]) || navigator.language || 'pt-BR').toLowerCase();
   var LG = nl === 'pt-pt' ? 'pt-PT' : nl.indexOf('pt') === 0 ? 'pt-BR' : D[nl.slice(0, 2)] ? nl.slice(0, 2) : 'en';
   document.documentElement.lang = LG;
@@ -174,7 +228,7 @@ html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.4
     [0, 1].forEach(function (t) {
       var r = el('div', 'row' + (over && sc.w === t ? ' won' : '')), who = el('div', 'who');
       var sv = el('span', 'srv' + (!over && sc.srv === t ? ' on' : '')); if (!over && sc.srv === t) sv.title = T('srv'); who.appendChild(sv);
-      who.appendChild(el('span', 'nm', d.names[t] || ''));
+      var nmE = el('span', 'nm'), parts = String(d.names[t] || '').split(' / '); parts.forEach(function (p, i) { if (i) nmE.appendChild(document.createTextNode(' ')); var pe = el('span', 'pn', p); if (i < parts.length - 1) pe.appendChild(el('span', 'sl', ' /')); nmE.appendChild(pe); }); who.appendChild(nmE);
       if (aceOn === t) who.appendChild(el('span', 'aceF', T('ace')));
       r.appendChild(who);
       var cells = el('div', 'cells');
@@ -193,6 +247,19 @@ html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.4
     if (d.playAt || d.startedAt) { fx.appendChild(fact('start', T('start'), startTxt(d.playAt || d.startedAt))); fx.appendChild(fact('dur', T('dur'), durNow(d), 'dur')); }
     if (live) fx.appendChild(fact('upd', T('upd2'), updTxt(d.updatedAt || Date.now()), 'upd'));
     card.appendChild(fx);
+    // modo TV: números principais numa linha e informações no rodapé
+    var S3 = sc.st;
+    if (S3 && S3.pts && S3.pts[0] + S3.pts[1] > 0) {
+      var ts = el('div', 'tvst'); function tsi(l, v) { var x = el('span', '', l); x.appendChild(el('b', '', v)); ts.appendChild(x); }
+      tsi(T('pts'), S3.pts[0] + ' – ' + S3.pts[1]);
+      if (S3.ace && S3.ace[0] + S3.ace[1] > 0) tsi(T('aces'), S3.ace[0] + ' – ' + S3.ace[1]);
+      if (S3.bpO && S3.bpO[0] + S3.bpO[1] > 0) tsi(T('bp'), S3.bpC[0] + '/' + S3.bpO[0] + ' – ' + S3.bpC[1] + '/' + S3.bpO[1]);
+      card.appendChild(ts);
+    }
+    var tf = $('tvf'); tf.textContent = '';
+    function tfi(l, v, i) { var x = el('span', '', l); var b2 = el('b', '', v); if (i) b2.id = i; x.appendChild(b2); tf.appendChild(x); }
+    if (d.playAt || d.startedAt) { tfi(T('start'), startTxt(d.playAt || d.startedAt)); tfi(T('dur'), durNow(d), 'tvdur'); }
+    if (live) tfi(T('upd2'), updTxt(d.updatedAt || Date.now()), 'tvupd');
     if (!net) card.appendChild(el('div', 'meta', T('net')));
     m.appendChild(card);
     // estatísticas
@@ -209,15 +276,50 @@ html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.4
       m.appendChild(sb2);
     }
     if (over && d.ins && d.ins.length) { var ins = el('div', 'card ins stats'); ins.appendChild(el('h2', '', T('sum'))); var ul = el('ul'); d.ins.forEach(function (x) { ul.appendChild(el('li', '', x)); }); ins.appendChild(ul); m.appendChild(ins); }
+      if (tvOn) tvFit();
   }
-  setInterval(function () { if (!last) return; var u = $('upd'); if (u) u.textContent = updTxt(last.updatedAt || Date.now()); var du = $('dur'); if (du) du.textContent = durNow(last); if (aceUntil && Date.now() > aceUntil) { aceUntil = 0; render(); } }, 1000);
+  setInterval(function () { if (!last) return; var u = $('upd'); if (u) u.textContent = updTxt(last.updatedAt || Date.now()); var du = $('dur'); if (du) du.textContent = durNow(last); var tu = $('tvupd'); if (tu) tu.textContent = updTxt(last.updatedAt || Date.now()); var td = $('tvdur'); if (td) td.textContent = durNow(last); if (aceUntil && Date.now() > aceUntil) { aceUntil = 0; render(); } }, 1000);
   if (!id) { msg(T('noid_t'), T('noid')); return; }
+  // 7.53: modo TV. Liga pelo botão ou abrindo o link com &tv=1. Tela cheia, tela sempre acesa, QR para acompanhar no celular.
+  var tvOn = false, wake = null, idleT = 0, tvCounted = false;
+  $('tvBtnT').textContent = T('tv'); $('tvFull').textContent = T('full'); $('tvExit').textContent = T('tvx');
+  function fsEl() { return document.fullscreenElement || document.webkitFullscreenElement; }
+  function goFull() { var r = document.documentElement, f = r.requestFullscreen || r.webkitRequestFullscreen; if (f && !fsEl()) try { var p = f.call(r); if (p && p.catch) p.catch(function () {}); } catch (e) {} }
+  function keepAwake() { try { if (tvOn && navigator.wakeLock && !wake && document.visibilityState === 'visible') navigator.wakeLock.request('screen').then(function (w) { wake = w; w.addEventListener('release', function () { wake = null; }); }).catch(function () {}); } catch (e) {} }
+  function poke() { if (!tvOn) return; document.body.classList.remove('idle'); $('tvc').classList.add('show'); clearTimeout(idleT); idleT = setTimeout(function () { document.body.classList.add('idle'); $('tvc').classList.remove('show'); }, 3000); }
+  // diminui as letras até o placar caber (nomes longos, duplas, telas baixas)
+  function tvFit() {
+    var m = $('main'), c = m.firstElementChild, st = document.body.style, k = 1; if (!c) return;
+    st.setProperty('--k', '1');
+    while (k > 0.45 && (c.offsetHeight > m.clientHeight + 1 || c.scrollWidth > c.clientWidth + 1)) { k = Math.round((k - 0.05) * 100) / 100; st.setProperty('--k', String(k)); }
+  }
+  window.addEventListener('resize', function () { if (tvOn) tvFit(); });
+  function tvSet(on, full) {
+    tvOn = on; document.body.classList.toggle('tv', on);
+    try { history.replaceState(null, '', location.pathname + '?id=' + id + (on ? '&tv=1' : '')); } catch (e) {}
+    if (on) {
+      if (!$('tvq').firstChild && window.BXQR && window.BXLive) { try { var q = el('div'); q.innerHTML = BXQR.svg(BXLive.url(id), { size: 160, margin: 2 }); $('tvq').innerHTML = '<span>' + T('tvq') + '</span>'; $('tvq').appendChild(q.firstChild); } catch (e) {} }
+      if (full) goFull(); keepAwake(); poke(); tvFit(); setTimeout(tvFit, 400);
+      $('tvFull').hidden = !(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);
+      if (!tvCounted && window.BXTel) { tvCounted = true; var k2 = 'boxscore.live.tv', dd2 = new Date().toISOString().slice(0, 10), sv2 = ''; try { sv2 = localStorage.getItem(k2) || ''; } catch (e) {} if (sv2 !== id + '|' + dd2) { try { localStorage.setItem(k2, id + '|' + dd2); } catch (e) {} try { BXTel.count('v_live_tv'); } catch (e) {} } }
+    } else {
+      document.body.style.removeProperty('--k'); clearTimeout(idleT); document.body.classList.remove('idle'); $('tvc').classList.remove('show');
+      if (fsEl()) try { (document.exitFullscreen || document.webkitExitFullscreen).call(document); } catch (e) {}
+      if (wake) try { wake.release(); } catch (e) {} wake = null;
+    }
+  }
+  $('tvBtn').addEventListener('click', function () { tvSet(true, true); });
+  $('tvFull').addEventListener('click', function () { goFull(); poke(); });
+  $('tvExit').addEventListener('click', function () { tvSet(false); });
+  ['mousemove', 'touchstart', 'keydown'].forEach(function (ev) { document.addEventListener(ev, poke, { passive: true }); });
+  document.addEventListener('keydown', function (e) { if (!tvOn) return; if (e.key === 'Escape' && !fsEl()) tvSet(false); else if (e.key === 'f' || e.key === 'F') goFull(); });
+  document.addEventListener('visibilitychange', keepAwake);
   try { firebase.initializeApp(FB_CFG); } catch (e) {}
   var db = firebase.firestore(), unsub = null;
   // 7.52: contagem anônima de quem abriu o link (uma vez por transmissão por dia neste aparelho; sem conta, sem nomes nem placar)
   try {
     if (window.BXTel) {
-      BXTel.init({ module: 'aovivo', build: '7.52', lang: LG, getDb: function () { return db; }, getUid: function () { return null; } });
+      BXTel.init({ module: 'aovivo', build: '7.53', lang: LG, getDb: function () { return db; }, getUid: function () { return null; } });
       var sk = 'boxscore.live.seen', seen = {}; try { seen = JSON.parse(localStorage.getItem(sk) || '{}') || {}; } catch (e) {}
       var dd = new Date().toISOString().slice(0, 10);
       if (seen[id] !== dd) { seen[id] = dd; Object.keys(seen).forEach(function (k) { if (seen[k] !== dd) delete seen[k]; }); try { localStorage.setItem(sk, JSON.stringify(seen)); } catch (e) {} BXTel.count('v_live_open'); }
@@ -228,7 +330,7 @@ html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.4
     unsub = db.collection('live').doc(id).onSnapshot(function (snap) {
       net = true;
       if (!snap.exists) { if (!last) msg(T('gone_t'), T('gone')); else { last.on = false; render(); } return; }
-      last = snap.data(); lastAt = Date.now(); render();
+      last = snap.data(); lastAt = Date.now(); render(); $('tvBtn').hidden = false;
     }, function (err) {
       var c = err && err.code;
       if (c === 'permission-denied' || c === 'not-found') { if (last && last.sc && (last.sc.w === 0 || last.sc.w === 1)) { last.expAt = 0; render(); } else msg(T('gone_t'), T('gone')); return; }
@@ -237,6 +339,7 @@ html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.4
   }
   window.addEventListener('online', function () { net = true; watch(); });
   window.addEventListener('offline', function () { net = false; render(); });
+  if (/[?&]tv=1/.test(location.search)) tvSet(true, false);
   watch();
 })();
 </script>
