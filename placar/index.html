@@ -1046,7 +1046,7 @@ html.nfy .bar { padding-right: max(230px, env(safe-area-inset-right, 0px)); }
       <div class="actions"><button class="btn" type="button" id="sManage">Gerenciar dados salvos</button></div>
       <label class="check srow"><span class="sic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><input type="checkbox" id="sTel"> Enviar estatísticas de uso</label>
       <span class="hint" id="sTelHint">Só contagens anônimas de uso dos recursos (ex.: quantas partidas, se usou a pulseira), para melhorar o app. Nunca nomes, placares, mensagens, fotos ou local.</span>
-      <p class="note" id="verNote">BoxScore Beta 7.39 · Placar 4.46.0</p>
+      <p class="note" id="verNote">BoxScore Beta 7.40 · Placar 4.46.1</p>
     </div>
     <div class="actions"><button class="btn primary" type="button" data-close>Pronto</button></div>
   </div>
@@ -1695,15 +1695,22 @@ try { I18N.applyDom(); } catch (e) {}
     else { diag.push(k === 'tick' ? [t, k, 1, t] : [t, k, d === undefined ? '' : String(d)]); if (diag.length > 400) diag.splice(0, diag.length - 400); }
     try { localStorage.setItem(DIAG_K, JSON.stringify(diag)); } catch (e) {}
   }
-  function dtext() {
+  function dtext(extra) {
     if (!diag) dlog('open');
+    var rows = diag.concat((extra || []).filter(function (r) { return r && r.length >= 2; }).map(function (r) { return [Number(r[0]), String(r[1]), r[2] ? String(r[2]) : '']; }))
+      .sort(function (a, b) { return a[0] - b[0]; });
     var hh = function (t) { var d = new Date(t), z = function (n) { return (n < 10 ? '0' : '') + n; }; return z(d.getDate()) + '/' + z(d.getMonth() + 1) + ' ' + z(d.getHours()) + ':' + z(d.getMinutes()) + ':' + z(d.getSeconds()); };
     var ua = (navigator.userAgent || '').replace(/^.*?\(([^)]*)\).*$/, '$1');
-    return ['BoxScore 7.39 · ' + ua].concat(diag.map(function (r) {
+    return ['BoxScore 7.40 · ' + ua].concat(rows.map(function (r) {
       return hh(r[0]) + ' ' + r[1] + (r[1] === 'tick' ? ' x' + r[2] + ' até ' + hh(r[3]).slice(6) : (r[2] ? ' ' + r[2] : ''));
     })).join('\n');
   }
-  window.BXDiag = { log: dlog, text: dtext, clear: function () { diag = []; try { localStorage.removeItem(DIAG_K); } catch (e) {} } };
+  function dfull() {   // 7.40: junta o registro nativo (Android: linhas n-*), que continua mesmo se a página congelar
+    var bg = window.BXBg;
+    if (!bg || !bg.nativeLog) return Promise.resolve(dtext());
+    return bg.nativeLog().then(function (n) { var t0 = diag && diag.length ? diag[0][0] : 0; return dtext((n || []).filter(function (r) { return Number(r[0]) >= t0; })); }, function () { return dtext(); });
+  }
+  window.BXDiag = { log: dlog, text: dtext, full: dfull, clear: function () { diag = []; try { localStorage.removeItem(DIAG_K); } catch (e) {} } };
   window.addEventListener('bx-bg-err', function (ev) { dlog('bg-err', ev.detail && ev.detail.msg); });
   function bgSync(force) {
     var bg = window.BXBg; if (!bg || !bg.supported) return;
@@ -4055,10 +4062,12 @@ try { I18N.applyDom(); } catch (e) {}
       f4.appendChild(el('span', 'hint', T('Mostra o que aconteceu com as pulseiras, inclusive com a tela bloqueada. Copie e mande para o suporte.')));
       var pre = el('pre', 'diagBox'); pre.hidden = true;
       var a4 = el('div', 'actions');
-      a4.appendChild(btn(T('Ver registro'), '', function () { pre.textContent = window.BXDiag.text(); pre.hidden = !pre.hidden; if (!pre.hidden) pre.scrollTop = pre.scrollHeight; }));
+      a4.appendChild(btn(T('Ver registro'), '', function () { if (!pre.hidden) { pre.hidden = true; return; } window.BXDiag.full().then(function (tx) { pre.textContent = tx; pre.hidden = false; pre.scrollTop = pre.scrollHeight; }); }));
       a4.appendChild(btn(T('Copiar registro'), '', function () {
-        var tx = window.BXDiag.text(), okc = function () { showToast(T('Registro copiado.')); };
-        try { navigator.clipboard.writeText(tx).then(okc, function () { pre.textContent = tx; pre.hidden = false; }); } catch (x) { pre.textContent = tx; pre.hidden = false; }
+        window.BXDiag.full().then(function (tx) {
+          var okc = function () { showToast(T('Registro copiado.')); };
+          try { navigator.clipboard.writeText(tx).then(okc, function () { pre.textContent = tx; pre.hidden = false; }); } catch (x) { pre.textContent = tx; pre.hidden = false; }
+        });
       }));
       a4.appendChild(btn(T('Limpar'), '', function () { window.BXDiag.clear(); pre.textContent = ''; pre.hidden = true; }));
       f4.appendChild(a4); f4.appendChild(pre); body.appendChild(f4);
@@ -4548,7 +4557,7 @@ try { I18N.applyDom(); } catch (e) {}
     b.disabled = true; err.textContent = '';
     var doc = { topic: $('ctTopic').value, msg: msg.slice(0, 2000), email: em.slice(0, 120), uid: sy.user ? sy.user.uid : null,
       name: String((P.sync.acct && P.sync.acct.name) || '').slice(0, 80), lang: String(P.settings.lang || 'pt-BR').slice(0, 8),
-      build: '7.39', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
+      build: '7.40', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
     sy.db.collection('contact').add(doc).then(function () {
       b.disabled = false; $('ctMsg').value = ''; closeSheets(); showToast(T("Mensagem enviada. Obrigado! Responderemos pelo e-mail informado."));
     }, function (e) { b.disabled = false; err.textContent = Tf("Não foi possível enviar ({0}). Tente de novo.", (e && e.code) || T("erro")); });
@@ -5377,7 +5386,7 @@ try { I18N.applyDom(); } catch (e) {}
   // Beta 7.8: telemetria de uso (shared/telemetry.js) e versão da ponte do app nativo na linha de versão
   try {
     if (window.BXTel) {
-      BXTel.init({ module: 'placar', build: '7.39', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
+      BXTel.init({ module: 'placar', build: '7.40', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
       tel('p_open');
       $('sTel').checked = BXTel.isOn();
       $('sTel').addEventListener('change', function () { BXTel.setOn(this.checked); showToast(this.checked ? T("Estatísticas de uso ligadas. Obrigado!") : T("Estatísticas de uso desligadas.")); });
