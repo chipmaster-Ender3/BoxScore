@@ -1,0 +1,952 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<title>BoxScore · Clube</title>
+<meta name="theme-color" content="#0A1014"><link rel="stylesheet" href="../fonts/fonts.css">
+<link rel="manifest" href="../manifest.webmanifest"><link rel="icon" href="../icons/icon-192.png">
+<style>:root{--bg:#EDF0F2;--panel:#FFFFFF;--ink:#0E1A22;--muted:#56646E;--line:#CDD5DB;--p1:#C4401B;--p2:#0D6A88;--acc:#4a6b00;--bad:#B3261E;--warn:#8A5A00;--overlay:rgba(10,18,24,.55);--hatch:rgba(14,26,34,.06);--display:'Big Shoulders Display','Arial Narrow','Roboto Condensed',sans-serif;--ui:'Public Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0A1014;--panel:#121B21;--ink:#EDF2F5;--muted:#8C9DA7;--line:#25333B;--acc:#c6f24a;--bad:#ff7a6b;--warn:#F2C86A;--overlay:rgba(0,0,0,.65);--hatch:rgba(255,255,255,.05);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0A1014;--panel:#121B21;--ink:#EDF2F5;--muted:#8C9DA7;--line:#25333B;--acc:#c6f24a;--bad:#ff7a6b;--warn:#F2C86A;--overlay:rgba(0,0,0,.65);--hatch:rgba(255,255,255,.05);color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui)}[hidden]{display:none!important}
+main{max-width:1080px;margin:0 auto;padding:14px 14px calc(96px + env(safe-area-inset-bottom,0px));display:grid;gap:12px}
+header{display:flex;align-items:center;gap:10px}header h1{flex:1;margin:0;font:900 30px/1 var(--display);letter-spacing:.02em;text-transform:uppercase}header small{font:700 11px var(--ui);color:var(--muted);letter-spacing:.08em}
+header.hero{position:relative;align-items:flex-end;min-height:clamp(92px,15vh,120px);padding:12px 14px;border-radius:16px;color:#fff;background:linear-gradient(90deg,rgba(5,9,13,.86) 0%,rgba(5,9,13,.6) 42%,rgba(5,9,13,.12) 78%,rgba(5,9,13,0) 100%),var(--hero,linear-gradient(120deg,#2F7351,#2D63AD)) 100% 50%/cover no-repeat}
+header.hero .htx{flex:1;min-width:0;display:grid;gap:2px}header.hero h1{color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.55);font-size:clamp(24px,7vw,34px)}
+header.hero #kick{font:800 11px/1 var(--ui);letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.78);display:block}header.hero #ver{color:rgba(255,255,255,.65);align-self:flex-start}
+header.hero .btn{color:#fff;background:rgba(0,0,0,.38);border-color:transparent;align-self:flex-start}header.hero .btn.on{background:#fff;color:#111}
+@media (max-width:560px){header.hero{flex-wrap:wrap;align-content:space-between;row-gap:10px}header.hero .htx{order:9;flex-basis:100%}header.hero #ver{display:none}}
+.btn{min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font:700 14px var(--ui);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}.btn.pri{background:var(--ink);color:var(--panel);border-color:var(--ink)}.btn.bad{color:var(--bad);border-color:var(--bad)}.btn[disabled]{opacity:.5}.btn.sm{min-height:36px;padding:0 12px;font-size:13px}
+.ic{display:inline-grid;width:20px;height:20px;flex:none}.ic svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--panel);border-top:1px solid var(--line);padding:6px max(6px,calc((100vw - 760px)/2)) calc(6px + env(safe-area-inset-bottom,0px));box-shadow:0 -6px 18px rgba(0,0,0,.06)}
+.tabs button{min-height:56px;border-radius:14px;border:0;background:transparent;color:var(--muted);font:700 12px var(--ui);padding:4px 2px;display:grid;place-items:center;align-content:center;gap:3px;cursor:pointer}.tabs .tic{display:grid;place-items:center;width:52px;height:30px;border-radius:15px}.tabs .tic .ic{width:24px;height:24px}.tabs .tl{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tabs button[aria-selected=true]{color:var(--ink)}.tabs button[aria-selected=true] .tic{background:var(--bg)}.tabs button[aria-selected=true] svg{stroke-width:2.6}
+.card{border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:14px;display:grid;gap:10px;min-width:0}
+.sech{display:flex;align-items:center;gap:12px}.sech b{font:800 16px var(--ui);display:block}.sico{width:40px;height:40px;border-radius:50%;flex:none;display:grid;place-items:center;border:1px solid var(--line);background:var(--bg)}.sico .ic{width:22px;height:22px}
+.sub{color:var(--muted);font:400 13.5px/1.35 var(--ui)}.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.grow{flex:1;min-width:0}
+.chip{display:inline-flex;align-items:center;gap:4px;font:700 12px/1 var(--ui);padding:6px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}.chip.ok{color:var(--ink);border-color:var(--ink)}.chip.bad{color:var(--bad);border-color:var(--bad)}.chip.warn{color:var(--warn);border-color:var(--warn)}.chip .dotc{width:8px;height:8px;border-radius:50%;background:var(--c,var(--muted))}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel)}.seg button{flex:1 1 0;min-width:0;min-height:44px;border:0;border-left:1px solid var(--line);background:transparent;color:var(--ink);font:700 14px var(--ui);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 6px}.seg button:first-child{border-left:0}.seg button[aria-pressed=true]{background:var(--ink);color:var(--panel)}
+input,select,textarea{min-width:0;min-height:46px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:0 12px;font:400 16px var(--ui);width:100%}textarea{padding:10px 12px;min-height:80px}input[type=checkbox]{width:22px;height:22px;min-height:0}
+.f{display:grid;gap:6px;min-width:0}.f>span{font:700 12px/1.15 var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.msg{color:var(--bad);font:600 14px/1.35 var(--ui)}.msg.w{color:var(--warn)}
+.empty{display:grid;gap:10px;justify-items:center;text-align:center;padding:24px 12px;color:var(--muted)}.empty .ic{width:40px;height:40px}
+.list{display:grid;gap:10px}@media (min-width:820px){.list.g2{grid-template-columns:1fr 1fr}}
+.item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:14px;padding:12px 14px;cursor:pointer;font:inherit;min-width:0}.item:hover{background:color-mix(in srgb,var(--ink) 4%,var(--panel))}
+.item .av{width:44px;height:44px;border-radius:12px;flex:none;display:grid;place-items:center;font:900 18px var(--ui);color:#fff;background:var(--c,#56646E)}.item .av .ic{width:22px;height:22px}
+.item .tx{flex:1;min-width:0;display:grid;gap:3px}.item .tx b{font:800 15.5px/1.2 var(--ui);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.item .tx small{font:500 13px/1.3 var(--ui);color:var(--muted)}.item .chev{color:var(--muted)}
+.bar{height:8px;border-radius:4px;background:var(--bg);overflow:hidden;border:1px solid var(--line)}.bar i{display:block;height:100%;background:var(--ink)}.bar.full i{background:var(--bad)}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}@media (min-width:700px){.stats{grid-template-columns:repeat(4,1fr)}}
+.stat{border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:12px;display:grid;gap:4px;min-width:0}.stat span{display:flex;align-items:center;gap:6px;font:700 12px var(--ui);color:var(--muted)}.stat span .ic{width:16px;height:16px}.stat b{font:900 28px/1 var(--display)}.stat small{font:500 12px var(--ui);color:var(--muted)}
+.cols{display:grid;gap:12px}@media (min-width:900px){.cols{grid-template-columns:1fr 1fr}}
+.now{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}.now:first-of-type{border-top:0}.now b{font:800 15px var(--ui);min-width:90px}.now .grow{font:600 14px/1.3 var(--ui)}
+.st-free{color:var(--acc)}.st-busy{color:var(--ink)}.st-off{color:var(--muted)}
+.wins{display:flex;flex-wrap:wrap;gap:6px}
+.fc{display:flex;align-items:flex-end;gap:3px;height:110px;padding:6px 2px 0;overflow-x:auto}.fc .col{flex:1 0 22px;display:grid;justify-items:center;gap:3px;align-self:stretch;grid-template-rows:auto 1fr auto}.fc .col i{width:100%;max-width:26px;border-radius:5px 5px 2px 2px;background:var(--acc);align-self:end}.fc .col i.z{background:var(--line);height:3px!important}.fc .col em{font:800 11px var(--ui);font-style:normal}.fc .col small{font:600 10px var(--ui);color:var(--muted)}
+.dbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.dbar .dlab{flex:1;min-width:160px;display:grid;gap:2px}.dbar .dlab b{font:900 22px/1.05 var(--display);text-transform:uppercase;letter-spacing:.02em}.dbar input[type=date]{width:auto;min-height:44px}
+.dstrip{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.dstrip button{min-height:54px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font:700 12px var(--ui);display:grid;place-items:center;gap:1px;cursor:pointer;padding:4px 0}.dstrip button b{font:900 18px/1 var(--display)}.dstrip button[aria-pressed=true]{background:var(--ink);color:var(--panel);border-color:var(--ink)}.dstrip button.hol{border-color:var(--warn)}.dstrip button.cl{opacity:.55}
+.ag{overflow:auto;border:1px solid var(--line);border-radius:14px;background:var(--panel);max-height:72vh}
+.ag table{border-collapse:separate;border-spacing:0;min-width:100%}
+.ag th,.ag td{border-bottom:1px solid var(--line);border-left:1px solid var(--line);padding:0;min-width:128px;height:48px;vertical-align:top}
+.ag th{position:sticky;top:0;background:var(--panel);z-index:2;font:800 13px var(--ui);padding:8px;text-align:left;height:auto}.ag th small{display:block;font:600 11px var(--ui);color:var(--muted)}
+.ag .tm{position:sticky;left:0;z-index:1;background:var(--panel);min-width:60px;width:60px;font:700 12px var(--ui);color:var(--muted);text-align:center;padding-top:6px;border-left:0}.ag th.tm{z-index:3}
+.cell{width:100%;height:100%;min-height:47px;border:0;background:transparent;color:var(--ink);text-align:left;padding:6px 8px;cursor:pointer;display:grid;align-content:start;gap:2px;font:600 12px/1.25 var(--ui)}.cell b{font:800 13px/1.2 var(--ui)}.cell small{color:var(--muted);font:600 11px var(--ui)}
+.cell.free small{color:var(--acc)}.cell.free:hover{background:color-mix(in srgb,var(--acc) 10%,transparent)}
+.cell.cls{background:color-mix(in srgb,var(--c) 16%,var(--panel));box-shadow:inset 4px 0 0 var(--c)}
+.cell.bk{background:color-mix(in srgb,var(--c) 14%,var(--panel));box-shadow:inset 4px 0 0 var(--c)}
+.cell.off{cursor:default;background:repeating-linear-gradient(135deg,var(--hatch) 0 6px,transparent 6px 12px)}
+.legend{display:flex;flex-wrap:wrap;gap:8px}
+.um{position:fixed;inset:0;z-index:60;background:var(--overlay);display:grid;align-items:end;justify-items:center}.um .umb{width:100%;max-width:620px;max-height:92dvh;overflow-y:auto;background:var(--panel);color:var(--ink);border-radius:18px 18px 0 0;padding:10px 16px calc(16px + env(safe-area-inset-bottom));display:grid;gap:12px}
+@media (min-width:760px){.um{align-items:center}.um .umb{border-radius:18px;max-height:88dvh}}
+.um .umb>b.st{font:900 24px/1.05 var(--display);text-transform:uppercase;letter-spacing:.02em}
+.grab{width:44px;height:5px;border-radius:3px;background:var(--line);justify-self:center;margin:2px 0 4px;cursor:grab;touch-action:none}
+.um .foot{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:sticky;bottom:calc(-16px - env(safe-area-inset-bottom));background:var(--panel);padding:10px 0 4px}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.days button{min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:700 13px var(--ui);cursor:pointer;padding:0}.days button[aria-pressed=true]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.picks{display:flex;flex-wrap:wrap;gap:6px}.pick{min-height:40px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:700 13px var(--ui);padding:0 14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}.pick[aria-pressed=true]{background:var(--ink);color:var(--panel);border-color:var(--ink)}.pick .dotc{width:10px;height:10px;border-radius:50%;background:var(--c)}
+.swatch{display:flex;gap:8px;flex-wrap:wrap}.swatch button{width:36px;height:36px;border-radius:50%;border:3px solid transparent;background:var(--c);cursor:pointer}.swatch button[aria-pressed=true]{border-color:var(--ink)}
+.hrow{display:grid;grid-template-columns:84px auto 1fr 1fr;gap:8px;align-items:center;padding:6px 0;border-top:1px solid var(--line)}@media (max-width:620px){.hrow{grid-template-columns:1fr auto}.hrow input[type=time]{grid-column:span 1}.hrow .tt2{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:8px}}.hrow .tt2{display:contents}.hrow:first-child{border-top:0}.hrow b{font:800 14px var(--ui)}.hrow.off input{opacity:.4}
+.avrow{display:grid;grid-template-columns:72px auto 1fr;gap:8px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}.avrow:first-child{border-top:0}.avrow .tt{display:grid;grid-template-columns:1fr 1fr;gap:6px}.avrow.off .tt{opacity:.35;pointer-events:none}
+.band{display:grid;grid-template-columns:1fr 1fr 1.2fr 44px;gap:8px;align-items:end}
+.feer{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,.9fr) minmax(0,1.2fr) 44px;gap:8px;align-items:end}.band{grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.2fr) 44px!important}@media (max-width:520px){.band{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;padding-bottom:10px;border-bottom:1px solid var(--line)}.band>button{justify-self:end}.feer{grid-template-columns:minmax(0,1fr) minmax(0,1fr);padding-bottom:10px;border-bottom:1px solid var(--line)}.feer>label:first-child{grid-column:1/-1}.feer>button{grid-column:2;justify-self:end}.three{grid-template-columns:1fr 1fr}.three>:first-child{grid-column:1/-1}}
+.icb{width:44px;height:44px;min-height:44px;padding:0;border-radius:50%}
+.tgl{display:flex;align-items:center;gap:10px;min-height:44px;font:600 15px var(--ui);cursor:pointer}
+.toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font:700 14px var(--ui);z-index:90;max-width:90vw;text-align:center}
+.steps{display:grid;gap:6px}.stp{display:flex;align-items:center;gap:10px;min-height:44px;border:0;background:transparent;color:var(--ink);font:600 15px var(--ui);text-align:left;cursor:pointer;padding:0}.stp .ck{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;flex:none}.stp.done .ck{background:var(--acc);border-color:var(--acc);color:#0A1014}.stp.done span.l{color:var(--muted);text-decoration:line-through}.stp .ck .ic{width:16px;height:16px}
+.foot2{color:var(--muted);font:500 12px var(--ui);text-align:center;padding:8px}
+.search{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:0 12px;background:var(--panel)}.search input{border:0;background:transparent;min-height:44px;padding:0;outline:0}
+</style>
+<script src="../shared/modules.js"></script>
+<script src="../shared/heroes.js"></script>
+</head><body>
+<main>
+<header id="hdr" class="hero"><div class="htx"><small id="kick">BoxScore · Clube</small><h1 id="ttl">Clube</h1></div><small id="ver"></small><button class="btn" id="setB" type="button"></button><button class="btn" id="back" type="button"></button></header>
+<div id="gate" class="card" hidden><div class="sech"><span class="sico" id="gateI"></span><div class="grow"><b id="gateH"></b><div class="sub" id="gateT"></div></div></div><button class="btn pri" id="login" type="button"></button><div class="msg" id="gateE" hidden></div></div>
+<div id="app" hidden><div id="view" style="display:grid;gap:12px"></div><nav class="tabs" id="tabs"></nav></div>
+</main>
+<script>
+(function () {
+  'use strict';
+  var VERSION = '0.1.0', BUILD = '7.43';
+  var FB_CFG = { apiKey: 'AIzaSyD_L90YxJAVRuTfPqwNbETJlbV9BYdnuYI', authDomain: 'boxsocore.firebaseapp.com', projectId: 'boxsocore', storageBucket: 'boxsocore.firebasestorage.app', messagingSenderId: '639383913161', appId: '1:639383913161:web:a9bb75fcf99f4b03378318' };
+  var FB_VER = '10.12.2', FB_LIBS = ['app', 'auth', 'firestore'];
+  var COLS = ['courts', 'coaches', 'students', 'classes', 'bookings'];
+
+  // ---------- idioma (rascunho: textos em português; inglês para os demais idiomas por enquanto) ----------
+  var LG = BXMods.lang(), PT = /^pt/.test(LG);
+  try { document.documentElement.lang = LG; } catch (e) {}
+  var EN = {};   // preenchido no fim do arquivo
+  function T(s) { return PT ? s : (EN[s] || s); }
+  function Tf(s) { var r = T(s); for (var i = 1; i < arguments.length; i++) r = r.split('{' + (i - 1) + '}').join(arguments[i]);
+    return sing(r); }
+  // singular quando o número é 1 ("1 turmas" -> "1 turma")
+  function sing(r) {
+    return r.replace(/(^|[^\d.,])1 (turma|aluno|quadra|professor)s( ativo| cadastrada| inativa)?s?\b/g, function (m, p, w, adj) { return p + '1 ' + w + (adj || ''); })
+      .replace(/(^|[^\d.,])1 (class)es\b/g, '$11 $2').replace(/(^|[^\d.,])1 (student|court|coach)s\b/g, '$11 $2');
+  }
+
+  // ---------- utilidades ----------
+  function $(id) { return document.getElementById(id); }
+  function h(tag, attrs, kids) {
+    var e = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) {
+      var v = attrs[k]; if (v == null || v === false) return;
+      if (k === 'text') e.textContent = v; else if (k === 'on') Object.keys(v).forEach(function (ev) { e.addEventListener(ev, v[ev]); });
+      else if (k === 'cls') e.className = v; else if (k === 'style') e.setAttribute('style', v); else if (k === 'value') e.value = v; else e.setAttribute(k, v === true ? '' : v);
+    });
+    (kids || []).forEach(function (c) { if (c != null && c !== false) e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return e;
+  }
+  var ICONS = {
+    home: '<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
+    cal: '<rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+    court: '<rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M4 12h16M8 3v18M16 3v18M8 7.5h8M8 16.5h8"/>',
+    group: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1a4 4 0 0 1 4-4h5a4 4 0 0 1 4 4v1"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M21.5 20v-1a4 4 0 0 0-3-3.9"/>',
+    user: '<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/>',
+    coach: '<circle cx="12" cy="7" r="3.5"/><path d="M5 21v-2a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v2"/><path d="M15.5 3.5l3-1.5M19 6h2"/>',
+    gear: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>', trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/>', chev: '<path d="M9 5l7 7-7 7"/>',
+    left: '<path d="M15 5l-7 7 7 7"/>', right: '<path d="M9 5l7 7-7 7"/>', check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>', money: '<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.8"/><path d="M6 9.5v5M18 9.5v5"/>',
+    ball: '<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6c3 2.5 3 10.3 0 12.8M18.4 5.6c-3 2.5-3 10.3 0 12.8"/>', grid4: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+    search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>', trophy: '<path d="M8 4h8v5a4 4 0 0 1-8 0V4zM8 6H4.5a3 3 0 0 0 3.5 4M16 6h3.5a3 3 0 0 1-3.5 4M12 13v4M8 21h8M9.5 17h5v4h-5z"/>',
+    tool: '<path d="M14.7 6.3a4 4 0 0 0 5 5L21 13l-8 8-3-3-3 3-2-2 3-3-3-3 8-8z"/>', star: '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+    link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>', club: '<path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-6h6v6M3 21h18"/>',
+    flag: '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>', people: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1a4 4 0 0 1 4-4h5a4 4 0 0 1 4 4v1"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M21.5 20v-1a4 4 0 0 0-3-3.9"/>'
+  };
+  function ic(n) { var e = document.createElement('span'); e.className = 'ic'; e.setAttribute('aria-hidden', 'true'); e.innerHTML = '<svg viewBox="0 0 24 24">' + (ICONS[n] || '') + '</svg>'; return e; }
+  function ibtn(n, txt, cls, fn, attrs) { return h('button', Object.assign({ type: 'button', cls: 'btn ' + (cls || ''), on: { click: fn } }, attrs || {}), [ic(n), txt ? h('span', { text: txt }) : null]); }
+  function secH(n, t, sub, right) { return h('div', { cls: 'sech' }, [h('span', { cls: 'sico' }, [ic(n)]), h('div', { cls: 'grow' }, [h('b', { text: t }), sub ? h('div', { cls: 'sub', text: sub }) : null]), right || null]); }
+  function toast(m) { var t = h('div', { cls: 'toast', text: m }); document.body.appendChild(t); setTimeout(function () { t.remove(); }, 2600); }
+  function lsGet(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function norm(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim(); }
+  function initials(n) { var p = String(n || '?').trim().split(/\s+/); return ((p[0] || '?')[0] + (p.length > 1 ? p[p.length - 1][0] : '')).toUpperCase(); }
+  function byName(a, b) { return String(a.name || '').localeCompare(String(b.name || ''), LG); }
+  function uidGen() { return 'x' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+  // horários em minutos desde 00:00 ('07:30' -> 450)
+  function toMin(s) { var m = /^(\d{1,2}):(\d{2})$/.exec(s || ''); return m ? (+m[1]) * 60 + (+m[2]) : NaN; }
+  function hm(n) { var a = Math.floor(n / 60), b = n % 60; return (a < 10 ? '0' : '') + a + ':' + (b < 10 ? '0' : '') + b; }
+  function durL(min) { var a = Math.floor(min / 60), b = min % 60; return b ? (a ? a + ' h ' + b + ' min' : b + ' min') : a + ' h'; }
+  function ymd(d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+  function parseYmd(s) { var p = String(s).split('-'); return new Date(+p[0], +p[1] - 1, +p[2], 12); }
+  function addDays(s, n) { var d = parseYmd(s); d.setDate(d.getDate() + n); return ymd(d); }
+  function today() { return ymd(new Date()); }
+  function cap1(s) { s = String(s || '').replace(/\.$/, ''); return s.charAt(0).toUpperCase() + s.slice(1); }
+  function dayName(dow, kind) { return cap1(new Intl.DateTimeFormat(LG, { weekday: kind || 'short' }).format(new Date(2024, 0, 7 + dow, 12))); }
+  function dateL(s, opt) { return cap1(new Intl.DateTimeFormat(LG, opt || { weekday: 'long', day: 'numeric', month: 'short' }).format(parseYmd(s))); }
+  var WEEK = [1, 2, 3, 4, 5, 6, 0];   // segunda a domingo
+  function daysL(days) {
+    var d = (days || []).slice().sort(function (a, b) { return WEEK.indexOf(a) - WEEK.indexOf(b); });
+    if (d.length === 5 && [1, 2, 3, 4, 5].every(function (x) { return d.indexOf(x) >= 0; })) return T('Seg a Sex');
+    if (d.length === 7) return T('Todos os dias');
+    return d.map(function (x) { return dayName(x); }).join(', ');
+  }
+  function money(v) { var cur = (S.club && S.club.cur) || 'BRL'; try { return new Intl.NumberFormat(LG, { style: 'currency', currency: cur, maximumFractionDigits: v % 1 ? 2 : 0 }).format(v || 0); } catch (e) { return cur + ' ' + Number(v || 0).toFixed(2); } }
+  var CUR = { 'pt-BR': 'BRL', 'pt-PT': 'EUR', en: 'USD', es: 'EUR', fr: 'EUR', de: 'EUR' };
+  var PAL = ['#C4401B', '#0D6A88', '#4E7A12', '#7B3FA0', '#B07A00', '#2D63AD', '#A0365B', '#2F7351', '#5B5F66', '#D0662B'];
+  var KINDS = { rent: ['Aluguel', '#0D6A88', 'money'], tournament: ['Torneio', '#B07A00', 'trophy'], maintenance: ['Manutenção', '#5B5F66', 'tool'], event: ['Evento', '#7B3FA0', 'star'] };
+  var SURF = [['', 'Não informar'], ['clay', 'Saibro'], ['hard', 'Rápida'], ['grass', 'Grama'], ['carpet', 'Carpete / sintético'], ['sand', 'Areia']];
+  var LEVELS = ['', 'Iniciante', 'Intermediário', 'Avançado', 'Competição', 'Infantil', 'Kids'];
+
+  // ---------- estado ----------
+  var S = { user: null, db: null, auth: null, clubs: [], cid: '', club: null, loading: false, err: false, tab: lsGet('boxscore.clube.tab') || 'geral', date: today(), agMode: 'courts', pMode: 'students', q: '', rentT: 'wd' };
+  COLS.forEach(function (c) { S[c] = []; });
+
+  // ---------- Firebase ----------
+  function loadFB() {
+    if (window.firebase && firebase.auth && firebase.firestore) return Promise.resolve();
+    return new Promise(function (res, rej) {
+      var i = 0;
+      (function next() {
+        if (i >= FB_LIBS.length) return res();
+        var s = document.createElement('script'); s.src = 'https://www.gstatic.com/firebasejs/' + FB_VER + '/firebase-' + FB_LIBS[i++] + '-compat.js';
+        s.onload = next; s.onerror = function () { rej(new Error('load')); }; document.head.appendChild(s);
+      })();
+    });
+  }
+  function initFB() {
+    return loadFB().then(function () {
+      firebase.initializeApp(FB_CFG);
+      S.auth = firebase.auth(); S.db = firebase.firestore();
+      try { S.db.settings({ experimentalAutoDetectLongPolling: true, merge: true }); } catch (e) {}
+      try { S.auth.getRedirectResult().catch(function () {}); } catch (e) {}
+      S.auth.onAuthStateChanged(function (u) { S.user = u || null; paintGate(); if (u) loadClubs(); });
+    }).catch(function () { $('gate').hidden = false; $('app').hidden = true; $('gateT').textContent = T('Não foi possível carregar. Verifique a internet.'); $('login').hidden = true; });
+  }
+  function login() {
+    $('gateE').hidden = true;
+    var prov = new firebase.auth.GoogleAuthProvider();
+    S.auth.signInWithPopup(prov).catch(function (e) {
+      var c = (e && e.code) || '';
+      if (/popup-blocked|operation-not-supported/.test(c)) { try { return S.auth.signInWithRedirect(prov); } catch (x) {} }
+      if (/popup-closed|cancelled/.test(c)) return;
+      $('gateE').hidden = false; $('gateE').textContent = T('Não foi possível entrar. Tente de novo.');
+    });
+  }
+  function paintGate() {
+    $('gate').hidden = !!S.user; $('app').hidden = !S.user; $('login').hidden = false;
+    $('setB').hidden = !S.user || !S.club;
+    if (!S.user) { $('gateH').textContent = T('Gestão do clube'); $('gateT').textContent = T('Entre com a mesma conta Google do Placar e da Comunidade para cadastrar o clube, as quadras, os professores, os alunos e as turmas.'); heroTop(); }
+  }
+
+  // ---------- dados ----------
+  function clubRef(id) { return S.db.collection('clubs').doc(id || S.cid); }
+  function sub(col) { return clubRef().collection(col); }
+  function fixClub(c) {
+    c.hours = c.hours || {}; ['0', '1', '2', '3', '4', '5', '6', 'hol'].forEach(function (k) { c.hours[k] = c.hours[k] || { open: '08:00', close: '22:00', closed: k === 'hol' }; });
+    c.rent = c.rent || {}; ['wd', 'sat', 'sun', 'hol'].forEach(function (k) { c.rent[k] = c.rent[k] || []; });
+    c.fees = c.fees || []; c.holidays = c.holidays || []; c.slot = c.slot || 60; c.cur = c.cur || CUR[LG] || 'BRL';
+    return c;
+  }
+  function loadClubs() {
+    S.loading = true; S.err = false; paint();
+    return S.db.collection('clubs').where('admins', 'array-contains', S.user.uid).get().then(function (r) {
+      S.clubs = r.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); });
+      var last = lsGet('boxscore.clube.cid'), c = S.clubs.filter(function (x) { return x.id === last; })[0] || S.clubs[0];
+      if (c) return openClub(c);
+      S.club = null; S.cid = ''; S.loading = false; paint();
+    }).catch(function () { S.loading = false; S.err = true; paint(); });
+  }
+  function openClub(c) {
+    S.cid = c.id; S.club = fixClub(c); lsSet('boxscore.clube.cid', c.id); S.loading = true; paint();
+    return Promise.all(COLS.map(function (n) { return sub(n).get(); })).then(function (rs) {
+      COLS.forEach(function (n, i) { S[n] = rs[i].docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); }); });
+      sortAll(); S.loading = false; paint();
+    }).catch(function () { S.loading = false; S.err = true; paint(); });
+  }
+  function sortAll() {
+    S.courts.sort(function (a, b) { return (a.order || 0) - (b.order || 0) || byName(a, b); });
+    S.coaches.sort(byName); S.students.sort(byName);
+    S.classes.sort(function (a, b) { return WEEK.indexOf((a.days || [9])[0]) - WEEK.indexOf((b.days || [9])[0]) || toMin(a.from) - toMin(b.from) || byName(a, b); });
+    S.bookings.sort(function (a, b) { return String(a.date || '').localeCompare(String(b.date || '')) || toMin(a.from) - toMin(b.from); });
+  }
+  function clean(o) { var d = {}; Object.keys(o).forEach(function (k) { if (k !== 'id' && o[k] !== undefined) d[k] = o[k]; }); return d; }
+  function saveItem(col, item) {
+    var data = clean(item); data.updatedAt = Date.now(); if (!item.id) data.createdAt = Date.now();
+    var ref = item.id ? sub(col).doc(item.id) : sub(col).doc();
+    return ref.set(data).then(function () {
+      data.id = ref.id; var arr = S[col], i = arr.map(function (x) { return x.id; }).indexOf(ref.id);
+      if (i >= 0) arr[i] = data; else arr.push(data); sortAll(); return data;
+    });
+  }
+  function delItem(col, id) { return sub(col).doc(id).delete().then(function () { S[col] = S[col].filter(function (x) { return x.id !== id; }); }); }
+  function saveClub(patch) {
+    var next = Object.assign({}, S.club, patch), data = clean(next); data.updatedAt = Date.now();
+    return clubRef().set(data).then(function () { S.club = fixClub(Object.assign({ id: S.cid }, data)); S.clubs = S.clubs.map(function (c) { return c.id === S.cid ? S.club : c; }); });
+  }
+  function failT() { toast(T('Não foi possível salvar. Verifique a internet e tente de novo.')); }
+  function find(col, id) { return S[col].filter(function (x) { return x.id === id; })[0] || null; }
+  function nameOf(col, id) { var x = find(col, id); return x ? x.name : ''; }
+  function coachColor(id) { var c = find('coaches', id); if (c && c.color) return c.color; var i = S.coaches.map(function (x) { return x.id; }).indexOf(id); return i >= 0 ? PAL[i % PAL.length] : '#5B5F66'; }
+
+  // ---------- agenda: o que está acontecendo em cada quadra e com cada professor ----------
+  function dayInfo(ds) {
+    var d = parseYmd(ds), dow = d.getDay(), hol = S.club.holidays.filter(function (x) { return x.date === ds; })[0] || null;
+    var key = hol ? 'hol' : String(dow), hr = S.club.hours[key] || {};
+    var o = toMin(hr.open), c = toMin(hr.close);
+    return { ds: ds, dow: dow, hol: hol, key: key, closed: !!hr.closed || !(o < c), open: o, close: c, type: hol ? 'hol' : dow === 0 ? 'sun' : dow === 6 ? 'sat' : 'wd' };
+  }
+  function slotsOf(di) { var st = S.club.slot || 60, out = []; if (di.closed) return out; for (var m = di.open; m + st <= di.close; m += st) out.push(m); return out; }
+  function classOn(cl, di) { return cl.active !== false && (cl.days || []).indexOf(di.dow) >= 0 && (!di.hol || !!S.club.holClasses); }
+  function bookingOn(b, di) { return b.repeat === 'weekly' ? ((b.days || []).indexOf(di.dow) >= 0 && (!b.start || di.ds >= b.start) && (!b.end || di.ds <= b.end)) : b.date === di.ds; }
+  function onCourt(b, cid) { return !b.courts || !b.courts.length || b.courts.indexOf(cid) >= 0; }
+  function ov(a1, a2, b1, b2) { return a1 < b2 && b1 < a2; }
+  function activeCourts() { return S.courts.filter(function (c) { return c.active !== false; }); }
+  function occ(courtId, di, s, e) {
+    for (var i = 0; i < S.classes.length; i++) { var cl = S.classes[i]; if (cl.courtId === courtId && classOn(cl, di) && ov(s, e, toMin(cl.from), toMin(cl.to))) return { kind: 'class', item: cl }; }
+    for (var j = 0; j < S.bookings.length; j++) { var b = S.bookings[j]; if (onCourt(b, courtId) && bookingOn(b, di) && ov(s, e, toMin(b.from), toMin(b.to))) return { kind: b.kind || 'rent', item: b }; }
+    return null;
+  }
+  function priceAt(di, s) { var bands = S.club.rent[di.type] || []; for (var i = 0; i < bands.length; i++) if (toMin(bands[i].from) <= s && s < toMin(bands[i].to)) return +bands[i].price || 0; return null; }
+  function coachWin(co, dow) { var a = (co.avail || {})[dow]; if (!a || !a.on) return []; var w = []; if (toMin(a.from) < toMin(a.to)) w.push([toMin(a.from), toMin(a.to)]); if (toMin(a.from2) < toMin(a.to2)) w.push([toMin(a.from2), toMin(a.to2)]); return w; }
+  function coachAt(co, di, s, e) {
+    for (var i = 0; i < S.classes.length; i++) { var cl = S.classes[i]; if (cl.coachId === co.id && classOn(cl, di) && ov(s, e, toMin(cl.from), toMin(cl.to))) return { kind: 'class', item: cl }; }
+    var w = coachWin(co, di.dow); for (var k = 0; k < w.length; k++) if (w[k][0] <= s && e <= w[k][1]) return { kind: 'free' };
+    return { kind: 'off' };
+  }
+  // junta horários seguidos com a mesma situação em janelas [início, fim]
+  function windows(list) { var out = []; list.forEach(function (x) { var l = out[out.length - 1]; if (l && l[1] === x[0]) l[1] = x[1]; else out.push([x[0], x[1]]); }); return out; }
+  function courtFree(courtId, di) { var st = S.club.slot; return windows(slotsOf(di).filter(function (s) { return !occ(courtId, di, s, s + st); }).map(function (s) { return [s, s + st]; })); }
+  function coachFree(co, di) { var st = S.club.slot; return windows(slotsOf(di).filter(function (s) { return coachAt(co, di, s, s + st).kind === 'free'; }).map(function (s) { return [s, s + st]; })); }
+  function rentValue(di, s, e) { var st = S.club.slot, sum = 0, any = false; for (var m = s; m < e; m += st) { var p = priceAt(di, m); if (p != null) { sum += p * Math.min(st, e - m) / 60; any = true; } } return any ? sum : null; }
+  function studentsOf(clId) { return S.students.filter(function (s) { return (s.status || 'active') === 'active' && (s.classIds || []).indexOf(clId) >= 0; }); }
+  function weekMin(filter) { var t = 0; S.classes.forEach(function (cl) { if (cl.active !== false && filter(cl)) t += Math.max(0, toMin(cl.to) - toMin(cl.from)) * (cl.days || []).length; }); return t; }
+
+  // ---------- folha de baixo (padrão da Comunidade: alça, tocar fora ou Esc fecha) ----------
+  function sheet(build) {
+    var root = h('div', { cls: 'um', role: 'dialog', 'aria-modal': 'true' }), box = h('div', { cls: 'umb' });
+    function close() { root.remove(); document.removeEventListener('keydown', esc); }
+    function esc(e) { if (e.key === 'Escape') close(); }
+    root.addEventListener('click', function (e) { if (e.target === root) close(); });
+    document.addEventListener('keydown', esc);
+    var g = h('div', { cls: 'grab', 'aria-hidden': 'true' }); box.appendChild(g);
+    var y0 = null, dy = 0;
+    g.addEventListener('pointerdown', function (e) { y0 = e.clientY; dy = 0; try { g.setPointerCapture(e.pointerId); } catch (x) {} });
+    g.addEventListener('pointermove', function (e) { if (y0 == null) return; dy = Math.max(0, e.clientY - y0); box.style.transform = 'translateY(' + dy + 'px)'; });
+    function end() { if (y0 == null) return; y0 = null; if (dy > 60) close(); else box.style.transform = ''; }
+    g.addEventListener('pointerup', end); g.addEventListener('pointercancel', end);
+    build(close).forEach(function (k) { if (k) box.appendChild(k); });
+    root.appendChild(box); document.body.appendChild(root);
+    var f = box.querySelector('input[type=text],input:not([type]),textarea'); if (f && !f.value && window.innerWidth > 760) setTimeout(function () { f.focus(); }, 50);
+    return close;
+  }
+  function fld(label, input, hint) { return h('label', { cls: 'f' }, [h('span', { text: label }), input, hint ? h('small', { cls: 'sub', text: hint }) : null]); }
+  function inp(val, attrs) { return h('input', Object.assign({ type: 'text', value: val == null ? '' : val }, attrs || {})); }
+  function sel(opts, val) { var s = h('select', {}, opts.map(function (o) { return h('option', { value: o[0], text: o[1] }); })); s.value = val == null ? '' : val; return s; }
+  function segC(opts, val, onch) {
+    var cur = val, el = h('div', { cls: 'seg', role: 'group' });
+    function draw() { el.textContent = ''; opts.forEach(function (o) { el.appendChild(h('button', { type: 'button', 'aria-pressed': String(o[0] === cur), on: { click: function () { cur = o[0]; draw(); if (onch) onch(cur); } } }, [o[2] ? ic(o[2]) : null, h('span', { text: o[1] })])); }); }
+    draw(); el.get = function () { return cur; }; return el;
+  }
+  function daysC(val, onch) {
+    var cur = (val || []).slice(), el = h('div', { cls: 'days', role: 'group' });
+    WEEK.forEach(function (d) { var b = h('button', { type: 'button', 'aria-pressed': String(cur.indexOf(d) >= 0), text: dayName(d) }); b.addEventListener('click', function () { var i = cur.indexOf(d); if (i >= 0) cur.splice(i, 1); else cur.push(d); b.setAttribute('aria-pressed', String(i < 0)); if (onch) onch(cur); }); el.appendChild(b); });
+    el.get = function () { return cur.slice(); }; return el;
+  }
+  function picksC(items, val, onch) {   // items: [{id, name, color}]
+    var cur = (val || []).slice(), el = h('div', { cls: 'picks', role: 'group' });
+    items.forEach(function (it) { var b = h('button', { type: 'button', cls: 'pick', 'aria-pressed': String(cur.indexOf(it.id) >= 0), style: it.color ? '--c:' + it.color : null }, [it.color ? h('i', { cls: 'dotc' }) : null, h('span', { text: it.name })]);
+      b.addEventListener('click', function () { var i = cur.indexOf(it.id); if (i >= 0) cur.splice(i, 1); else cur.push(it.id); b.setAttribute('aria-pressed', String(i < 0)); if (onch) onch(cur); }); el.appendChild(b); });
+    el.get = function () { return cur.slice(); }; return el;
+  }
+  function tglC(label, on) { var c = h('input', { type: 'checkbox' }); c.checked = !!on; var l = h('label', { cls: 'tgl' }, [c, h('span', { text: label })]); l.get = function () { return c.checked; }; l.box = c; return l; }
+  function timeI(v) { return h('input', { type: 'time', value: v || '', step: '300' }); }
+  function numI(v, attrs) { return h('input', Object.assign({ type: 'number', inputmode: 'decimal', min: '0', step: 'any', value: v == null ? '' : v }, attrs || {})); }
+  function footBtns(close, saveTxt, onSave, delFn) {
+    var msg = h('div', { cls: 'msg', hidden: true }), save = h('button', { type: 'button', cls: 'btn pri', text: saveTxt || T('Salvar') });
+    save.addEventListener('click', function () { msg.hidden = true; onSave(msg, save); });
+    var left = delFn ? confirmBtn(T('Excluir'), T('Toque de novo para excluir'), delFn) : h('button', { type: 'button', cls: 'btn', text: T('Cancelar'), on: { click: close } });
+    return [msg, h('div', { cls: 'foot' }, [left, save])];
+  }
+  function confirmBtn(txt, again, fn) {
+    var armed = false, b = h('button', { type: 'button', cls: 'btn bad' }, [ic('trash'), h('span', { text: txt })]);
+    b.addEventListener('click', function () { if (!armed) { armed = true; b.lastChild.textContent = again; setTimeout(function () { armed = false; b.lastChild.textContent = txt; }, 3500); return; } fn(); });
+    return b;
+  }
+  function err(msg, t, warn) { msg.hidden = false; msg.textContent = t; msg.className = 'msg' + (warn ? ' w' : ''); }
+  function busy(btn, on) { btn.disabled = on; }
+
+  // ---------- topo e abas ----------
+  var TABS = [['geral', 'Visão geral', 'home', 'sum'], ['agenda', 'Agenda', 'cal', 'marcar'], ['quadras', 'Quadras', 'court', 'jogos'], ['turmas', 'Turmas', 'group', 'grupos'], ['pessoas', 'Pessoas', 'people', 'jogador']];
+  function heroTop() {
+    var m = TABS.filter(function (t) { return t[0] === S.tab; })[0];
+    if (S.tab === 'clube') m = ['clube', 'Clube', 'gear', 'ajustes'];
+    var on = S.user && S.club;
+    $('ttl').textContent = on && m ? T(m[1]) : T('Clube');
+    $('kick').textContent = on ? 'BoxScore · ' + S.club.name : 'BoxScore';
+    if (window.BXHero) BXHero.apply($('hdr'), on && m ? m[3] : 'ajustes');
+    var sb = $('setB'); sb.hidden = !on; sb.classList.toggle('on', S.tab === 'clube');
+  }
+  function paintTabs() {
+    var host = $('tabs'); host.textContent = ''; host.hidden = !S.club;
+    TABS.forEach(function (t) {
+      host.appendChild(h('button', { type: 'button', 'aria-selected': String(S.tab === t[0]), on: { click: function () { go(t[0]); } } }, [h('span', { cls: 'tic' }, [ic(t[2])]), h('span', { cls: 'tl', text: T(t[1]) })]));
+    });
+  }
+  function go(tab) { S.tab = tab; lsSet('boxscore.clube.tab', tab); paint(); window.scrollTo(0, 0); }
+  function paint() {
+    if (!S.user) return;
+    heroTop(); paintTabs();
+    var v = $('view'); v.textContent = '';
+    if (S.loading) { v.appendChild(h('div', { cls: 'empty' }, [ic('clock'), h('span', { text: T('Carregando...') })])); return; }
+    if (S.err) { v.appendChild(h('div', { cls: 'card' }, [h('div', { cls: 'msg', text: T('Não foi possível carregar. Verifique a internet.') }), ibtn('clock', T('Tentar de novo'), '', loadClubs)])); return; }
+    if (!S.club) { v.appendChild(viewNewClub()); return; }
+    var f = { geral: viewGeral, agenda: viewAgenda, quadras: viewCourts, turmas: viewClasses, pessoas: viewPeople, clube: viewClub }[S.tab] || viewGeral;
+    v.appendChild(f());
+    v.appendChild(h('div', { cls: 'foot2', text: Tf('Clube {0} · build {1}', VERSION, BUILD) }));
+  }
+
+  // ---------- cadastro do clube ----------
+  function defaultClub(name, city, phone) {
+    var uid = S.user.uid, H = function (o, c, x) { return { open: o, close: c, closed: !!x }; };
+    return { name: name, city: city, phone: phone, owner: uid, admins: [uid], cur: CUR[LG] || 'BRL', slot: 60, holClasses: false,
+      hours: { '1': H('07:00', '23:00'), '2': H('07:00', '23:00'), '3': H('07:00', '23:00'), '4': H('07:00', '23:00'), '5': H('07:00', '23:00'), '6': H('07:00', '20:00'), '0': H('08:00', '14:00'), hol: H('08:00', '14:00', true) },
+      rent: { wd: [{ from: '07:00', to: '18:00', price: 0 }, { from: '18:00', to: '23:00', price: 0 }], sat: [{ from: '07:00', to: '20:00', price: 0 }], sun: [{ from: '08:00', to: '14:00', price: 0 }], hol: [{ from: '08:00', to: '14:00', price: 0 }] },
+      fees: [], holidays: [], createdAt: Date.now(), updatedAt: Date.now() };
+  }
+  function clubForm(onDone, cancel) {
+    var n = inp('', { autocomplete: 'organization' }), c = inp(''), p = inp('', { type: 'tel', autocomplete: 'tel' }), msg = h('div', { cls: 'msg', hidden: true });
+    var b = h('button', { type: 'button', cls: 'btn pri', text: T('Cadastrar clube') });
+    b.addEventListener('click', function () {
+      if (!n.value.trim()) return err(msg, T('Digite o nome do clube.'));
+      busy(b, true);
+      var data = defaultClub(n.value.trim(), c.value.trim(), p.value.trim()), ref = S.db.collection('clubs').doc();
+      ref.set(data).then(function () { var cl = Object.assign({ id: ref.id }, data); S.clubs.push(cl); COLS.forEach(function (k) { S[k] = []; }); S.tab = 'geral'; return openClub(cl); }).then(function () { toast(T('Clube cadastrado.')); if (onDone) onDone(); })
+        .catch(function () { busy(b, false); err(msg, T('Não foi possível salvar. Verifique a internet e tente de novo.')); });
+    });
+    return [fld(T('Nome do clube'), n), h('div', { cls: 'two' }, [fld(T('Cidade'), c), fld(T('Telefone / WhatsApp'), p)]), msg, cancel ? h('div', { cls: 'two' }, [h('button', { type: 'button', cls: 'btn', text: T('Cancelar'), on: { click: cancel } }), b]) : b];
+  }
+  function viewNewClub() {
+    return h('div', { cls: 'card' }, [secH('club', T('Cadastre seu clube'), T('Depois você cadastra as quadras, os horários de funcionamento, os professores, as turmas e os alunos. A agenda mostra sozinha os horários livres para aluguel e torneios.'))].concat(clubForm()));
+  }
+
+  // ---------- seletor de data ----------
+  function dateBar(onPick) {
+    var di = dayInfo(S.date), di2 = h('input', { type: 'date', value: S.date, 'aria-label': T('Escolher data') });
+    di2.addEventListener('change', function () { if (di2.value) { S.date = di2.value; onPick(); } });
+    var lab = h('div', { cls: 'dlab' }, [h('b', { text: S.date === today() ? T('Hoje') + ' · ' + dateL(S.date, { day: 'numeric', month: 'short' }) : dateL(S.date) }),
+      h('span', { cls: 'sub', text: di.hol ? Tf('Feriado: {0}', di.hol.name || T('feriado')) + (di.closed ? ' · ' + T('fechado') : '') : di.closed ? T('Clube fechado neste dia') : Tf('Aberto das {0} às {1}', hm(di.open), hm(di.close)) })]);
+    return h('div', { cls: 'dbar' }, [
+      h('button', { type: 'button', cls: 'btn icb', 'aria-label': T('Dia anterior'), on: { click: function () { S.date = addDays(S.date, -1); onPick(); } } }, [ic('left')]),
+      lab, di2,
+      S.date !== today() ? h('button', { type: 'button', cls: 'btn', text: T('Hoje'), on: { click: function () { S.date = today(); onPick(); } } }) : null,
+      h('button', { type: 'button', cls: 'btn icb', 'aria-label': T('Próximo dia'), on: { click: function () { S.date = addDays(S.date, 1); onPick(); } } }, [ic('right')])]);
+  }
+  function dayStrip(onPick) {
+    var d = parseYmd(S.date), mon = addDays(S.date, -((d.getDay() + 6) % 7)), el = h('div', { cls: 'dstrip' });
+    for (var i = 0; i < 7; i++) (function (ds) {
+      var di = dayInfo(ds);
+      el.appendChild(h('button', { type: 'button', cls: (di.hol ? 'hol ' : '') + (di.closed ? 'cl' : ''), 'aria-pressed': String(ds === S.date), title: dateL(ds), on: { click: function () { S.date = ds; onPick(); } } },
+        [h('span', { text: dayName(di.dow) }), h('b', { text: String(parseYmd(ds).getDate()) })]));
+    })(addDays(mon, i));
+    return el;
+  }
+
+  // ---------- Visão geral ----------
+  function stat(icon, label, val, small) { return h('div', { cls: 'stat' }, [h('span', {}, [ic(icon), document.createTextNode(label)]), h('b', { text: String(val) }), small ? h('small', { text: small }) : null]); }
+  function viewGeral() {
+    var wrap = h('div', { style: 'display:grid;gap:12px' }), di = dayInfo(S.date), sl = slotsOf(di), st = S.club.slot, courts = activeCourts();
+    wrap.appendChild(dateBar(paint));
+    // primeiros passos
+    var hasPrice = ['wd', 'sat', 'sun', 'hol'].some(function (k) { return S.club.rent[k].some(function (b) { return +b.price > 0; }); });
+    var steps = [[S.courts.length > 0, 'Cadastrar as quadras', 'quadras'], [!!S.club.hoursOk, 'Conferir os horários de funcionamento', 'clube'], [hasPrice, 'Definir o valor da hora do aluguel', 'clube'], [S.club.fees.length > 0, 'Cadastrar as mensalidades', 'clube'], [S.coaches.length > 0, 'Cadastrar os professores', 'pessoas:coaches'], [S.classes.length > 0, 'Criar as turmas', 'turmas'], [S.students.length > 0, 'Cadastrar os alunos', 'pessoas:students']];
+    if (steps.some(function (x) { return !x[0]; })) {
+      wrap.appendChild(h('div', { cls: 'card' }, [secH('flag', T('Primeiros passos'), Tf('{0} de {1} feitos. Toque em um item para ir até ele.', steps.filter(function (x) { return x[0]; }).length, steps.length)),
+        h('div', { cls: 'steps' }, steps.map(function (x) { return h('button', { type: 'button', cls: 'stp' + (x[0] ? ' done' : ''), on: { click: function () { var p = x[2].split(':'); if (p[1]) S.pMode = p[1]; go(p[0]); } } }, [h('span', { cls: 'ck' }, [x[0] ? ic('check') : null]), h('span', { cls: 'l', text: T(x[1]) })]); }))]));
+    }
+    // números
+    var total = sl.length * courts.length, busyN = 0, freeVal = 0, freeMin = 0;
+    courts.forEach(function (c) { sl.forEach(function (s) { if (occ(c.id, di, s, s + st)) busyN++; else { freeMin += st; var p = priceAt(di, s); if (p) freeVal += p * st / 60; } }); });
+    var actS = S.students.filter(function (s) { return (s.status || 'active') === 'active'; });
+    var feeSum = actS.reduce(function (a, s) { var f = S.club.fees.filter(function (x) { return x.id === s.feeId; })[0]; return a + (f ? +f.price || 0 : 0); }, 0);
+    wrap.appendChild(h('div', { cls: 'stats' }, [
+      stat('court', T('Quadras'), courts.length, S.courts.length > courts.length ? Tf('{0} inativa(s)', S.courts.length - courts.length) : T('ativas')),
+      stat('coach', T('Professores'), S.coaches.length, Tf('{0} turmas', S.classes.filter(function (c) { return c.active !== false; }).length)),
+      stat('user', T('Alunos ativos'), actS.length, S.students.length > actS.length ? Tf('{0} pausados ou saíram', S.students.length - actS.length) : ''),
+      stat('money', T('Mensalidades / mês'), money(feeSum), T('previsto, alunos ativos')),
+      stat('cal', T('Ocupação do dia'), total ? Math.round(busyN * 100 / total) + '%' : '—', di.closed ? T('clube fechado') : Tf('{0} de {1} horários', busyN, total)),
+      stat('clock', T('Horas livres no dia'), durL(freeMin), T('somando todas as quadras')),
+      stat('money', T('Valor das horas livres'), hasPrice ? money(freeVal) : '—', hasPrice ? T('se todas forem alugadas') : T('defina os valores em Clube')),
+      stat('trophy', T('Reservas e eventos'), S.bookings.filter(function (b) { return bookingOn(b, di); }).length, T('neste dia'))]));
+    // agora
+    var cols = h('div', { cls: 'cols' });
+    if (S.date === today() && !di.closed && courts.length) {
+      var d = new Date(), nm = d.getHours() * 60 + d.getMinutes(), cardN = h('div', { cls: 'card' }, [secH('clock', Tf('Agora · {0}', hm(nm)), T('O que está acontecendo em cada quadra e com cada professor.'))]);
+      if (nm < di.open || nm >= di.close) cardN.appendChild(h('div', { cls: 'sub', text: Tf('Clube fechado agora. Hoje abre das {0} às {1}.', hm(di.open), hm(di.close)) }));
+      else {
+        courts.forEach(function (c) {
+          var o = occ(c.id, di, nm, nm + 1), txt, cls;
+          if (o) { txt = occLabel(o) + ' · ' + Tf('até {0}', o.item.to); cls = 'st-busy'; }
+          else { var w = courtFree(c.id, di).filter(function (x) { return x[0] <= nm + st && nm < x[1]; })[0]; txt = w ? Tf('Livre até {0}', hm(w[1])) : T('Livre'); cls = 'st-free'; }
+          cardN.appendChild(h('div', { cls: 'now' }, [h('b', { text: c.name }), h('span', { cls: 'grow ' + cls, text: txt })]));
+        });
+        S.coaches.forEach(function (co) {
+          var a = coachAt(co, di, nm, nm + 1), txt = a.kind === 'class' ? Tf('Em aula: {0} · {1}', a.item.name, nameOf('courts', a.item.courtId) || T('sem quadra')) : a.kind === 'free' ? T('Livre agora') : T('Fora do horário');
+          cardN.appendChild(h('div', { cls: 'now' }, [h('b', { text: co.name }), h('span', { cls: 'grow ' + (a.kind === 'free' ? 'st-free' : a.kind === 'off' ? 'st-off' : 'st-busy'), text: txt })]));
+        });
+      }
+      cols.appendChild(cardN);
+    }
+    // quadras livres por horário (para aluguel e torneios)
+    if (courts.length && sl.length) {
+      var mx = courts.length, fc = h('div', { cls: 'fc', role: 'img', 'aria-label': T('Quadras livres por horário') });
+      sl.forEach(function (s) { var n = courts.filter(function (c) { return !occ(c.id, di, s, s + st); }).length;
+        fc.appendChild(h('div', { cls: 'col', title: Tf('{0}: {1} de {2} quadras livres', hm(s), n, mx) }, [h('em', { text: String(n) }), h('i', { cls: n ? '' : 'z', style: 'height:' + Math.max(3, Math.round(n * 70 / mx)) + 'px' }), h('small', { text: s % 60 ? '' : String(s / 60) })])); });
+      cols.appendChild(h('div', { cls: 'card' }, [secH('grid4', T('Quadras livres por horário'), T('Barras altas mostram os melhores horários para aluguel e para torneios com várias quadras.')), fc]));
+      var cf = h('div', { cls: 'card' }, [secH('court', T('Horários livres por quadra'), T('Toque em um horário para reservar ou bloquear.'))]);
+      courts.forEach(function (c) {
+        var w = courtFree(c.id, di);
+        cf.appendChild(h('div', { style: 'display:grid;gap:6px;padding:6px 0;border-top:1px solid var(--line)' }, [h('b', { text: c.name, style: 'font:800 14px var(--ui)' }),
+          w.length ? h('div', { cls: 'wins' }, w.map(function (x) { var val = rentValue(di, x[0], x[1]); return h('button', { type: 'button', cls: 'pick', on: { click: function () { bookingSheet(null, { court: c.id, from: hm(x[0]), to: hm(Math.min(x[1], x[0] + st)) }); } } }, [h('span', { text: hm(x[0]) + '–' + hm(x[1]) + (val ? ' · ' + money(val) : '') })]); }))
+            : h('span', { cls: 'sub', text: T('Sem horário livre neste dia.') })]));
+      });
+      cols.appendChild(cf);
+    }
+    if (S.coaches.length && !di.closed) {
+      var cc = h('div', { cls: 'card' }, [secH('coach', T('Professores: horários livres'), T('Dentro da disponibilidade de cada um, fora das turmas.'))]);
+      S.coaches.forEach(function (co) {
+        var w = coachFree(co, di), taught = S.classes.filter(function (cl) { return cl.coachId === co.id && classOn(cl, di); }).reduce(function (a, cl) { return a + Math.max(0, toMin(cl.to) - toMin(cl.from)); }, 0);
+        cc.appendChild(h('div', { style: 'display:grid;gap:6px;padding:6px 0;border-top:1px solid var(--line)' }, [h('div', { cls: 'row' }, [h('span', { cls: 'chip', style: '--c:' + coachColor(co.id) }, [h('i', { cls: 'dotc' }), document.createTextNode(co.name)]), taught ? h('span', { cls: 'sub', text: Tf('{0} de aula neste dia', durL(taught)) }) : null]),
+          w.length ? h('div', { cls: 'wins' }, w.map(function (x) { return h('span', { cls: 'chip ok', text: hm(x[0]) + '–' + hm(x[1]) }); })) : h('span', { cls: 'sub', text: coachWin(co, di.dow).length ? T('Sem horário livre neste dia.') : T('Não trabalha neste dia.') })]));
+      });
+      cols.appendChild(cc);
+    }
+    if (S.classes.length) {
+      var ct = h('div', { cls: 'card' }, [secH('group', T('Alunos por turma'), Tf('{0} alunos em turmas', S.classes.reduce(function (a, c) { return a + studentsOf(c.id).length; }, 0)))]);
+      S.classes.forEach(function (cl) { ct.appendChild(classRow(cl, true)); });
+      cols.appendChild(ct);
+    }
+    if (cols.children.length) wrap.appendChild(cols);
+    if (!courts.length) wrap.appendChild(emptyBox('court', T('Cadastre as quadras para ver a ocupação e os horários livres.'), T('Cadastrar quadras'), function () { go('quadras'); }));
+    return wrap;
+  }
+  function occLabel(o) {
+    if (o.kind === 'class') return Tf('Turma {0}', o.item.name) + (o.item.coachId ? ' · ' + nameOf('coaches', o.item.coachId) : '');
+    return T(KINDS[o.kind] ? KINDS[o.kind][0] : 'Ocupado') + (o.item.title ? ': ' + o.item.title : '');
+  }
+  function emptyBox(icon, txt, btn, fn) { return h('div', { cls: 'card' }, [h('div', { cls: 'empty' }, [ic(icon), h('span', { text: txt }), btn ? ibtn('plus', btn, 'pri', fn) : null])]); }
+
+  // ---------- Agenda ----------
+  function viewAgenda() {
+    var wrap = h('div', { style: 'display:grid;gap:12px' }), di = dayInfo(S.date), sl = slotsOf(di), st = S.club.slot;
+    wrap.appendChild(dateBar(paint)); wrap.appendChild(dayStrip(paint));
+    wrap.appendChild(h('div', { cls: 'row' }, [h('div', { cls: 'grow', style: 'flex:1 1 260px' }, [segC([['courts', T('Quadras'), 'court'], ['coaches', T('Professores'), 'coach']], S.agMode, function (v) { S.agMode = v; paint(); })]),
+      ibtn('plus', T('Reservar ou bloquear'), 'pri', function () { bookingSheet(null, {}); })]));
+    if (di.closed) { wrap.appendChild(emptyBox('cal', di.hol ? Tf('Feriado ({0}): clube fechado. Dá para mudar em Clube > Horário de funcionamento.', di.hol.name || T('feriado')) : T('Clube fechado neste dia. Dá para mudar em Clube > Horário de funcionamento.'))); return wrap; }
+    var cols = S.agMode === 'courts' ? activeCourts() : S.coaches;
+    if (!cols.length) { wrap.appendChild(S.agMode === 'courts' ? emptyBox('court', T('Nenhuma quadra cadastrada.'), T('Cadastrar quadras'), function () { go('quadras'); }) : emptyBox('coach', T('Nenhum professor cadastrado.'), T('Cadastrar professores'), function () { S.pMode = 'coaches'; go('pessoas'); })); return wrap; }
+    // matriz: para cada coluna, a situação de cada horário; horários seguidos com o mesmo item viram uma célula só
+    var M = cols.map(function (c) { return sl.map(function (s) { return S.agMode === 'courts' ? (occ(c.id, di, s, s + st) || { kind: 'free' }) : coachAt(c, di, s, s + st); }); });
+    var tb = h('tbody'), skip = cols.map(function () { return 0; });
+    sl.forEach(function (s, r) {
+      var tr = h('tr', {}, [h('td', { cls: 'tm', text: hm(s) })]);
+      cols.forEach(function (c, ci) {
+        if (skip[ci] > 0) { skip[ci]--; return; }
+        var o = M[ci][r], span = 1;
+        if (o.item) while (r + span < sl.length && M[ci][r + span].item === o.item) span++;
+        skip[ci] = span - 1;
+        var end = s + span * st, cell;
+        if (S.agMode === 'courts') {
+          if (o.kind === 'free') { var p = priceAt(di, s); cell = h('button', { type: 'button', cls: 'cell free', on: { click: function () { bookingSheet(null, { court: c.id, from: hm(s), to: hm(s + st) }); } } }, [h('span', { text: T('Livre') }), p ? h('small', { text: money(p) + '/h' }) : null]); }
+          else if (o.kind === 'class') cell = h('button', { type: 'button', cls: 'cell cls', style: '--c:' + coachColor(o.item.coachId), on: { click: function () { classSheet(o.item); } } }, [h('b', { text: o.item.name }), h('span', { text: nameOf('coaches', o.item.coachId) || T('sem professor') }), h('small', { text: o.item.from + '–' + o.item.to + ' · ' + Tf('{0}/{1} alunos', studentsOf(o.item.id).length, o.item.capacity || '–') })]);
+          else { var K = KINDS[o.kind] || KINDS.event; cell = h('button', { type: 'button', cls: 'cell bk', style: '--c:' + K[1], on: { click: function () { bookingSheet(o.item); } } }, [h('b', { text: T(K[0]) }), o.item.title ? h('span', { text: o.item.title }) : null, h('small', { text: o.item.from + '–' + o.item.to + (o.item.repeat === 'weekly' ? ' · ' + T('toda semana') : '') })]); }
+        } else {
+          if (o.kind === 'class') cell = h('button', { type: 'button', cls: 'cell cls', style: '--c:' + coachColor(c.id), on: { click: function () { classSheet(o.item); } } }, [h('b', { text: o.item.name }), h('span', { text: nameOf('courts', o.item.courtId) || T('sem quadra') }), h('small', { text: o.item.from + '–' + o.item.to })]);
+          else if (o.kind === 'free') cell = h('div', { cls: 'cell free', style: 'cursor:default' }, [h('span', { text: T('Livre') })]);
+          else cell = h('div', { cls: 'cell off', 'aria-label': T('Fora do horário') });
+        }
+        tr.appendChild(h('td', { rowspan: span > 1 ? String(span) : null, style: span > 1 ? 'height:' + (48 * span) + 'px' : null }, [cell]));
+      });
+      tb.appendChild(tr);
+    });
+    var head = h('tr', {}, [h('th', { cls: 'tm', text: '' })].concat(cols.map(function (c) {
+      if (S.agMode === 'courts') { var fr = courtFree(c.id, di).reduce(function (a, x) { return a + x[1] - x[0]; }, 0); return h('th', {}, [document.createTextNode(c.name), h('small', { text: Tf('{0} livres', durL(fr)) })]); }
+      var fw = coachFree(c, di).reduce(function (a, x) { return a + x[1] - x[0]; }, 0); return h('th', { style: 'box-shadow:inset 0 -3px 0 ' + coachColor(c.id) }, [document.createTextNode(c.name), h('small', { text: coachWin(c, di.dow).length ? Tf('{0} livres', durL(fw)) : T('não trabalha') })]);
+    })));
+    wrap.appendChild(h('div', { cls: 'ag' }, [h('table', {}, [h('thead', {}, [head]), tb])]));
+    var lg = h('div', { cls: 'legend' }, [h('span', { cls: 'chip', style: '--c:var(--acc)' }, [h('i', { cls: 'dotc' }), document.createTextNode(T('Livre'))])]);
+    if (S.agMode === 'courts') { lg.appendChild(h('span', { cls: 'chip' }, [document.createTextNode(T('Turma: cor do professor'))])); Object.keys(KINDS).forEach(function (k) { lg.appendChild(h('span', { cls: 'chip', style: '--c:' + KINDS[k][1] }, [h('i', { cls: 'dotc' }), document.createTextNode(T(KINDS[k][0]))])); }); }
+    else lg.appendChild(h('span', { cls: 'chip' }, [document.createTextNode(T('Listrado: fora do horário do professor'))]));
+    wrap.appendChild(lg);
+    return wrap;
+  }
+
+  // ---------- Quadras ----------
+  function viewCourts() {
+    var wrap = h('div', { style: 'display:grid;gap:12px' });
+    wrap.appendChild(h('div', { cls: 'row' }, [h('div', { cls: 'grow sub', text: Tf('{0} quadras cadastradas', S.courts.length) }), ibtn('plus', T('Nova quadra'), 'pri', function () { courtSheet(null); })]));
+    if (!S.courts.length) { wrap.appendChild(emptyBox('court', T('Nenhuma quadra cadastrada. Cadastre cada quadra do clube com o piso, se é coberta e se tem iluminação.'), T('Nova quadra'), function () { courtSheet(null); })); return wrap; }
+    var l = h('div', { cls: 'list g2' });
+    S.courts.forEach(function (c) {
+      var wk = weekMin(function (cl) { return cl.courtId === c.id; }), nCl = S.classes.filter(function (cl) { return cl.courtId === c.id && cl.active !== false; }).length;
+      var bits = [T((SURF.filter(function (x) { return x[0] === c.surface; })[0] || SURF[0])[1])].filter(function (x) { return x !== T('Não informar'); });
+      if (c.covered) bits.push(T('coberta')); if (c.lights) bits.push(T('iluminação'));
+      l.appendChild(h('button', { type: 'button', cls: 'item', on: { click: function () { courtSheet(c); } } }, [h('span', { cls: 'av', style: '--c:' + (c.active === false ? '#8C9DA7' : '#2F7351') }, [ic('court')]),
+        h('span', { cls: 'tx' }, [h('b', { text: c.name }), h('small', { text: (bits.join(' · ') || T('Piso não informado')) }), h('small', { text: c.active === false ? T('Inativa: não aparece na agenda') : Tf('{0} turmas · {1} de aula por semana', nCl, durL(wk)) })]), h('span', { cls: 'chev' }, [ic('chev')])]));
+    });
+    wrap.appendChild(l); return wrap;
+  }
+  function courtSheet(c) {
+    c = c || {};
+    var n = inp(c.name || Tf('Quadra {0}', S.courts.length + 1)), sf = sel(SURF.map(function (x) { return [x[0], T(x[1])]; }), c.surface || ''), cov = tglC(T('Coberta'), c.covered), lit = tglC(T('Tem iluminação'), c.lights), act = tglC(T('Ativa (aparece na agenda)'), c.active !== false), note = h('textarea', { placeholder: T('Observações (opcional)') }); note.value = c.note || '';
+    sheet(function (close) {
+      return [h('b', { cls: 'st', text: c.id ? T('Editar quadra') : T('Nova quadra') }), fld(T('Nome'), n), fld(T('Piso'), sf), h('div', { cls: 'two' }, [cov, lit]), act, note].concat(footBtns(close, T('Salvar'), function (msg, b) {
+        if (!n.value.trim()) return err(msg, T('Digite o nome da quadra.'));
+        busy(b, true);
+        saveItem('courts', Object.assign({}, c, { name: n.value.trim(), surface: sf.value, covered: cov.get(), lights: lit.get(), active: act.get(), note: note.value.trim(), order: c.order != null ? c.order : S.courts.length }))
+          .then(function () { close(); paint(); toast(T('Quadra salva.')); }).catch(function () { busy(b, false); failT(); });
+      }, c.id ? function () {
+        var lk = S.classes.filter(function (cl) { return cl.courtId === c.id; });
+        delItem('courts', c.id).then(function () { return Promise.all(lk.map(function (cl) { return saveItem('classes', Object.assign({}, cl, { courtId: '' })); })); })
+          .then(function () { close(); paint(); toast(lk.length ? Tf('Quadra excluída. {0} turma(s) ficaram sem quadra.', lk.length) : T('Quadra excluída.')); }).catch(failT);
+      } : null));
+    });
+  }
+
+  // ---------- Turmas ----------
+  function classRow(cl, compact) {
+    var n = studentsOf(cl.id).length, capN = +cl.capacity || 0, pct = capN ? Math.min(100, Math.round(n * 100 / capN)) : 0;
+    var fee = S.club.fees.filter(function (f) { return f.id === cl.feeId; })[0];
+    return h('button', { type: 'button', cls: 'item', style: compact ? 'border:0;border-top:1px solid var(--line);border-radius:0;padding:10px 0;background:transparent' : null, on: { click: function () { classSheet(cl); } } }, [
+      h('span', { cls: 'av', style: '--c:' + coachColor(cl.coachId) }, [document.createTextNode(initials(cl.name))]),
+      h('span', { cls: 'tx' }, [h('b', { text: cl.name + (cl.active === false ? ' · ' + T('inativa') : '') }),
+        h('small', { text: daysL(cl.days) + ' · ' + cl.from + '–' + cl.to + ' · ' + (nameOf('courts', cl.courtId) || T('sem quadra')) }),
+        h('small', { text: (nameOf('coaches', cl.coachId) || T('sem professor')) + (cl.level ? ' · ' + T(cl.level) : '') + (fee && !compact ? ' · ' + fee.name + ' ' + money(fee.price) : '') }),
+        capN ? h('div', { cls: 'row', style: 'gap:8px' }, [h('div', { cls: 'bar grow' + (n >= capN ? ' full' : '') }, [h('i', { style: 'width:' + pct + '%' })]), h('small', { text: Tf('{0}/{1} alunos', n, capN) })]) : h('small', { text: Tf('{0} alunos', n) })]),
+      h('span', { cls: 'chev' }, [ic('chev')])]);
+  }
+  function viewClasses() {
+    var wrap = h('div', { style: 'display:grid;gap:12px' });
+    wrap.appendChild(h('div', { cls: 'row' }, [h('div', { cls: 'grow sub', text: Tf('{0} turmas · {1} alunos em turmas', S.classes.length, S.classes.reduce(function (a, c) { return a + studentsOf(c.id).length; }, 0)) }), ibtn('plus', T('Nova turma'), 'pri', function () { classSheet(null); })]));
+    if (!S.classes.length) { wrap.appendChild(emptyBox('group', T('Nenhuma turma ainda. Uma turma junta professor, quadra, dias e horário; depois você coloca os alunos nela.'), T('Nova turma'), function () { classSheet(null); })); return wrap; }
+    var groups = [['', T('Sem professor')]].concat(S.coaches.map(function (c) { return [c.id, c.name]; }));
+    groups.forEach(function (g) {
+      var list = S.classes.filter(function (cl) { return (cl.coachId || '') === g[0] || (g[0] === '' && cl.coachId && !find('coaches', cl.coachId)); });
+      if (!list.length) return;
+      wrap.appendChild(h('div', { cls: 'row', style: 'margin-top:6px' }, [h('span', { cls: 'chip ok', style: '--c:' + (g[0] ? coachColor(g[0]) : 'var(--muted)') }, [h('i', { cls: 'dotc' }), document.createTextNode(g[1])]), h('span', { cls: 'sub', text: Tf('{0} turmas · {1} de aula por semana', list.length, durL(weekMin(function (cl) { return list.indexOf(cl) >= 0; }))) })]));
+      wrap.appendChild(h('div', { cls: 'list g2' }, list.map(function (cl) { return classRow(cl); })));
+    });
+    return wrap;
+  }
+  // conflitos de uma turma com outras turmas, reservas e a disponibilidade do professor
+  function classCheck(x) {
+    var hard = [], soft = [], a = toMin(x.from), b = toMin(x.to);
+    S.classes.forEach(function (o) {
+      if (o.id === x.id || o.active === false || x.active === false) return;
+      var same = (o.days || []).filter(function (d) { return x.days.indexOf(d) >= 0; }); if (!same.length || !ov(a, b, toMin(o.from), toMin(o.to))) return;
+      if (x.courtId && o.courtId === x.courtId) hard.push(Tf('A quadra já tem a turma {0} ({1}, {2}–{3}).', o.name, daysL(same), o.from, o.to));
+      if (x.coachId && o.coachId === x.coachId) hard.push(Tf('O professor já dá aula na turma {0} ({1}, {2}–{3}).', o.name, daysL(same), o.from, o.to));
+    });
+    S.bookings.forEach(function (bk) { if (bk.repeat !== 'weekly' || !x.courtId || !onCourt(bk, x.courtId)) return; var same = (bk.days || []).filter(function (d) { return x.days.indexOf(d) >= 0; }); if (same.length && ov(a, b, toMin(bk.from), toMin(bk.to))) hard.push(Tf('A quadra tem um bloqueio fixo: {0} ({1}, {2}–{3}).', T((KINDS[bk.kind] || KINDS.event)[0]) + (bk.title ? ' ' + bk.title : ''), daysL(same), bk.from, bk.to)); });
+    x.days.forEach(function (d) {
+      var hr = S.club.hours[String(d)]; if (hr.closed || a < toMin(hr.open) || b > toMin(hr.close)) soft.push(Tf('{0}: fora do horário de funcionamento do clube.', dayName(d, 'long')));
+      var co = find('coaches', x.coachId); if (co) { var w = coachWin(co, d); if (!w.some(function (r) { return r[0] <= a && b <= r[1]; })) soft.push(Tf('{0}: fora da disponibilidade de {1}.', dayName(d, 'long'), co.name)); }
+    });
+    return { hard: hard, soft: soft };
+  }
+  function classSheet(cl) {
+    cl = cl || {};
+    var n = inp(cl.name || ''), co = sel([['', T('Sem professor')]].concat(S.coaches.map(function (c) { return [c.id, c.name]; })), cl.coachId || ''),
+      ct = sel([['', T('Sem quadra')]].concat(S.courts.map(function (c) { return [c.id, c.name]; })), cl.courtId || ''),
+      dy = daysC(cl.days || []), f = timeI(cl.from || '18:00'), t = timeI(cl.to || '19:00'), capI = numI(cl.capacity || 4, { step: '1', inputmode: 'numeric' }),
+      lv = sel(LEVELS.map(function (x) { return [x, x ? T(x) : T('Não informar')]; }), cl.level || ''), fe = sel([['', T('Sem mensalidade')]].concat(S.club.fees.map(function (x) { return [x.id, x.name + ' · ' + money(x.price)]; })), cl.feeId || ''),
+      act = tglC(T('Turma ativa'), cl.active !== false), forced = false;
+    var studs = cl.id ? studentsOf(cl.id) : [];
+    sheet(function (close) {
+      return [h('b', { cls: 'st', text: cl.id ? T('Editar turma') : T('Nova turma') }), fld(T('Nome da turma'), n, T('Ex.: Iniciantes terça e quinta, Kids manhã')),
+        h('div', { cls: 'two' }, [fld(T('Professor'), co), fld(T('Quadra'), ct)]), fld(T('Dias da semana'), dy), h('div', { cls: 'two' }, [fld(T('Começa'), f), fld(T('Termina'), t)]),
+        h('div', { cls: 'three' }, [fld(T('Vagas'), capI), fld(T('Nível'), lv), fld(T('Mensalidade'), fe)]), act,
+        cl.id ? h('div', { cls: 'f' }, [h('span', { text: Tf('Alunos nesta turma ({0})', studs.length) }), studs.length ? h('div', { cls: 'picks' }, studs.map(function (s) { return h('span', { cls: 'chip', text: s.name }); })) : h('span', { cls: 'sub', text: T('Nenhum aluno ainda. Os alunos entram na turma pelo cadastro do aluno, em Pessoas.') })]) : null
+      ].concat(footBtns(close, T('Salvar'), function (msg, b) {
+        var x = Object.assign({}, cl, { name: n.value.trim(), coachId: co.value, courtId: ct.value, days: dy.get(), from: f.value, to: t.value, capacity: Math.max(0, Math.round(+capI.value || 0)), level: lv.value, feeId: fe.value, active: act.get() });
+        if (!x.name) return err(msg, T('Digite o nome da turma.'));
+        if (!x.days.length) return err(msg, T('Escolha pelo menos um dia da semana.'));
+        if (!(toMin(x.from) < toMin(x.to))) return err(msg, T('O horário de término precisa ser depois do início.'));
+        var ck = classCheck(x);
+        if (ck.hard.length) return err(msg, ck.hard.join(' '));
+        if (ck.soft.length && !forced) { forced = true; b.textContent = T('Salvar mesmo assim'); return err(msg, ck.soft.join(' '), true); }
+        busy(b, true);
+        saveItem('classes', x).then(function () { close(); paint(); toast(T('Turma salva.')); }).catch(function () { busy(b, false); failT(); });
+      }, cl.id ? function () {
+        var lk = S.students.filter(function (s) { return (s.classIds || []).indexOf(cl.id) >= 0; });
+        delItem('classes', cl.id).then(function () { return Promise.all(lk.map(function (s) { return saveItem('students', Object.assign({}, s, { classIds: s.classIds.filter(function (i) { return i !== cl.id; }) })); })); })
+          .then(function () { close(); paint(); toast(T('Turma excluída.')); }).catch(failT);
+      } : null));
+    });
+  }
+
+  // ---------- Pessoas: professores e alunos ----------
+  function viewPeople() {
+    var wrap = h('div', { style: 'display:grid;gap:12px' }), isS = S.pMode === 'students';
+    wrap.appendChild(segC([['students', T('Alunos'), 'user'], ['coaches', T('Professores'), 'coach']], S.pMode, function (v) { S.pMode = v; S.q = ''; paint(); }));
+    var q = h('input', { type: 'search', value: S.q, placeholder: isS ? T('Buscar aluno por nome, telefone ou turma') : T('Buscar professor'), 'aria-label': T('Buscar') });
+    var list = h('div', { cls: 'list g2' });
+    function fill() {
+      list.textContent = ''; var k = norm(S.q);
+      if (isS) {
+        var arr = S.students.filter(function (s) { return !k || norm(s.name + ' ' + (s.phone || '') + ' ' + (s.classIds || []).map(function (i) { return nameOf('classes', i); }).join(' ')).indexOf(k) >= 0; });
+        arr.forEach(function (s) {
+          var st = s.status || 'active', fee = S.club.fees.filter(function (f) { return f.id === s.feeId; })[0];
+          list.appendChild(h('button', { type: 'button', cls: 'item', on: { click: function () { studentSheet(s); } } }, [h('span', { cls: 'av', style: '--c:' + (st === 'active' ? coachColor(s.coachId) : '#8C9DA7') }, [document.createTextNode(initials(s.name))]),
+            h('span', { cls: 'tx' }, [h('b', { text: s.name }), h('small', { text: (nameOf('coaches', s.coachId) || T('sem professor')) + ' · ' + ((s.classIds || []).map(function (i) { return nameOf('classes', i); }).filter(Boolean).join(', ') || T('sem turma')) }),
+              h('small', { text: (st === 'active' ? T('Ativo') : st === 'paused' ? T('Pausado') : T('Saiu')) + (fee ? ' · ' + fee.name + ' ' + money(fee.price) : '') + (s.phone ? ' · ' + s.phone : '') })]), h('span', { cls: 'chev' }, [ic('chev')])]));
+        });
+        if (!arr.length) list.appendChild(h('div', { cls: 'sub', text: S.students.length ? T('Ninguém encontrado.') : T('Nenhum aluno cadastrado ainda.') }));
+      } else {
+        var arr2 = S.coaches.filter(function (c) { return !k || norm(c.name + ' ' + (c.phone || '')).indexOf(k) >= 0; });
+        arr2.forEach(function (c) {
+          var wk = weekMin(function (cl) { return cl.coachId === c.id; }), av = WEEK.reduce(function (a, d) { return a + coachWin(c, d).reduce(function (x, w) { return x + w[1] - w[0]; }, 0); }, 0);
+          var nS = S.students.filter(function (s) { return s.coachId === c.id && (s.status || 'active') === 'active'; }).length, nC = S.classes.filter(function (cl) { return cl.coachId === c.id; }).length;
+          list.appendChild(h('button', { type: 'button', cls: 'item', on: { click: function () { coachSheet(c); } } }, [h('span', { cls: 'av', style: '--c:' + coachColor(c.id) }, [document.createTextNode(initials(c.name))]),
+            h('span', { cls: 'tx' }, [h('b', { text: c.name }), h('small', { text: Tf('{0} turmas · {1} alunos ativos', nC, nS) }), h('small', { text: av ? Tf('{0} de aula de {1} disponíveis por semana', durL(wk), durL(av)) : T('Disponibilidade não informada') })]), h('span', { cls: 'chev' }, [ic('chev')])]));
+        });
+        if (!arr2.length) list.appendChild(h('div', { cls: 'sub', text: S.coaches.length ? T('Ninguém encontrado.') : T('Nenhum professor cadastrado ainda.') }));
+      }
+    }
+    q.addEventListener('input', function () { S.q = q.value; fill(); });
+    wrap.appendChild(h('div', { cls: 'row' }, [h('label', { cls: 'search grow' }, [ic('search'), q]), isS ? ibtn('plus', T('Novo aluno'), 'pri', function () { studentSheet(null); }) : ibtn('plus', T('Novo professor'), 'pri', function () { coachSheet(null); })]));
+    if (isS) { var act = S.students.filter(function (s) { return (s.status || 'active') === 'active'; }).length; wrap.appendChild(h('div', { cls: 'sub', text: Tf('{0} alunos · {1} ativos', S.students.length, act) })); }
+    fill(); wrap.appendChild(list); return wrap;
+  }
+  function coachSheet(c) {
+    c = c || {};
+    var n = inp(c.name || ''), ph = inp(c.phone || '', { type: 'tel' }), em = inp(c.email || '', { type: 'email' }), color = c.color || PAL[S.coaches.length % PAL.length];
+    var sw = h('div', { cls: 'swatch', role: 'group', 'aria-label': T('Cor na agenda') });
+    PAL.forEach(function (p) { var b = h('button', { type: 'button', style: '--c:' + p, 'aria-pressed': String(p === color), 'aria-label': p }); b.addEventListener('click', function () { color = p; sw.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); }); sw.appendChild(b); });
+    var av = JSON.parse(JSON.stringify(c.avail || {})), rows = h('div', {});
+    WEEK.forEach(function (d) {
+      var a = av[d] = av[d] || { on: d !== 0, from: '08:00', to: '12:00', from2: '15:00', to2: '21:00' };
+      var on = h('input', { type: 'checkbox', 'aria-label': dayName(d, 'long') }); on.checked = !!a.on;
+      var i1 = timeI(a.from), i2 = timeI(a.to), i3 = timeI(a.from2), i4 = timeI(a.to2), row = h('div', { cls: 'avrow' + (a.on ? '' : ' off') }, [h('b', { text: dayName(d) }), on, h('div', { style: 'display:grid;gap:6px' }, [h('div', { cls: 'tt' }, [i1, i2]), h('div', { cls: 'tt' }, [i3, i4])])]);
+      on.addEventListener('change', function () { a.on = on.checked; row.classList.toggle('off', !a.on); });
+      [[i1, 'from'], [i2, 'to'], [i3, 'from2'], [i4, 'to2']].forEach(function (p) { p[0].addEventListener('change', function () { a[p[1]] = p[0].value; }); });
+      rows.appendChild(row);
+    });
+    var note = h('textarea', { placeholder: T('Observações (opcional)') }); note.value = c.note || '';
+    sheet(function (close) {
+      return [h('b', { cls: 'st', text: c.id ? T('Editar professor') : T('Novo professor') }), fld(T('Nome'), n), h('div', { cls: 'two' }, [fld(T('Telefone / WhatsApp'), ph), fld(T('E-mail'), em)]), fld(T('Cor na agenda'), sw),
+        h('div', { cls: 'f' }, [h('span', { text: T('Disponibilidade na semana') }), h('small', { cls: 'sub', text: T('Marque os dias em que dá aula. Até dois períodos por dia (ex.: manhã e noite); deixe o segundo em branco se não usar.') }), rows]), note
+      ].concat(footBtns(close, T('Salvar'), function (msg, b) {
+        if (!n.value.trim()) return err(msg, T('Digite o nome do professor.'));
+        var bad = WEEK.filter(function (d) { var a = av[d]; return a.on && !(toMin(a.from) < toMin(a.to)); });
+        if (bad.length) return err(msg, Tf('Confira o horário de {0}: o fim precisa ser depois do início.', bad.map(function (d) { return dayName(d); }).join(', ')));
+        busy(b, true);
+        saveItem('coaches', Object.assign({}, c, { name: n.value.trim(), phone: ph.value.trim(), email: em.value.trim(), color: color, avail: av, note: note.value.trim() })).then(function () { close(); paint(); toast(T('Professor salvo.')); }).catch(function () { busy(b, false); failT(); });
+      }, c.id ? function () {
+        var lc = S.classes.filter(function (x) { return x.coachId === c.id; }), ls = S.students.filter(function (x) { return x.coachId === c.id; });
+        delItem('coaches', c.id).then(function () { return Promise.all(lc.map(function (x) { return saveItem('classes', Object.assign({}, x, { coachId: '' })); }).concat(ls.map(function (x) { return saveItem('students', Object.assign({}, x, { coachId: '' })); }))); })
+          .then(function () { close(); paint(); toast(T('Professor excluído. As turmas e os alunos dele ficaram sem professor.')); }).catch(failT);
+      } : null));
+    });
+  }
+  function studentSheet(s) {
+    s = s || {};
+    var n = inp(s.name || ''), ph = inp(s.phone || '', { type: 'tel' }), em = inp(s.email || '', { type: 'email' }),
+      lv = sel(LEVELS.map(function (x) { return [x, x ? T(x) : T('Não informar')]; }), s.level || ''),
+      co = sel([['', T('Sem professor')]].concat(S.coaches.map(function (c) { return [c.id, c.name]; })), s.coachId || ''),
+      fe = sel([['', T('Sem mensalidade')]].concat(S.club.fees.map(function (x) { return [x.id, x.name + ' · ' + money(x.price)]; })), s.feeId || ''),
+      stS = segC([['active', T('Ativo')], ['paused', T('Pausado')], ['left', T('Saiu')]], s.status || 'active'),
+      since = h('input', { type: 'date', value: s.since || today() }), note = h('textarea', { placeholder: T('Observações (opcional)') }), clsHost = h('div', {}), cur = (s.classIds || []).slice(), picker = null;
+    note.value = s.note || '';
+    function drawCls() {
+      clsHost.textContent = '';
+      var items = S.classes.filter(function (cl) { return !co.value || cl.coachId === co.value || cur.indexOf(cl.id) >= 0; }).map(function (cl) {
+        var nn = studentsOf(cl.id).filter(function (x) { return x.id !== s.id; }).length; return { id: cl.id, name: cl.name + ' · ' + daysL(cl.days) + ' ' + cl.from + (cl.capacity ? ' · ' + Tf('{0}/{1}', nn, cl.capacity) : ''), color: coachColor(cl.coachId) }; });
+      if (!items.length) { clsHost.appendChild(h('span', { cls: 'sub', text: co.value ? T('Este professor ainda não tem turmas.') : T('Nenhuma turma cadastrada.') })); picker = null; return; }
+      picker = picksC(items, cur, function (v) { cur = v; }); clsHost.appendChild(picker);
+    }
+    co.addEventListener('change', drawCls);
+    drawCls();
+    sheet(function (close) {
+      return [h('b', { cls: 'st', text: s.id ? T('Editar aluno') : T('Novo aluno') }), fld(T('Nome'), n), h('div', { cls: 'two' }, [fld(T('Telefone / WhatsApp'), ph), fld(T('E-mail'), em)]),
+        h('div', { cls: 'two' }, [fld(T('Professor'), co), fld(T('Nível'), lv)]), h('div', { cls: 'f' }, [h('span', { text: T('Turmas') }), h('small', { cls: 'sub', text: T('Mostra as turmas do professor escolhido.') }), clsHost]),
+        h('div', { cls: 'two' }, [fld(T('Mensalidade'), fe), fld(T('Aluno desde'), since)]), fld(T('Situação'), stS), note
+      ].concat(footBtns(close, T('Salvar'), function (msg, b) {
+        if (!n.value.trim()) return err(msg, T('Digite o nome do aluno.'));
+        var full = cur.filter(function (id) { var cl = find('classes', id); return cl && cl.capacity && (s.classIds || []).indexOf(id) < 0 && studentsOf(id).length >= cl.capacity; });
+        if (full.length && !b.dataset.forced) { b.dataset.forced = '1'; b.textContent = T('Salvar mesmo assim'); return err(msg, Tf('Turma lotada: {0}.', full.map(function (i) { return nameOf('classes', i); }).join(', ')), true); }
+        busy(b, true);
+        saveItem('students', Object.assign({}, s, { name: n.value.trim(), phone: ph.value.trim(), email: em.value.trim(), level: lv.value, coachId: co.value, classIds: cur.filter(function (i) { return !!find('classes', i); }), feeId: fe.value, status: stS.get(), since: since.value, note: note.value.trim() }))
+          .then(function () { close(); paint(); toast(T('Aluno salvo.')); }).catch(function () { busy(b, false); failT(); });
+      }, s.id ? function () { delItem('students', s.id).then(function () { close(); paint(); toast(T('Aluno excluído.')); }).catch(failT); } : null));
+    });
+  }
+
+  // ---------- Reservas e bloqueios (aluguel, torneio, manutenção, evento) ----------
+  function bookingCheck(x) {
+    var hard = [], a = toMin(x.from), b = toMin(x.to), dates = [];
+    if (x.repeat === 'weekly') { for (var i = 0; i < 7; i++) { var ds = addDays(x.start || today(), i); if (x.days.indexOf(parseYmd(ds).getDay()) >= 0) dates.push(ds); } }
+    else dates.push(x.date);
+    var courts = x.courts.length ? x.courts : activeCourts().map(function (c) { return c.id; });
+    dates.forEach(function (ds) {
+      var di = dayInfo(ds);
+      if (di.closed) hard.push(Tf('{0}: clube fechado.', dateL(ds)));
+      else if (a < di.open || b > di.close) hard.push(Tf('{0}: fora do horário de funcionamento ({1}–{2}).', dateL(ds), hm(di.open), hm(di.close)));
+      courts.forEach(function (cid) {
+        S.classes.forEach(function (cl) { if (cl.courtId === cid && classOn(cl, di) && ov(a, b, toMin(cl.from), toMin(cl.to))) hard.push(Tf('{0} · {1}: turma {2} ({3}–{4}).', dateL(ds, { weekday: 'short', day: 'numeric' }), nameOf('courts', cid), cl.name, cl.from, cl.to)); });
+        S.bookings.forEach(function (o) { if (o.id !== x.id && onCourt(o, cid) && bookingOn(o, di) && ov(a, b, toMin(o.from), toMin(o.to))) hard.push(Tf('{0} · {1}: {2} ({3}–{4}).', dateL(ds, { weekday: 'short', day: 'numeric' }), nameOf('courts', cid), T((KINDS[o.kind] || KINDS.event)[0]) + (o.title ? ' ' + o.title : ''), o.from, o.to)); });
+      });
+    });
+    return hard.filter(function (v, i, arr) { return arr.indexOf(v) === i; }).slice(0, 4);
+  }
+  function bookingSheet(bk, pre) {
+    bk = bk || {}; pre = pre || {};
+    var kind = bk.kind || 'rent', rep = bk.repeat || 'once';
+    var ttl = inp(bk.title || ''), ph = inp(bk.phone || '', { type: 'tel' }), date = h('input', { type: 'date', value: bk.date || S.date }), start = h('input', { type: 'date', value: bk.start || S.date }), end = h('input', { type: 'date', value: bk.end || '' }),
+      dy = daysC(bk.days || [parseYmd(S.date).getDay()]), f = timeI(bk.from || pre.from || '18:00'), t = timeI(bk.to || pre.to || '19:00'),
+      cts = picksC(activeCourts().map(function (c) { return { id: c.id, name: c.name }; }), bk.courts || (pre.court ? [pre.court] : [])), pr = numI(bk.price != null ? bk.price : ''), paid = tglC(T('Pago'), bk.paid), priceAuto = bk.price == null;
+    var onceBox = fld(T('Data'), date), weekBox = h('div', { style: 'display:grid;gap:10px' }, [fld(T('Dias da semana'), dy), h('div', { cls: 'two' }, [fld(T('A partir de'), start), fld(T('Até (opcional)'), end)])]);
+    var rentBox = h('div', { style: 'display:grid;gap:10px' }, [h('div', { cls: 'two' }, [fld(T('Valor total'), pr, T('Calculado pela tabela; dá para mudar.')), h('div', { style: 'align-self:center' }, [paid])])]);
+    var ttlF = fld(T('Quem alugou'), ttl), phF = fld(T('Telefone / WhatsApp'), ph);
+    function sync() {
+      onceBox.hidden = rep !== 'once'; weekBox.hidden = rep !== 'weekly'; rentBox.hidden = kind !== 'rent'; phF.hidden = kind !== 'rent';
+      ttlF.firstChild.textContent = kind === 'rent' ? T('Quem alugou') : T('Descrição'); ttl.placeholder = kind === 'tournament' ? T('Ex.: Torneio de verão') : kind === 'maintenance' ? T('Ex.: troca do saibro') : '';
+      if (kind === 'rent' && priceAuto && rep === 'once') { var di = dayInfo(date.value || S.date), n = Math.max(1, cts.get().length), v = rentValue(di, toMin(f.value), toMin(t.value)); pr.value = v != null && toMin(f.value) < toMin(t.value) ? String(Math.round(v * n * 100) / 100) : ''; }
+    }
+    pr.addEventListener('input', function () { priceAuto = false; });
+    [date, f, t].forEach(function (e) { e.addEventListener('change', sync); }); cts.addEventListener('click', function () { setTimeout(sync, 0); });
+    var kS = segC(Object.keys(KINDS).map(function (k) { return [k, T(KINDS[k][0]), KINDS[k][2]]; }), kind, function (v) { kind = v; sync(); });
+    var rS = segC([['once', T('Uma vez')], ['weekly', T('Toda semana')]], rep, function (v) { rep = v; sync(); });
+    sync();
+    sheet(function (close) {
+      return [h('b', { cls: 'st', text: bk.id ? T('Editar reserva ou bloqueio') : T('Reservar ou bloquear horário') }), fld(T('Tipo'), kS), ttlF, phF,
+        h('div', { cls: 'f' }, [h('span', { text: T('Quadras') }), h('small', { cls: 'sub', text: T('Sem nenhuma marcada vale para todas as quadras.') }), cts]),
+        fld(T('Repetição'), rS), onceBox, weekBox, h('div', { cls: 'two' }, [fld(T('Começa'), f), fld(T('Termina'), t)]), rentBox,
+        h('div', { cls: 'sub', text: T('No futuro, as reservas feitas pela Comunidade vão aparecer aqui sozinhas.') })
+      ].concat(footBtns(close, T('Salvar'), function (msg, b) {
+        var x = Object.assign({}, bk, { kind: kind, title: ttl.value.trim(), phone: kind === 'rent' ? ph.value.trim() : '', repeat: rep, courts: cts.get(), from: f.value, to: t.value, source: bk.source || 'club' });
+        if (rep === 'once') { x.date = date.value; delete x.days; delete x.start; delete x.end; } else { x.days = dy.get(); x.start = start.value; x.end = end.value; delete x.date; }
+        if (kind === 'rent') { x.price = pr.value === '' ? null : Math.max(0, +pr.value); x.paid = paid.get(); } else { delete x.price; delete x.paid; }
+        if (rep === 'once' && !x.date) return err(msg, T('Escolha a data.'));
+        if (rep === 'weekly' && !x.days.length) return err(msg, T('Escolha pelo menos um dia da semana.'));
+        if (!(toMin(x.from) < toMin(x.to))) return err(msg, T('O horário de término precisa ser depois do início.'));
+        if (kind === 'rent' && !x.title) return err(msg, T('Digite quem alugou.'));
+        var hard = bookingCheck(x); if (hard.length) return err(msg, T('Horário ocupado:') + ' ' + hard.join(' '));
+        busy(b, true);
+        saveItem('bookings', x).then(function () { close(); paint(); toast(T('Salvo na agenda.')); }).catch(function () { busy(b, false); failT(); });
+      }, bk.id ? function () { delItem('bookings', bk.id).then(function () { close(); paint(); toast(T('Removido da agenda.')); }).catch(failT); } : null));
+    });
+  }
+
+  // ---------- Clube: dados, horários, feriados, valores, mensalidades ----------
+  function viewClub() {
+    var wrap = h('div', { style: 'display:grid;gap:12px' }), C = S.club;
+    // dados
+    var n = inp(C.name), ci = inp(C.city || ''), ph = inp(C.phone || '', { type: 'tel' }), cu = sel([['BRL', 'R$ · BRL'], ['EUR', '€ · EUR'], ['USD', '$ · USD']], C.cur);
+    wrap.appendChild(h('div', { cls: 'card' }, [secH('club', T('Dados do clube')), fld(T('Nome do clube'), n), h('div', { cls: 'three' }, [fld(T('Cidade'), ci), fld(T('Telefone / WhatsApp'), ph), fld(T('Moeda'), cu)]),
+      saveRow(function () { if (!n.value.trim()) return T('Digite o nome do clube.'); return saveClub({ name: n.value.trim(), city: ci.value.trim(), phone: ph.value.trim(), cur: cu.value }); })]));
+    // horário de funcionamento
+    var hrs = JSON.parse(JSON.stringify(C.hours)), hb = h('div', {});
+    WEEK.concat(['hol']).forEach(function (k) {
+      var x = hrs[k], open = h('input', { type: 'checkbox', 'aria-label': T('Aberto') }); open.checked = !x.closed;
+      var a = timeI(x.open), b = timeI(x.close), row = h('div', { cls: 'hrow' + (x.closed ? ' off' : '') }, [h('b', { text: k === 'hol' ? T('Feriados') : dayName(+k, 'long').split('-')[0] }), h('label', { cls: 'tgl', style: 'font-size:13px' }, [open, h('span', { text: T('Aberto') })]), h('div', { cls: 'tt2' }, [a, b])]);
+      open.addEventListener('change', function () { x.closed = !open.checked; row.classList.toggle('off', x.closed); });
+      a.addEventListener('change', function () { x.open = a.value; }); b.addEventListener('change', function () { x.close = b.value; });
+      hb.appendChild(row);
+    });
+    var slot = segC([[30, '30 min'], [60, '1 h'], [90, '1 h 30']], C.slot), holC = tglC(T('As turmas têm aula nos feriados'), C.holClasses);
+    wrap.appendChild(h('div', { cls: 'card' }, [secH('clock', T('Horário de funcionamento'), T('De segunda a domingo e nos feriados. Fora destes horários a agenda não oferece horário livre.')), hb,
+      fld(T('Duração de cada horário na agenda'), slot, T('É a unidade de reserva e de aluguel.')), holC,
+      saveRow(function () { var bad = Object.keys(hrs).filter(function (k) { return !hrs[k].closed && !(toMin(hrs[k].open) < toMin(hrs[k].close)); }); if (bad.length) return T('Confira os horários: o fechamento precisa ser depois da abertura.'); return saveClub({ hours: hrs, slot: slot.get(), holClasses: holC.get(), hoursOk: true }); })]));
+    // feriados
+    var hol = C.holidays.slice().sort(function (a, b) { return a.date.localeCompare(b.date); }), hl = h('div', { style: 'display:grid;gap:6px' });
+    function drawHol() {
+      hl.textContent = '';
+      if (!hol.length) hl.appendChild(h('span', { cls: 'sub', text: T('Nenhum feriado cadastrado.') }));
+      hol.forEach(function (x, i) { hl.appendChild(h('div', { cls: 'row' }, [h('b', { cls: 'grow', style: 'font:700 14px var(--ui)', text: dateL(x.date, { day: 'numeric', month: 'short', year: 'numeric', weekday: 'short' }) + ' · ' + (x.name || T('feriado')) }), h('button', { type: 'button', cls: 'btn icb', 'aria-label': T('Remover'), on: { click: function () { hol.splice(i, 1); drawHol(); } } }, [ic('trash')])])); });
+    }
+    drawHol();
+    var hd = h('input', { type: 'date' }), hn = inp('', { placeholder: T('Nome (ex.: Natal)') });
+    wrap.appendChild(h('div', { cls: 'card' }, [secH('flag', T('Feriados'), T('Nos feriados valem o horário e o valor de aluguel de feriado.')), hl,
+      h('div', { cls: 'row' }, [h('div', { style: 'flex:1 1 150px' }, [hd]), h('div', { style: 'flex:2 1 180px' }, [hn]), ibtn('plus', T('Adicionar'), '', function () { if (!hd.value) return toast(T('Escolha a data.')); hol = hol.filter(function (x) { return x.date !== hd.value; }); hol.push({ date: hd.value, name: hn.value.trim() }); hol.sort(function (a, b) { return a.date.localeCompare(b.date); }); hd.value = ''; hn.value = ''; drawHol(); })]),
+      saveRow(function () { return saveClub({ holidays: hol }); })]));
+    // valores do aluguel
+    var rent = JSON.parse(JSON.stringify(C.rent)), rb = h('div', { style: 'display:grid;gap:10px' });
+    function drawRent() {
+      rb.textContent = ''; var arr = rent[S.rentT];
+      if (!arr.length) rb.appendChild(h('span', { cls: 'sub', text: T('Sem valor para este tipo de dia.') }));
+      arr.forEach(function (x, i) {
+        var a = timeI(x.from), b = timeI(x.to), p = numI(x.price);
+        a.addEventListener('change', function () { x.from = a.value; }); b.addEventListener('change', function () { x.to = b.value; }); p.addEventListener('input', function () { x.price = +p.value || 0; });
+        rb.appendChild(h('div', { cls: 'band' }, [fld(T('Das'), a), fld(T('Até'), b), fld(T('Valor por hora'), p), h('button', { type: 'button', cls: 'btn icb', 'aria-label': T('Remover'), on: { click: function () { arr.splice(i, 1); drawRent(); } } }, [ic('trash')])]));
+      });
+      rb.appendChild(ibtn('plus', T('Adicionar faixa de horário'), 'sm', function () { var l = arr[arr.length - 1]; arr.push({ from: l ? l.to : '07:00', to: '23:00', price: l ? l.price : 0 }); drawRent(); }));
+    }
+    var rt = segC([['wd', T('Seg a Sex')], ['sat', T('Sábado')], ['sun', T('Domingo')], ['hol', T('Feriado')]], S.rentT, function (v) { S.rentT = v; drawRent(); });
+    drawRent();
+    wrap.appendChild(h('div', { cls: 'card' }, [secH('money', T('Valor do aluguel da quadra'), T('Por hora, com faixas de horário (ex.: horário nobre à noite). Fins de semana e feriados podem ter valores diferentes.')), rt, rb,
+      saveRow(function () { var bad = Object.keys(rent).some(function (k) { return rent[k].some(function (x) { return !(toMin(x.from) < toMin(x.to)); }); }); if (bad) return T('Confira as faixas: o fim precisa ser depois do início.'); Object.keys(rent).forEach(function (k) { rent[k].sort(function (a, b) { return toMin(a.from) - toMin(b.from); }); }); return saveClub({ rent: rent }); })]));
+    // mensalidades
+    var fees = JSON.parse(JSON.stringify(C.fees)), fb = h('div', { style: 'display:grid;gap:10px' });
+    function drawFees() {
+      fb.textContent = '';
+      if (!fees.length) fb.appendChild(h('span', { cls: 'sub', text: T('Nenhuma mensalidade cadastrada.') }));
+      fees.forEach(function (x, i) {
+        var nm = inp(x.name), w = numI(x.perWeek, { step: '1', inputmode: 'numeric' }), p = numI(x.price), used = S.students.filter(function (s) { return s.feeId === x.id; }).length;
+        nm.addEventListener('input', function () { x.name = nm.value; }); w.addEventListener('input', function () { x.perWeek = Math.round(+w.value || 0); }); p.addEventListener('input', function () { x.price = +p.value || 0; });
+        fb.appendChild(h('div', { cls: 'feer' }, [fld(T('Plano'), nm), fld(T('Aulas por semana'), w), fld(T('Valor / mês'), p), h('button', { type: 'button', cls: 'btn icb', 'aria-label': T('Remover'), title: used ? Tf('{0} aluno(s) usam este plano', used) : '', on: { click: function () { if (used && !confirm(Tf('{0} aluno(s) usam este plano e ficarão sem mensalidade. Remover?', used))) return; fees.splice(i, 1); drawFees(); } } }, [ic('trash')])]));
+      });
+      fb.appendChild(ibtn('plus', T('Adicionar plano'), 'sm', function () { var k = fees.length + 1; fees.push({ id: uidGen(), name: Tf('{0}x por semana', k), perWeek: k, price: 0 }); drawFees(); }));
+    }
+    drawFees();
+    wrap.appendChild(h('div', { cls: 'card' }, [secH('money', T('Mensalidades dos alunos'), T('Planos que você escolhe no cadastro do aluno e da turma. A visão geral soma o previsto por mês.')), fb,
+      saveRow(function () { if (fees.some(function (x) { return !String(x.name || '').trim(); })) return T('Dê um nome para cada plano.'); return saveClub({ fees: fees }).then(function () { var ids = fees.map(function (x) { return x.id; }); return Promise.all(S.students.filter(function (s) { return s.feeId && ids.indexOf(s.feeId) < 0; }).map(function (s) { return saveItem('students', Object.assign({}, s, { feeId: '' })); })); }); })]));
+    // administração e clubes
+    var adm = h('div', { cls: 'card' }, [secH('user', T('Quem administra'), T('Por enquanto só quem cadastrou o clube. Depois: convidar outros administradores, recepção e professores (cada um vê só o que precisa).')),
+      h('div', { cls: 'row' }, [h('span', { cls: 'chip ok', text: (S.user.displayName || S.user.email || '') + ' · ' + T('responsável') })])]);
+    if (S.clubs.length > 1) { var cs = sel(S.clubs.map(function (c) { return [c.id, c.name]; }), S.cid); cs.addEventListener('change', function () { var c = S.clubs.filter(function (x) { return x.id === cs.value; })[0]; if (c) { S.tab = 'geral'; openClub(c); } }); adm.appendChild(fld(T('Trocar de clube'), cs)); }
+    adm.appendChild(ibtn('plus', T('Cadastrar outro clube'), '', function () { sheet(function (close) { return [h('b', { cls: 'st', text: T('Novo clube') })].concat(clubForm(close, close)); }); }));
+    wrap.appendChild(adm);
+    wrap.appendChild(h('div', { cls: 'card' }, [secH('link', T('Ligação com a Comunidade (em breve)'), T('Quando ligarmos os módulos, quem marca um jogo na Comunidade vai ver os horários livres das quadras deste clube, com o valor, e reservar direto. A reserva cai aqui na agenda.'))]));
+    return wrap;
+  }
+  function saveRow(fn) {
+    var msg = h('div', { cls: 'msg', hidden: true }), b = h('button', { type: 'button', cls: 'btn pri', text: T('Salvar') });
+    b.addEventListener('click', function () {
+      msg.hidden = true; var r = fn();
+      if (typeof r === 'string') return err(msg, r);
+      busy(b, true); Promise.resolve(r).then(function () { busy(b, false); toast(T('Salvo.')); paint(); }).catch(function () { busy(b, false); err(msg, T('Não foi possível salvar. Verifique a internet e tente de novo.')); });
+    });
+    return h('div', { style: 'display:grid;gap:8px;justify-items:end' }, [msg, b]);
+  }
+
+  // ---------- início ----------
+  function start() {
+  $('ver').textContent = 'v' + VERSION;
+  $('gateI').appendChild(ic('club')); $('login').textContent = T('Entrar com Google'); $('login').addEventListener('click', login);
+  var sb = $('setB'); sb.appendChild(ic('gear')); sb.appendChild(h('span', { text: T('Clube') })); sb.addEventListener('click', function () { go(S.tab === 'clube' ? 'geral' : 'clube'); });
+  var bk = $('back'); bk.appendChild(ic('grid4')); bk.appendChild(h('span', { text: T('Módulos') })); bk.setAttribute('aria-label', T('Módulos')); bk.addEventListener('click', function () { location.href = '../?menu'; });
+  heroTop();
+  initFB();
+  }
+
+  EN = {
+    'Seg a Sex': 'Mon–Fri', 'Todos os dias': 'Every day', 'Aluguel': 'Rental', 'Torneio': 'Tournament', 'Manutenção': 'Maintenance', 'Evento': 'Event', 'Não informar': 'Not specified', 'Saibro': 'Clay', 'Rápida': 'Hard', 'Grama': 'Grass', 'Carpete / sintético': 'Carpet / synthetic', 'Areia': 'Sand',
+    'Iniciante': 'Beginner', 'Intermediário': 'Intermediate', 'Avançado': 'Advanced', 'Competição': 'Competitive', 'Infantil': 'Junior', 'Kids': 'Kids',
+    'Não foi possível carregar. Verifique a internet.': 'Could not load. Check your internet.', 'Não foi possível entrar. Tente de novo.': 'Could not sign in. Please try again.', 'Gestão do clube': 'Club management',
+    'Entre com a mesma conta Google do Placar e da Comunidade para cadastrar o clube, as quadras, os professores, os alunos e as turmas.': 'Sign in with the same Google account you use for Scoreboard and Community to register your club, courts, coaches, students and classes.',
+    'Não foi possível salvar. Verifique a internet e tente de novo.': 'Could not save. Check your internet and try again.', 'Salvar': 'Save', 'Excluir': 'Delete', 'Toque de novo para excluir': 'Tap again to delete', 'Cancelar': 'Cancel',
+    'Visão geral': 'Overview', 'Agenda': 'Schedule', 'Quadras': 'Courts', 'Turmas': 'Classes', 'Pessoas': 'People', 'Clube': 'Club', 'Carregando...': 'Loading...', 'Tentar de novo': 'Try again', 'Clube {0} · build {1}': 'Club {0} · build {1}',
+    'Cadastrar clube': 'Register club', 'Digite o nome do clube.': 'Enter the club name.', 'Clube cadastrado.': 'Club registered.', 'Nome do clube': 'Club name', 'Cidade': 'City', 'Telefone / WhatsApp': 'Phone / WhatsApp', 'Cadastre seu clube': 'Register your club',
+    'Depois você cadastra as quadras, os horários de funcionamento, os professores, as turmas e os alunos. A agenda mostra sozinha os horários livres para aluguel e torneios.': 'Then add the courts, opening hours, coaches, classes and students. The schedule works out the free times for rentals and tournaments by itself.',
+    'Escolher data': 'Pick a date', 'Hoje': 'Today', 'Feriado: {0}': 'Holiday: {0}', 'feriado': 'holiday', 'fechado': 'closed', 'Clube fechado neste dia': 'Club closed on this day', 'Aberto das {0} às {1}': 'Open {0} to {1}', 'Dia anterior': 'Previous day', 'Próximo dia': 'Next day',
+    'Cadastrar as quadras': 'Add the courts', 'Conferir os horários de funcionamento': 'Check the opening hours', 'Definir o valor da hora do aluguel': 'Set the hourly rental price', 'Cadastrar as mensalidades': 'Add the monthly fees', 'Cadastrar os professores': 'Add the coaches', 'Criar as turmas': 'Create the classes', 'Cadastrar os alunos': 'Add the students',
+    'Primeiros passos': 'Getting started', '{0} de {1} feitos. Toque em um item para ir até ele.': '{0} of {1} done. Tap an item to go there.', '{0} inativa(s)': '{0} inactive', 'ativas': 'active', 'Professores': 'Coaches', '{0} turmas': '{0} classes', 'Alunos ativos': 'Active students', '{0} pausados ou saíram': '{0} paused or left',
+    'Mensalidades / mês': 'Monthly fees', 'previsto, alunos ativos': 'expected, active students', 'Ocupação do dia': 'Occupancy', 'clube fechado': 'club closed', '{0} de {1} horários': '{0} of {1} slots', 'Horas livres no dia': 'Free hours', 'somando todas as quadras': 'across all courts', 'Valor das horas livres': 'Value of free hours',
+    'se todas forem alugadas': 'if all were rented', 'defina os valores em Clube': 'set prices in Club', 'Reservas e eventos': 'Bookings and events', 'neste dia': 'on this day', 'Agora · {0}': 'Now · {0}', 'O que está acontecendo em cada quadra e com cada professor.': 'What is happening on each court and with each coach.',
+    'Clube fechado agora. Hoje abre das {0} às {1}.': 'Club closed now. Today it is open {0} to {1}.', 'até {0}': 'until {0}', 'Livre até {0}': 'Free until {0}', 'Livre': 'Free', 'Em aula: {0} · {1}': 'Teaching: {0} · {1}', 'sem quadra': 'no court', 'Livre agora': 'Free now', 'Fora do horário': 'Off hours',
+    'Quadras livres por horário': 'Free courts by time', '{0}: {1} de {2} quadras livres': '{0}: {1} of {2} courts free', 'Barras altas mostram os melhores horários para aluguel e para torneios com várias quadras.': 'Tall bars show the best times for rentals and for tournaments on several courts.',
+    'Horários livres por quadra': 'Free times by court', 'Toque em um horário para reservar ou bloquear.': 'Tap a time to book or block it.', 'Sem horário livre neste dia.': 'No free time on this day.', 'Professores: horários livres': 'Coaches: free times', 'Dentro da disponibilidade de cada um, fora das turmas.': 'Within each coach’s availability, outside classes.',
+    '{0} de aula neste dia': '{0} of classes on this day', 'Não trabalha neste dia.': 'Does not work on this day.', 'Alunos por turma': 'Students per class', '{0} alunos em turmas': '{0} students in classes', 'Cadastre as quadras para ver a ocupação e os horários livres.': 'Add the courts to see occupancy and free times.', 'Cadastrar quadras': 'Add courts',
+    'Turma {0}': 'Class {0}', 'Ocupado': 'Busy', 'Reservar ou bloquear': 'Book or block', 'Feriado ({0}): clube fechado. Dá para mudar em Clube > Horário de funcionamento.': 'Holiday ({0}): club closed. You can change this in Club > Opening hours.', 'Clube fechado neste dia. Dá para mudar em Clube > Horário de funcionamento.': 'Club closed on this day. You can change this in Club > Opening hours.',
+    'Nenhuma quadra cadastrada.': 'No courts yet.', 'Nenhum professor cadastrado.': 'No coaches yet.', 'Cadastrar professores': 'Add coaches', 'sem professor': 'no coach', '{0}/{1} alunos': '{0}/{1} students', 'toda semana': 'weekly', '{0} livres': '{0} free', 'não trabalha': 'off',
+    'Turma: cor do professor': 'Class: coach colour', 'Listrado: fora do horário do professor': 'Striped: outside the coach’s hours', '{0} quadras cadastradas': '{0} courts', 'Nova quadra': 'New court', 'Nenhuma quadra cadastrada. Cadastre cada quadra do clube com o piso, se é coberta e se tem iluminação.': 'No courts yet. Add each court with its surface, whether it is covered and whether it has lights.',
+    'coberta': 'covered', 'iluminação': 'lights', 'Piso não informado': 'Surface not specified', 'Inativa: não aparece na agenda': 'Inactive: hidden from the schedule', '{0} turmas · {1} de aula por semana': '{0} classes · {1} of classes per week', 'Quadra {0}': 'Court {0}', 'Coberta': 'Covered', 'Tem iluminação': 'Has lights',
+    'Ativa (aparece na agenda)': 'Active (shown in the schedule)', 'Observações (opcional)': 'Notes (optional)', 'Editar quadra': 'Edit court', 'Nome': 'Name', 'Piso': 'Surface', 'Digite o nome da quadra.': 'Enter the court name.', 'Quadra salva.': 'Court saved.', 'Quadra excluída. {0} turma(s) ficaram sem quadra.': 'Court deleted. {0} class(es) no longer have a court.', 'Quadra excluída.': 'Court deleted.',
+    'inativa': 'inactive', '{0} alunos': '{0} students', '{0} turmas · {1} alunos em turmas': '{0} classes · {1} students in classes', 'Nova turma': 'New class', 'Nenhuma turma ainda. Uma turma junta professor, quadra, dias e horário; depois você coloca os alunos nela.': 'No classes yet. A class brings together a coach, a court, days and a time; then you add students to it.',
+    'Sem professor': 'No coach', 'A quadra já tem a turma {0} ({1}, {2}–{3}).': 'The court already has class {0} ({1}, {2}–{3}).', 'O professor já dá aula na turma {0} ({1}, {2}–{3}).': 'The coach already teaches class {0} ({1}, {2}–{3}).', 'A quadra tem um bloqueio fixo: {0} ({1}, {2}–{3}).': 'The court has a recurring block: {0} ({1}, {2}–{3}).',
+    '{0}: fora do horário de funcionamento do clube.': '{0}: outside the club’s opening hours.', '{0}: fora da disponibilidade de {1}.': '{0}: outside {1}’s availability.', 'Sem quadra': 'No court', 'Sem mensalidade': 'No monthly fee', 'Turma ativa': 'Active class', 'Editar turma': 'Edit class', 'Nome da turma': 'Class name',
+    'Ex.: Iniciantes terça e quinta, Kids manhã': 'E.g. Beginners Tue & Thu, Kids morning', 'Professor': 'Coach', 'Quadra': 'Court', 'Dias da semana': 'Days of the week', 'Começa': 'Starts', 'Termina': 'Ends', 'Vagas': 'Places', 'Nível': 'Level', 'Mensalidade': 'Monthly fee', 'Alunos nesta turma ({0})': 'Students in this class ({0})',
+    'Nenhum aluno ainda. Os alunos entram na turma pelo cadastro do aluno, em Pessoas.': 'No students yet. Students join a class from their record in People.', 'Digite o nome da turma.': 'Enter the class name.', 'Escolha pelo menos um dia da semana.': 'Choose at least one day of the week.', 'O horário de término precisa ser depois do início.': 'The end time must be after the start.',
+    'Salvar mesmo assim': 'Save anyway', 'Turma salva.': 'Class saved.', 'Turma excluída.': 'Class deleted.', 'Alunos': 'Students', 'Buscar aluno por nome, telefone ou turma': 'Search students by name, phone or class', 'Buscar professor': 'Search coaches', 'Buscar': 'Search', 'sem turma': 'no class', 'Ativo': 'Active', 'Pausado': 'Paused', 'Saiu': 'Left',
+    'Ninguém encontrado.': 'No one found.', 'Nenhum aluno cadastrado ainda.': 'No students yet.', '{0} turmas · {1} alunos ativos': '{0} classes · {1} active students', '{0} de aula de {1} disponíveis por semana': '{0} of classes out of {1} available per week', 'Disponibilidade não informada': 'Availability not set', 'Nenhum professor cadastrado ainda.': 'No coaches yet.',
+    'Novo aluno': 'New student', 'Novo professor': 'New coach', '{0} alunos · {1} ativos': '{0} students · {1} active', 'Cor na agenda': 'Schedule colour', 'Editar professor': 'Edit coach', 'E-mail': 'Email', 'Disponibilidade na semana': 'Weekly availability',
+    'Marque os dias em que dá aula. Até dois períodos por dia (ex.: manhã e noite); deixe o segundo em branco se não usar.': 'Tick the days they teach. Up to two periods a day (e.g. morning and evening); leave the second blank if not used.', 'Digite o nome do professor.': 'Enter the coach’s name.', 'Confira o horário de {0}: o fim precisa ser depois do início.': 'Check the hours for {0}: the end must be after the start.',
+    'Professor salvo.': 'Coach saved.', 'Professor excluído. As turmas e os alunos dele ficaram sem professor.': 'Coach deleted. Their classes and students no longer have a coach.', '{0}/{1}': '{0}/{1}', 'Este professor ainda não tem turmas.': 'This coach has no classes yet.', 'Nenhuma turma cadastrada.': 'No classes yet.', 'Editar aluno': 'Edit student',
+    'Mostra as turmas do professor escolhido.': 'Shows the chosen coach’s classes.', 'Aluno desde': 'Student since', 'Situação': 'Status', 'Digite o nome do aluno.': 'Enter the student’s name.', 'Turma lotada: {0}.': 'Class full: {0}.', 'Aluno salvo.': 'Student saved.', 'Aluno excluído.': 'Student deleted.',
+    '{0}: clube fechado.': '{0}: club closed.', '{0}: fora do horário de funcionamento ({1}–{2}).': '{0}: outside opening hours ({1}–{2}).', '{0} · {1}: turma {2} ({3}–{4}).': '{0} · {1}: class {2} ({3}–{4}).', '{0} · {1}: {2} ({3}–{4}).': '{0} · {1}: {2} ({3}–{4}).', 'Pago': 'Paid', 'Data': 'Date', 'A partir de': 'From', 'Até (opcional)': 'Until (optional)',
+    'Valor total': 'Total price', 'Calculado pela tabela; dá para mudar.': 'Worked out from the price table; you can change it.', 'Quem alugou': 'Rented by', 'Descrição': 'Description', 'Ex.: Torneio de verão': 'E.g. Summer tournament', 'Ex.: troca do saibro': 'E.g. clay resurfacing', 'Uma vez': 'Once', 'Toda semana': 'Every week',
+    'Editar reserva ou bloqueio': 'Edit booking or block', 'Reservar ou bloquear horário': 'Book or block a time', 'Tipo': 'Type', 'Sem nenhuma marcada vale para todas as quadras.': 'With none selected it applies to all courts.', 'Repetição': 'Repeat', 'No futuro, as reservas feitas pela Comunidade vão aparecer aqui sozinhas.': 'In the future, bookings made in Community will show up here automatically.',
+    'Escolha a data.': 'Choose the date.', 'Digite quem alugou.': 'Enter who is renting.', 'Horário ocupado:': 'Time not available:', 'Salvo na agenda.': 'Saved to the schedule.', 'Removido da agenda.': 'Removed from the schedule.', 'Dados do clube': 'Club details', 'Moeda': 'Currency', 'Aberto': 'Open', 'Feriados': 'Holidays',
+    'As turmas têm aula nos feriados': 'Classes run on holidays', 'Horário de funcionamento': 'Opening hours', 'De segunda a domingo e nos feriados. Fora destes horários a agenda não oferece horário livre.': 'Monday to Sunday and on holidays. Outside these hours the schedule offers no free time.', 'Duração de cada horário na agenda': 'Length of each schedule slot',
+    'É a unidade de reserva e de aluguel.': 'It is the booking and rental unit.', 'Confira os horários: o fechamento precisa ser depois da abertura.': 'Check the hours: closing must be after opening.', 'Nenhum feriado cadastrado.': 'No holidays yet.', 'Remover': 'Remove', 'Nome (ex.: Natal)': 'Name (e.g. Christmas)',
+    'Nos feriados valem o horário e o valor de aluguel de feriado.': 'On holidays the holiday hours and rental price apply.', 'Adicionar': 'Add', 'Sem valor para este tipo de dia.': 'No price for this type of day.', 'Das': 'From', 'Até': 'To', 'Valor por hora': 'Price per hour', 'Adicionar faixa de horário': 'Add time band',
+    'Sábado': 'Saturday', 'Domingo': 'Sunday', 'Feriado': 'Holiday', 'Valor do aluguel da quadra': 'Court rental price', 'Por hora, com faixas de horário (ex.: horário nobre à noite). Fins de semana e feriados podem ter valores diferentes.': 'Per hour, with time bands (e.g. evening peak). Weekends and holidays can have different prices.',
+    'Confira as faixas: o fim precisa ser depois do início.': 'Check the bands: the end must be after the start.', 'Nenhuma mensalidade cadastrada.': 'No monthly fees yet.', 'Plano': 'Plan', 'Aulas por semana': 'Per week', 'Valor / mês': 'Price / month', '{0} aluno(s) usam este plano': '{0} student(s) use this plan',
+    '{0} aluno(s) usam este plano e ficarão sem mensalidade. Remover?': '{0} student(s) use this plan and will be left without a fee. Remove?', 'Adicionar plano': 'Add plan', '{0}x por semana': '{0}x per week', 'Mensalidades dos alunos': 'Student monthly fees',
+    'Planos que você escolhe no cadastro do aluno e da turma. A visão geral soma o previsto por mês.': 'Plans you pick on the student and class records. The overview adds up the expected monthly total.', 'Dê um nome para cada plano.': 'Give each plan a name.', 'Quem administra': 'Administrators',
+    'Por enquanto só quem cadastrou o clube. Depois: convidar outros administradores, recepção e professores (cada um vê só o que precisa).': 'For now, only whoever registered the club. Later: invite other admins, front desk and coaches (each sees only what they need).', 'responsável': 'owner', 'Trocar de clube': 'Switch club', 'Cadastrar outro clube': 'Register another club', 'Novo clube': 'New club',
+    'Ligação com a Comunidade (em breve)': 'Link with Community (coming soon)', 'Quando ligarmos os módulos, quem marca um jogo na Comunidade vai ver os horários livres das quadras deste clube, com o valor, e reservar direto. A reserva cai aqui na agenda.': 'Once the modules are linked, people setting up a match in Community will see this club’s free court times and prices and book directly. The booking lands here in the schedule.',
+    'Salvo.': 'Saved.', 'Entrar com Google': 'Sign in with Google', 'Módulos': 'Modules'
+  };
+  start();
+})();
+</script></body></html>
