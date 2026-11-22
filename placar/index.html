@@ -546,8 +546,8 @@ html.nfy .bar { padding-right: max(230px, env(safe-area-inset-right, 0px)); }
 @media (prefers-reduced-motion:reduce){.liveTag i{animation:none}}
 .liveQR{display:flex;justify-content:center;margin:10px 0}.liveQR>div{background:#fff;padding:8px;border-radius:12px;line-height:0}.liveQR svg{width:200px;height:200px}
 .liveUrl{display:block;font:13px/1.35 ui-monospace,Menlo,monospace;word-break:break-all;padding:8px 10px;border-radius:10px;background:var(--bg);border:1px solid var(--line);user-select:all;text-transform:none}
-.liveActs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.liveActs .btn{min-height:44px;flex:1 1 auto}
-.liveAnn{display:flex;align-items:flex-start;gap:10px;margin:12px 0 0;font-size:14px;line-height:1.35}.liveAnn input{width:22px;height:22px;margin:0;flex:none}
+.liveActs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.liveActs .btn{min-height:48px;flex:1 1 auto}
+.liveAnn{margin:12px 0 4px;border-top:1px solid var(--line)}.liveAnn .sgrow{flex:1;min-width:0;font-size:16px;line-height:1.25}
 .liveSt{display:flex;align-items:center;gap:8px;font-weight:700;margin:0 0 6px}.liveSt i{width:10px;height:10px;border-radius:50%;background:#D92D20}
 #sTipRow.off{opacity:.5}
 .lvc{margin:0 0 12px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--bg)}
@@ -1070,7 +1070,7 @@ html.nfy .bar { padding-right: max(230px, env(safe-area-inset-right, 0px)); }
       <div class="actions"><button class="btn" type="button" id="sManage">Gerenciar dados salvos</button></div>
       <label class="check srow"><span class="sic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><input type="checkbox" id="sTel"> Enviar estatísticas de uso</label>
       <span class="hint" id="sTelHint">Só contagens anônimas de uso dos recursos (ex.: quantas partidas, se usou a pulseira), para melhorar o app. Nunca nomes, placares, mensagens, fotos ou local.</span>
-      <p class="note" id="verNote">BoxScore Beta 7.53 · Placar 4.54.0</p>
+      <p class="note" id="verNote">BoxScore Beta 7.54 · Placar 4.55.0</p>
     </div>
     <div class="actions"><button class="btn primary" type="button" data-close>Pronto</button></div>
   </div>
@@ -1744,7 +1744,7 @@ try { I18N.applyDom(); } catch (e) {}
       .sort(function (a, b) { return a[0] - b[0]; });
     var hh = function (t) { var d = new Date(t), z = function (n) { return (n < 10 ? '0' : '') + n; }; return z(d.getDate()) + '/' + z(d.getMonth() + 1) + ' ' + z(d.getHours()) + ':' + z(d.getMinutes()) + ':' + z(d.getSeconds()); };
     var ua = (navigator.userAgent || '').replace(/^.*?\(([^)]*)\).*$/, '$1');
-    return ['BoxScore 7.53 · ' + ua].concat(rows.map(function (r) {
+    return ['BoxScore 7.54 · ' + ua].concat(rows.map(function (r) {
       return hh(r[0]) + ' ' + r[1] + (r[1] === 'tick' ? ' x' + r[2] + ' até ' + hh(r[3]).slice(6) : (r[2] ? ' ' + r[2] : ''));
     })).join('\n');
   }
@@ -1849,12 +1849,17 @@ try { I18N.applyDom(); } catch (e) {}
     var L = liveOf();
     function el(tag, cls, txt) { var x = document.createElement(tag); if (cls) x.className = cls; if (txt != null) x.textContent = txt; return x; }
     function btn(txt, cls, fn) { var b = el('button', 'btn' + (cls ? ' ' + cls : ''), txt); b.type = 'button'; b.addEventListener('click', fn); return b; }
+    // 7.54: "Anunciar na Comunidade" na linha padrão das Configurações (ícone, texto, explicação e a caixa à direita)
+    function annRow(id, on, hint) {
+      var lb = el('label', 'check srow liveAnn'), ic = el('span', 'sic'); ic.innerHTML = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1a4 4 0 0 1 4-4h5a4 4 0 0 1 4 4v1"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M21.5 20v-1a4 4 0 0 0-3-3.9"/></svg>';
+      var cb = el('input'); cb.type = 'checkbox'; cb.checked = on; cb.id = id;
+      var tx = el('span', 'sgrow'); tx.appendChild(document.createTextNode(T("Anunciar na Comunidade"))); var h = el('span', 'shint', hint); tx.appendChild(h);
+      lb.appendChild(ic); lb.appendChild(cb); lb.appendChild(tx); return { row: lb, cb: cb };
+    }
     if (!sy.user) { host.appendChild(el('p', 'hint', T("Para transmitir ao vivo, entre com sua conta Google em Ajustes. Quem receber o link não precisa de conta."))); return; }
     if (!L) {
       host.appendChild(el('p', '', T("Quem tiver o link acompanha o placar em tempo real, sem instalar nada e sem login.")));
-      var lb = el('label', 'liveAnn'), cb = el('input'); cb.type = 'checkbox'; cb.checked = true; cb.id = 'liveAnnNew';
-      var tx = el('span'); tx.appendChild(el('b', '', T("Anunciar na Comunidade"))); tx.appendChild(document.createElement('br')); tx.appendChild(document.createTextNode(T("Seus amigos e seguidores veem que você está ao vivo.")));
-      lb.appendChild(cb); lb.appendChild(tx); host.appendChild(lb);
+      var ar = annRow('liveAnnNew', true, T("Seus amigos e seguidores veem que você está ao vivo.")), cb = ar.cb; host.appendChild(ar.row);
       var a = el('div', 'liveActs'); a.appendChild(btn(T("Começar transmissão"), 'primary', function () { liveStart(cb.checked); })); host.appendChild(a);
       host.appendChild(el('p', 'hint', T("O link vale enquanto a partida estiver rolando e até 3 horas depois do fim. Você pode encerrar a qualquer momento.")));
       return;
@@ -1868,11 +1873,9 @@ try { I18N.applyDom(); } catch (e) {}
     if (navigator.share) a2.appendChild(btn(T("Compartilhar"), '', function () { liveShare(u); }));
     a2.appendChild(btn(T("Copiar link"), '', function () { copyLive(u); }));
     host.appendChild(a2);
-    var lb2 = el('label', 'liveAnn'), cb2 = el('input'); cb2.type = 'checkbox'; cb2.checked = !!L.ann; cb2.id = 'liveAnn';
-    var tx2 = el('span'); tx2.appendChild(el('b', '', T("Anunciar na Comunidade"))); tx2.appendChild(document.createElement('br'));
-    tx2.appendChild(document.createTextNode(L.ann ? (L.aud && L.aud.length ? (L.aud.length === 1 ? T("Aparece para 1 pessoa: amigos e seguidores.") : Tf("Aparece para {0} pessoas: amigos e seguidores.", L.aud.length)) : T("Seus amigos e seguidores veem que você está ao vivo.")) : T("Desligado: só quem tem o link acompanha.")));
+    var ar2 = annRow('liveAnn', !!L.ann, L.ann ? (L.aud && L.aud.length ? (L.aud.length === 1 ? T("Aparece para 1 pessoa: amigos e seguidores.") : Tf("Aparece para {0} pessoas: amigos e seguidores.", L.aud.length)) : T("Seus amigos e seguidores veem que você está ao vivo.")) : T("Desligado: só quem tem o link acompanha.")), cb2 = ar2.cb;
     cb2.addEventListener('change', function () { liveSetAnn(cb2.checked); });
-    lb2.appendChild(cb2); lb2.appendChild(tx2); host.appendChild(lb2);
+    host.appendChild(ar2.row);
     var a3 = el('div', 'liveActs'), stop = btn(T("Encerrar transmissão"), 'danger', function () {}); stop.id = 'liveStop';
     confirmBtn(stop, 'liveStop', T("Encerrar transmissão"), liveStop); a3.appendChild(stop); host.appendChild(a3);
     if (!navigator.onLine) host.appendChild(el('p', 'hint', T("Sem internet: o placar volta a ser enviado quando a conexão voltar.")));
@@ -2560,12 +2563,15 @@ try { I18N.applyDom(); } catch (e) {}
 
 
   // 7.17: imagem no cabeçalho de cada janela (aparece ao abrir; gerada 1x)
-  var HERO_OF = { shNew: 'new', shProf: 'prof', shSet: 'set', shMore: 'more', shBand: 'band', shContact: 'contact', shShare: 'share', shDel: 'del', shData: 'data', shHist: 'hist', shSum: 'sum', shPriv: 'priv', shUser: 'user', shFr: 'fr', shClose: 'close' };
+  var HERO_OF = { shNew: 'new', shProf: 'prof', shSet: 'set', shMore: 'more', shBand: 'band', shContact: 'contact', shShare: 'share', shDel: 'del', shData: 'data', shHist: 'hist', shSum: 'sum', shPriv: 'priv', shUser: 'user', shFr: 'fr', shClose: 'close',
+    // 7.54: Ao vivo (ilustração do piso da partida) e Nível calculado no mesmo padrão das outras janelas
+    shLive: function () { var k = 'live_' + ((G && G.meta && G.meta.surface) || ''); return window.BXHero && BXHero.keys.indexOf(k) >= 0 ? k : 'live_saibro'; }, shLvInfo: 'trofeu' };
   (function () {
     Object.keys(HERO_OF).forEach(function (id) {
       var sh = $(id), head = sh && sh.querySelector('.card > .card-head'); if (!head) return;
-      head.classList.add('hero'); head.setAttribute('data-hero', HERO_OF[id]);
-      function on() { if (!sh.hidden && window.BXHero) BXHero.apply(head, HERO_OF[id]); }
+      function key() { var v = HERO_OF[id]; return typeof v === 'function' ? v() : v; }
+      head.classList.add('hero'); head.setAttribute('data-hero', typeof HERO_OF[id] === 'string' ? HERO_OF[id] : 'live');
+      function on() { if (!sh.hidden && window.BXHero) BXHero.apply(head, key()); }
       try { new MutationObserver(on).observe(sh, { attributes: true, attributeFilter: ['hidden'] }); } catch (x) {}
       on();
     });
@@ -4924,7 +4930,7 @@ try { I18N.applyDom(); } catch (e) {}
     b.disabled = true; err.textContent = '';
     var doc = { topic: $('ctTopic').value, msg: msg.slice(0, 2000), email: em.slice(0, 120), uid: sy.user ? sy.user.uid : null,
       name: String((P.sync.acct && P.sync.acct.name) || '').slice(0, 80), lang: String(P.settings.lang || 'pt-BR').slice(0, 8),
-      build: '7.53', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
+      build: '7.54', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
     sy.db.collection('contact').add(doc).then(function () {
       b.disabled = false; $('ctMsg').value = ''; closeSheets(); showToast(T("Mensagem enviada. Obrigado! Responderemos pelo e-mail informado."));
     }, function (e) { b.disabled = false; err.textContent = Tf("Não foi possível enviar ({0}). Tente de novo.", (e && e.code) || T("erro")); });
@@ -5753,7 +5759,7 @@ try { I18N.applyDom(); } catch (e) {}
   // Beta 7.8: telemetria de uso (shared/telemetry.js) e versão da ponte do app nativo na linha de versão
   try {
     if (window.BXTel) {
-      BXTel.init({ module: 'placar', build: '7.53', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
+      BXTel.init({ module: 'placar', build: '7.54', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
       tel('p_open');
       $('sTel').checked = BXTel.isOn();
       $('sTel').addEventListener('change', function () { BXTel.setOn(this.checked); showToast(this.checked ? T("Estatísticas de uso ligadas. Obrigado!") : T("Estatísticas de uso desligadas.")); });
