@@ -8,7 +8,7 @@
 <link rel="icon" href="../icons/icon-192.png">
 <link rel="stylesheet" href="../fonts/fonts.css">
 <style>
-/* BoxScore — Painel "Uso do app" (painel 1.0.4, Beta 7.36). Só para a equipe: lê a coleção telemetry. */
+/* BoxScore — Painel "Uso do app" (painel 1.0.5, Beta 7.45). Só para a equipe: lê a coleção telemetry. */
 :root { --bg: #f4f6f7; --card: #fcfcfb; --ink: #0b0b0b; --ink2: #52514e; --muted: #6b6a66; --line: #e2e1dc; --grid: #ecebe6;
   --s1: #2a78d6; --s2: #eb6834; --chip: #0a1014; --chipInk: #fff; color-scheme: light dark; }
 @media (prefers-color-scheme: dark) { :root { --bg: #0f0f0e; --card: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --muted: #9a998f; --line: #2e2e2b; --grid: #262624;
@@ -134,6 +134,20 @@ ol.steps { text-align: left; color: var(--ink2); }
     <p class="foot" id="foot"></p>
   </section>
 </main>
+<script>
+/* 7.45: ao abrir, confere se a versão publicada é outra; se for, apaga a cópia guardada e recarrega uma vez (o painel não passa pela atualização de módulos do Placar). */
+(function () {
+  var CUR = '1.0.5', base = location.pathname.replace(/[^\/]*$/, '');
+  if (!window.fetch || !window.caches) return;
+  fetch(base + 'index.html?v=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (t) {
+    var m = /painel (\d+\.\d+\.\d+)/.exec(t); if (!m || m[1] === CUR) return;
+    try { if (sessionStorage.getItem('bxPainelReload') === m[1]) return; sessionStorage.setItem('bxPainelReload', m[1]); } catch (e) { return; }
+    return caches.keys().then(function (ks) {
+      return Promise.all(ks.map(function (k) { return caches.open(k).then(function (c) { return Promise.all([base, base + 'index.html'].map(function (u) { return c.delete(u, { ignoreSearch: true }); })); }); }));
+    }).then(function () { location.reload(); });
+  }).catch(function () {});
+})();
+</script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
