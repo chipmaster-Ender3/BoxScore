@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0E1A21">
+<title>Ao vivo · BoxScore</title>
+<link rel="icon" href="../icons/icon-192.png">
+<link rel="stylesheet" href="../fonts/fonts.css">
+<style>
+/* BoxScore — Placar ao vivo (aovivo 1.0.0, Beta 7.47). Página pública: abre pelo link, sem login, e acompanha live/{id}. */
+:root { --bg: #0E1A21; --card: #14252E; --ink: #F4F7F5; --ink2: #B9C6CC; --muted: #8FA3AC; --line: #24404D; --live: #D92D20; --ball: #D7F24A; --win: #D7F24A;
+  --dsp: 'Big Shoulders Display', 'Arial Narrow', system-ui, sans-serif; --ui: 'Public Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+@media (prefers-color-scheme: light) { :root { --bg: #F3F5F4; --card: #FFFFFF; --ink: #0B1418; --ink2: #3D4B52; --muted: #5E6E75; --line: #DCE3E2; --win: #2E6B00; } }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.45 var(--ui); -webkit-text-size-adjust: 100%; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: max(16px, env(safe-area-inset-top)) clamp(12px, 3vw, 32px) 32px; }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: clamp(12px, 2.5vw, 24px); }
+.brand { font: 800 clamp(18px, 2.4vw, 26px)/1 var(--dsp); letter-spacing: .06em; text-transform: uppercase; color: var(--ink); text-decoration: none; }
+.pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; font: 800 clamp(13px, 1.6vw, 16px)/1 var(--ui); letter-spacing: .08em; text-transform: uppercase; color: #fff; background: var(--live); }
+.pill i { width: 10px; height: 10px; border-radius: 50%; background: #fff; animation: pulse 1.4s ease-in-out infinite; }
+.pill.end { background: var(--muted); } .pill.end i { display: none; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .pill i { animation: none; } }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: clamp(14px, 3vw, 28px); }
+.board { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0; }
+.row { display: contents; }
+.who { display: flex; align-items: center; gap: 10px; min-width: 0; padding: clamp(10px, 2vw, 18px) 0; border-bottom: 1px solid var(--line); }
+.row:last-child .who, .row:last-child .cells { border-bottom: 0; }
+.srv { width: clamp(12px, 1.6vw, 18px); height: clamp(12px, 1.6vw, 18px); border-radius: 50%; flex: none; background: transparent; }
+.srv.on { background: var(--ball); box-shadow: 0 0 0 2px rgba(0,0,0,.15) inset; }
+.nm { font: 800 clamp(20px, 4.2vw, 48px)/1.1 var(--dsp); text-transform: uppercase; letter-spacing: .02em; overflow-wrap: anywhere; }
+.row.won .nm { color: var(--win); }
+.cells { display: flex; align-items: center; justify-content: flex-end; gap: clamp(6px, 1.6vw, 18px); border-bottom: 1px solid var(--line); padding-left: 12px; }
+.c { min-width: clamp(22px, 3.6vw, 44px); text-align: center; font: 700 clamp(20px, 4vw, 44px)/1 var(--dsp); color: var(--ink2); position: relative; }
+.c sup { font: 700 .45em/1 var(--ui); position: absolute; top: -.2em; right: -.45em; color: var(--muted); }
+.c.cur { color: var(--ink); }
+.c.pt { min-width: clamp(54px, 9vw, 110px); padding: 6px 8px; border-radius: 12px; background: var(--ball); color: #0B1418; font-size: clamp(26px, 5.6vw, 64px); }
+.c.win { color: var(--win); }
+.meta { margin-top: 14px; color: var(--muted); font-size: clamp(13px, 1.6vw, 16px); display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.flag { margin-top: 12px; font-weight: 700; color: var(--ink); }
+.ins { margin-top: 18px; }
+.ins h2 { font: 800 18px/1.2 var(--dsp); text-transform: uppercase; letter-spacing: .05em; margin: 0 0 8px; }
+.ins ul { margin: 0; padding-left: 20px; color: var(--ink2); } .ins li + li { margin-top: 4px; }
+.msg { text-align: center; padding: 48px 12px; color: var(--ink2); }
+.msg b { display: block; color: var(--ink); font: 800 26px/1.2 var(--dsp); text-transform: uppercase; margin-bottom: 8px; }
+.foot { margin-top: 22px; text-align: center; color: var(--muted); font-size: 14px; }
+.foot a { color: var(--ink2); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a class="brand" href="../" id="brand">BoxScore</a><span class="pill" id="pill" hidden><i aria-hidden="true"></i><span id="pillT"></span></span></div>
+  <main id="main" aria-live="polite"><div class="card msg" id="loading"></div></main>
+  <p class="foot" id="foot"></p>
+</div>
+<script src="../shared/live.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+(function () {
+  'use strict';
+  var FB_CFG = { apiKey: 'AIzaSyD_L90YxJAVRuTfPqwNbETJlbV9BYdnuYI', authDomain: 'boxsocore.firebaseapp.com', projectId: 'boxsocore', storageBucket: 'boxsocore.firebasestorage.app', messagingSenderId: '639383913161', appId: '1:639383913161:web:a9bb75fcf99f4b03378318' };
+  var D = {
+    'pt-BR': { updnow: 'Atualizado agora', live: 'Ao vivo', end: 'Fim de jogo', off: 'Transmissão encerrada', win: 'Vitória de {0}', srv: 'saca', tb: 'Tie-break', stb: 'Super tie-break', upd: 'Atualizado há {0}', now: 'agora', s: '{0} s', m: '{0} min', load: 'Carregando o placar…',
+      gone_t: 'Link expirado', gone: 'Esta transmissão terminou ou o link não existe mais.', noid_t: 'Link incompleto', noid: 'Abra o link completo que você recebeu.', net: 'Sem conexão. O placar volta a atualizar sozinho.',
+      stopped: 'O dono encerrou a transmissão. Último placar:', sum: 'Resumo da partida', foot: 'Placar de tênis com voz e pulseira.', know: 'Conheça o BoxScore', sets: 'Sets', doubles: 'Duplas' },
+    'pt-PT': { updnow: 'Atualizado agora', live: 'Em direto', end: 'Fim do jogo', off: 'Transmissão terminada', win: 'Vitória de {0}', srv: 'serve', tb: 'Tie-break', stb: 'Super tie-break', upd: 'Atualizado há {0}', now: 'agora', s: '{0} s', m: '{0} min', load: 'A carregar o marcador…',
+      gone_t: 'Ligação expirada', gone: 'Esta transmissão terminou ou a ligação já não existe.', noid_t: 'Ligação incompleta', noid: 'Abra a ligação completa que recebeu.', net: 'Sem ligação. O marcador volta a atualizar sozinho.',
+      stopped: 'O dono terminou a transmissão. Último marcador:', sum: 'Resumo da partida', foot: 'Marcador de ténis com voz e pulseira.', know: 'Conheça o BoxScore', sets: 'Sets', doubles: 'Pares' },
+    en: { updnow: 'Updated just now', live: 'Live', end: 'Match over', off: 'Broadcast ended', win: '{0} wins', srv: 'serving', tb: 'Tie-break', stb: 'Super tie-break', upd: 'Updated {0} ago', now: 'just now', s: '{0} s', m: '{0} min', load: 'Loading the score…',
+      gone_t: 'Link expired', gone: 'This broadcast has ended or the link no longer exists.', noid_t: 'Incomplete link', noid: 'Open the full link you received.', net: 'No connection. The score will update again on its own.',
+      stopped: 'The owner ended the broadcast. Last score:', sum: 'Match summary', foot: 'Tennis scoreboard with voice and a wristband.', know: 'Discover BoxScore', sets: 'Sets', doubles: 'Doubles' },
+    es: { updnow: 'Actualizado ahora', live: 'En vivo', end: 'Fin del partido', off: 'Transmisión finalizada', win: 'Victoria de {0}', srv: 'saca', tb: 'Tie-break', stb: 'Super tie-break', upd: 'Actualizado hace {0}', now: 'ahora', s: '{0} s', m: '{0} min', load: 'Cargando el marcador…',
+      gone_t: 'Enlace caducado', gone: 'Esta transmisión terminó o el enlace ya no existe.', noid_t: 'Enlace incompleto', noid: 'Abre el enlace completo que recibiste.', net: 'Sin conexión. El marcador se actualizará solo.',
+      stopped: 'El dueño finalizó la transmisión. Último marcador:', sum: 'Resumen del partido', foot: 'Marcador de tenis con voz y pulsera.', know: 'Conoce BoxScore', sets: 'Sets', doubles: 'Dobles' },
+    fr: { updnow: "Mis à jour à l'instant", live: 'En direct', end: 'Fin du match', off: 'Diffusion terminée', win: 'Victoire de {0}', srv: 'au service', tb: 'Tie-break', stb: 'Super tie-break', upd: 'Mis à jour il y a {0}', now: 'à l\'instant', s: '{0} s', m: '{0} min', load: 'Chargement du score…',
+      gone_t: 'Lien expiré', gone: 'Cette diffusion est terminée ou le lien n\'existe plus.', noid_t: 'Lien incomplet', noid: 'Ouvrez le lien complet que vous avez reçu.', net: 'Pas de connexion. Le score se remettra à jour tout seul.',
+      stopped: 'Le propriétaire a arrêté la diffusion. Dernier score :', sum: 'Résumé du match', foot: 'Tableau de score de tennis avec voix et bracelet.', know: 'Découvrir BoxScore', sets: 'Sets', doubles: 'Double' },
+    de: { updnow: 'Gerade aktualisiert', live: 'Live', end: 'Spielende', off: 'Übertragung beendet', win: '{0} gewinnt', srv: 'Aufschlag', tb: 'Tiebreak', stb: 'Match-Tiebreak', upd: 'Aktualisiert vor {0}', now: 'gerade eben', s: '{0} s', m: '{0} min', load: 'Spielstand wird geladen…',
+      gone_t: 'Link abgelaufen', gone: 'Diese Übertragung ist beendet oder der Link existiert nicht mehr.', noid_t: 'Unvollständiger Link', noid: 'Öffne den vollständigen Link, den du bekommen hast.', net: 'Keine Verbindung. Der Spielstand aktualisiert sich von selbst.',
+      stopped: 'Der Besitzer hat die Übertragung beendet. Letzter Stand:', sum: 'Spielzusammenfassung', foot: 'Tennis-Anzeigetafel mit Stimme und Armband.', know: 'BoxScore entdecken', sets: 'Sätze', doubles: 'Doppel' }
+  };
+  var nl = String((navigator.languages && navigator.languages[0]) || navigator.language || 'pt-BR').toLowerCase();
+  var LG = nl === 'pt-pt' ? 'pt-PT' : nl.indexOf('pt') === 0 ? 'pt-BR' : D[nl.slice(0, 2)] ? nl.slice(0, 2) : 'en';
+  document.documentElement.lang = LG;
+  function T(k) { return (D[LG] && D[LG][k]) || D['pt-BR'][k] || k; }
+  function Tf(k) { var a = arguments; return T(k).replace(/\{(\d+)\}/g, function (m, i) { return a[+i + 1] != null ? a[+i + 1] : ''; }); }
+  function $(id) { return document.getElementById(id); }
+  function el(tag, cls, txt) { var x = document.createElement(tag); if (cls) x.className = cls; if (txt != null) x.textContent = txt; return x; }
+  $('loading').textContent = T('load');
+  var ft = $('foot'); ft.appendChild(document.createTextNode(T('foot') + ' ')); var a = el('a', '', T('know')); a.href = '../'; ft.appendChild(a);
+  var id = (location.search.match(/[?&]id=([A-Za-z0-9]{16,40})/) || [])[1] || '';
+  var last = null, lastAt = 0, net = true;
+  function msg(t, d) { var m = $('main'); m.textContent = ''; var c = el('div', 'card msg'); c.appendChild(el('b', '', t)); c.appendChild(document.createTextNode(d)); m.appendChild(c); $('pill').hidden = true; }
+  function parseSet(x) {   // "6-4", "7-6(5)" ou "[10-8]" (super tie-break)
+    var m = /^\[?(\d+)-(\d+)\]?(?:\((\d+)\))?$/.exec(String(x || '')); if (!m) return null;
+    return { a: +m[1], b: +m[2], tb: m[3] != null ? +m[3] : null, sup: String(x).charAt(0) === '[' };
+  }
+  function updTxt(ms) { var s = Math.max(0, Math.round((Date.now() - ms) / 1000)); return s < 5 ? T('updnow') : Tf('upd', s < 60 ? Tf('s', s) : Tf('m', Math.round(s / 60))); }
+  function render() {
+    var d = last; if (!d) return;
+    var sc = d.sc || {}, over = sc.w === 0 || sc.w === 1, live = d.on && !over && d.expAt > Date.now();
+    var pill = $('pill'); pill.hidden = false; pill.className = 'pill' + (live ? '' : ' end'); $('pillT').textContent = live ? T('live') : over ? T('end') : T('off');
+    document.title = (live ? '● ' : '') + d.names[0] + ' x ' + d.names[1] + ' · BoxScore';
+    var m = $('main'); m.textContent = ''; var card = el('div', 'card'), b = el('div', 'board');
+    var sets = (sc.sets || []).map(parseSet).filter(Boolean);
+    [0, 1].forEach(function (t) {
+      var r = el('div', 'row' + (over && sc.w === t ? ' won' : '')), who = el('div', 'who');
+      var sv = el('span', 'srv' + (!over && sc.srv === t ? ' on' : '')); if (!over && sc.srv === t) sv.title = T('srv'); who.appendChild(sv);
+      who.appendChild(el('span', 'nm', d.names[t] || '')); r.appendChild(who);
+      var cells = el('div', 'cells');
+      sets.forEach(function (st) { var mine = t ? st.b : st.a, oth = t ? st.a : st.b, c = el('span', 'c' + (mine > oth ? ' win' : ''), String(mine)); if (st.tb != null && mine < oth) c.appendChild(el('sup', '', String(st.tb))); cells.appendChild(c); });
+      if (!over) { cells.appendChild(el('span', 'c cur', String((sc.g || [0, 0])[t]))); cells.appendChild(el('span', 'c pt', String((sc.p || ['0', '0'])[t] || '0'))); }
+      r.appendChild(cells); b.appendChild(r);
+    });
+    card.appendChild(b);
+    if (over) card.appendChild(el('div', 'flag', Tf('win', d.names[sc.w])));
+    else if (!d.on) card.appendChild(el('div', 'flag', T('stopped')));
+    else if (sc.tb) card.appendChild(el('div', 'flag', T('tb')));
+    var mt = el('div', 'meta'); if (d.place) mt.appendChild(el('span', '', d.place)); if (d.mode === 'doubles') mt.appendChild(el('span', '', T('doubles')));
+    var up = el('span', '', updTxt(d.updatedAt || Date.now())); up.id = 'upd'; if (live) mt.appendChild(up);
+    if (!net) mt.appendChild(el('span', '', T('net')));
+    card.appendChild(mt);
+    if (over && d.ins && d.ins.length) { var ins = el('div', 'ins'); ins.appendChild(el('h2', '', T('sum'))); var ul = el('ul'); d.ins.forEach(function (x) { ul.appendChild(el('li', '', x)); }); ins.appendChild(ul); card.appendChild(ins); }
+    m.appendChild(card);
+  }
+  setInterval(function () { var u = $('upd'); if (u && last) u.textContent = updTxt(last.updatedAt || Date.now()); }, 5000);
+  if (!id) { msg(T('noid_t'), T('noid')); return; }
+  try { firebase.initializeApp(FB_CFG); } catch (e) {}
+  var db = firebase.firestore(), unsub = null;
+  function watch() {
+    if (unsub) try { unsub(); } catch (e) {}
+    unsub = db.collection('live').doc(id).onSnapshot(function (snap) {
+      net = true;
+      if (!snap.exists) { if (!last) msg(T('gone_t'), T('gone')); else { last.on = false; render(); } return; }
+      last = snap.data(); lastAt = Date.now(); render();
+    }, function (err) {
+      var c = err && err.code;
+      if (c === 'permission-denied' || c === 'not-found') { if (last && last.sc && (last.sc.w === 0 || last.sc.w === 1)) { last.expAt = 0; render(); } else msg(T('gone_t'), T('gone')); return; }
+      net = false; render(); setTimeout(watch, 5000);
+    });
+  }
+  window.addEventListener('online', function () { net = true; watch(); });
+  window.addEventListener('offline', function () { net = false; render(); });
+  watch();
+})();
+</script>
+</body>
+</html>
