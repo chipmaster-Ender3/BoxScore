@@ -186,6 +186,15 @@
     var l = L[L.length - 1];
     return { st: st, last: { w: l[0], ace: !!l[11], n: L.length } };
   }
+  // 7.56: momento decisivo para a página ao vivo: match point > set point > break point (t = '' quando não há)
+  function liveStake(s) {
+    if (s.winner !== null) return { t: '', p: -1 };
+    var k = E().stakes(s);
+    for (var i = 0; i < 2; i++) if (k.matchPoint[i]) return { t: 'mp', p: i };
+    for (i = 0; i < 2; i++) if (k.setPoint[i]) return { t: 'sp', p: i };
+    var al = alertInfo(s); if (al && al.type === 'bp') return { t: 'bp', p: al.player };
+    return { t: '', p: -1 };
+  }
   function liveDoc(base, G, now, ins) {
     var s = G.state, m = G.meta, d = E().display(s), over = s.winner !== null, ended = over ? (base.endedAt || now) : 0, ls = liveStats(m);
     return {
@@ -193,7 +202,7 @@
       audience: base.ann ? (base.aud || []).slice(0, 400) : [], names: [String(m.names[0] || '').slice(0, 80), String(m.names[1] || '').slice(0, 80)],
       mode: s.cfg.mode === 'doubles' ? 'doubles' : 'singles', place: String(m.place || '').slice(0, 80),
       sc: { sets: (s.sets || []).map(setText), g: s.games.slice(), p: over ? ['', ''] : [String(d.points[0]), String(d.points[1])], srv: over ? -1 : d.server, tb: !!d.tiebreak, w: over ? s.winner : -1, sw: s.setsWon.slice(),
-        st: ls.st, last: ls.last || { w: -1, ace: false, n: 0 } },
+        st: ls.st, last: ls.last || { w: -1, ace: false, n: 0 }, k: liveStake(s) },
       sport: 'tennis', surf: String(m.surface || '').slice(0, 20), playAt: m.playStart || m.startedAt || base.startedAt || now,
       ins: over ? (ins || []) : [], startedAt: base.startedAt || now, updatedAt: now, endedAt: ended,
       expAt: over ? ended + AFTER_MS : now + LIVE_MS

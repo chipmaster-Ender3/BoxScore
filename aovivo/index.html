@@ -9,7 +9,7 @@
 <link rel="icon" href="../icons/icon-192.png">
 <link rel="stylesheet" href="../fonts/fonts.css">
 <style>
-/* BoxScore — Placar ao vivo (aovivo 1.2.0, Beta 7.53). Página pública: abre pelo link, sem login, e acompanha live/{id}. */
+/* BoxScore — Placar ao vivo (aovivo 1.3.0, Beta 7.56). Página pública: abre pelo link, sem login, e acompanha live/{id}. */
 :root { --bg: #0E1A21; --card: #14252E; --ink: #F4F7F5; --ink2: #B9C6CC; --muted: #8FA3AC; --line: #24404D; --live: #D92D20; --ball: #D7F24A; --win: #D7F24A;
   --dsp: 'Big Shoulders Display', 'Arial Narrow', system-ui, sans-serif; --ui: 'Public Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
 @media (prefers-color-scheme: light) { :root { --bg: #F3F5F4; --card: #FFFFFF; --ink: #0B1418; --ink2: #3D4B52; --muted: #5E6E75; --line: #DCE3E2; --win: #2E6B00; } }
@@ -53,6 +53,12 @@ html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.4
 .aceF { display: inline-flex; align-items: center; margin-left: 10px; padding: 4px 10px; border-radius: 8px; background: var(--live); color: #fff; font: 800 clamp(14px, 2vw, 22px)/1 var(--dsp); letter-spacing: .08em; animation: aceIn .5s ease-out; }
 @keyframes aceIn { 0% { transform: scale(.4); opacity: 0; } 70% { transform: scale(1.15); } 100% { transform: scale(1); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .aceF { animation: none; } }
+.stkF { display: inline-flex; align-items: center; margin-left: 10px; padding: 4px 10px; border-radius: 8px; background: var(--ball); color: #0B1418; font: 800 clamp(13px, 1.8vw, 20px)/1 var(--dsp); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; animation: aceIn .5s ease-out; }
+.stkF.stk-mp { background: #FFB020; }
+@media (prefers-reduced-motion: reduce) { .stkF { animation: none; } }
+body.tv .stkF { font-size: calc(min(5.4vh, 3.6vw) * var(--k, 1)); padding: .8vh 1.2vw; border-radius: 1.4vh; margin-left: 1.4vw; animation: aceIn .5s ease-out, stkP 1.6s ease-in-out .5s infinite; }
+@keyframes stkP { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+@media (prefers-reduced-motion: reduce) { body.tv .stkF { animation: none; } }
 .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 14px; }
 .fact { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 14px; background: var(--bg); border: 1px solid var(--line); min-width: 0; }
 .fact svg { width: 22px; height: 22px; flex: none; fill: none; stroke: var(--ink2); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -176,6 +182,16 @@ body.tv .tvc.show { opacity: 1; pointer-events: auto; }
     de: { tv: 'TV-Modus', full: 'Vollbild', tvx: 'TV-Modus beenden', tvq: 'Auf dem Handy<br>verfolgen' }
   };
   Object.keys(D3).forEach(function (l) { for (var k in D3[l]) D[l][k] = D3[l][k]; });
+  // 7.56: momentos decisivos (vêm prontos do app em sc.k)
+  var D4 = {
+    'pt-BR': { k_mp: 'Match point', k_sp: 'Set point', k_bp: 'Break point' },
+    'pt-PT': { k_mp: 'Match point', k_sp: 'Set point', k_bp: 'Break point' },
+    en: { k_mp: 'Match point', k_sp: 'Set point', k_bp: 'Break point' },
+    es: { k_mp: 'Punto de partido', k_sp: 'Punto de set', k_bp: 'Punto de quiebre' },
+    fr: { k_mp: 'Balle de match', k_sp: 'Balle de set', k_bp: 'Balle de break' },
+    de: { k_mp: 'Matchball', k_sp: 'Satzball', k_bp: 'Breakball' }
+  };
+  Object.keys(D4).forEach(function (l) { for (var k in D4[l]) D[l][k] = D4[l][k]; });
   var nl = String((navigator.languages && navigator.languages[0]) || navigator.language || 'pt-BR').toLowerCase();
   var LG = nl === 'pt-pt' ? 'pt-PT' : nl.indexOf('pt') === 0 ? 'pt-BR' : D[nl.slice(0, 2)] ? nl.slice(0, 2) : 'en';
   document.documentElement.lang = LG;
@@ -223,6 +239,7 @@ body.tv .tvc.show { opacity: 1; pointer-events: auto; }
     var la = sc.last || {};
     if (la.n && la.n !== aceSeen) { if (aceSeen >= 0 && la.ace) aceUntil = Date.now() + 8000; else if (aceSeen < 0 && la.ace && Date.now() - (d.updatedAt || 0) < 8000) aceUntil = (d.updatedAt || Date.now()) + 8000; aceSeen = la.n; }
     var aceOn = la.ace && Date.now() < aceUntil && !over ? la.w : -1;
+    var stk = !over && live && sc.k && /^(mp|sp|bp)$/.test(sc.k.t) && (sc.k.p === 0 || sc.k.p === 1) ? sc.k : null;
     var m = $('main'); m.textContent = ''; var card = el('div', 'card'), b = el('div', 'board');
     var sets = (sc.sets || []).map(parseSet).filter(Boolean);
     [0, 1].forEach(function (t) {
@@ -230,6 +247,7 @@ body.tv .tvc.show { opacity: 1; pointer-events: auto; }
       var sv = el('span', 'srv' + (!over && sc.srv === t ? ' on' : '')); if (!over && sc.srv === t) sv.title = T('srv'); who.appendChild(sv);
       var nmE = el('span', 'nm'), parts = String(d.names[t] || '').split(' / '); parts.forEach(function (p, i) { if (i) nmE.appendChild(document.createTextNode(' ')); var pe = el('span', 'pn', p); if (i < parts.length - 1) pe.appendChild(el('span', 'sl', ' /')); nmE.appendChild(pe); }); who.appendChild(nmE);
       if (aceOn === t) who.appendChild(el('span', 'aceF', T('ace')));
+      if (stk && stk.p === t) who.appendChild(el('span', 'stkF stk-' + stk.t, T('k_' + stk.t)));
       r.appendChild(who);
       var cells = el('div', 'cells');
       sets.forEach(function (st) { var mine = t ? st.b : st.a, oth = t ? st.a : st.b, c = el('span', 'c' + (mine > oth ? ' win' : ''), String(mine)); if (st.tb != null && mine < oth) c.appendChild(el('sup', '', String(st.tb))); cells.appendChild(c); });
@@ -319,7 +337,7 @@ body.tv .tvc.show { opacity: 1; pointer-events: auto; }
   // 7.52: contagem anônima de quem abriu o link (uma vez por transmissão por dia neste aparelho; sem conta, sem nomes nem placar)
   try {
     if (window.BXTel) {
-      BXTel.init({ module: 'aovivo', build: '7.53', lang: LG, getDb: function () { return db; }, getUid: function () { return null; } });
+      BXTel.init({ module: 'aovivo', build: '7.56', lang: LG, getDb: function () { return db; }, getUid: function () { return null; } });
       var sk = 'boxscore.live.seen', seen = {}; try { seen = JSON.parse(localStorage.getItem(sk) || '{}') || {}; } catch (e) {}
       var dd = new Date().toISOString().slice(0, 10);
       if (seen[id] !== dd) { seen[id] = dd; Object.keys(seen).forEach(function (k) { if (seen[k] !== dd) delete seen[k]; }); try { localStorage.setItem(sk, JSON.stringify(seen)); } catch (e) {} BXTel.count('v_live_open'); }
