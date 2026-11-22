@@ -151,6 +151,7 @@ main .card.hasm{position:relative}main .card.hasm>.row:first-child{padding-right
 main .cmore{position:absolute;top:8px;right:8px;width:44px;height:44px;border-radius:50%;border:0;background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer}main .cmore .ic{width:22px;height:22px}
 main .youin{display:flex;align-items:center;gap:6px;color:var(--s-open);font:700 14px var(--ui)}main .youin .ic{width:18px;height:18px}
 .um .btn.mrow{display:flex;align-items:center;justify-content:flex-start;gap:12px;text-align:left}.um .btn.mrow .ic{width:20px;height:20px}.um .btn.mrow.bad{color:var(--bad);border-color:var(--bad)}
+main .phd{align-items:center;gap:4px}main .phd .sp{flex:1}main .pwho{display:inline-flex;align-items:center;gap:10px;min-height:44px;min-width:0;border:0;background:transparent;color:inherit;padding:0;text-align:left;cursor:pointer;font:800 15px var(--ui)}main .pwho b{font:inherit;overflow-wrap:anywhere}main .pwho:hover b{text-decoration:underline}main .pdm{color:var(--muted);padding:0 8px}main .pdm:hover{color:var(--ink)}main .ptgn{border:0;background:transparent;padding:0;font:inherit;color:inherit;cursor:pointer;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
 main .pact{display:inline-flex;align-items:center;gap:6px;min-height:44px;min-width:44px;padding:0 10px;border:0;border-radius:12px;background:transparent;color:var(--ink);font:700 15px var(--ui);cursor:pointer}main .pact .ic{width:22px;height:22px}
 main .pact.on{color:#E0245E}main .pact.on .ic svg{fill:currentColor}main .pact.pmore{margin-left:auto;color:var(--muted)}
 </style>
@@ -247,7 +248,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
 (function () {
   'use strict';
   BXMods.mark('rede');
-  var VERSION = '0.55.0';
+  var VERSION = '0.56.0';
   var FB_CFG = { apiKey: 'AIzaSyD_L90YxJAVRuTfPqwNbETJlbV9BYdnuYI', authDomain: 'boxsocore.firebaseapp.com', projectId: 'boxsocore', storageBucket: 'boxsocore.firebasestorage.app', messagingSenderId: '639383913161', appId: '1:639383913161:web:a9bb75fcf99f4b03378318' };
   var FB_VER = '10.12.2', FB_LIBS = ['app', 'auth', 'firestore'];
   var HOUR = 3600000;
@@ -761,7 +762,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     return loadFB().then(function () {
       firebase.initializeApp(FB_CFG);
       S.auth = firebase.auth(); S.db = firebase.firestore();
-      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.54', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
+      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.55', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
       try { S.db.settings({ experimentalAutoDetectLongPolling: true, merge: true }); } catch (e) {}
       try { S.auth.getRedirectResult().catch(function () {}); } catch (e) {}
       S.auth.onAuthStateChanged(function (u) { S.user = u || null; paintGate(); if (u) { loadFriends(); loadFollows(); loadBlocks().then(reload); ensureProfile(); } });
@@ -1290,18 +1291,27 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
   }
   function cardPost(p) {
     var uid = S.user.uid, mine = p.authorUid === uid, liked = (p.likes || []).indexOf(uid) >= 0, kids = [];
-    kids.push(h('div', { cls: 'row' }, [memAv(p.authorUid, p.authorName), h('b', { text: p.authorName || '?', style: 'flex:1;font:800 15px var(--ui)' }), h('span', { cls: 'sub', 'data-ts': String(p.createdAt || p.playedAt || 0), title: fmtWhen(p.createdAt || p.playedAt || 0), text: postWhen(p.createdAt || p.playedAt) })]));
+    // 7.55: tocar na foto ou no nome abre o perfil; ao lado do nome, ícone de mensagem direta (só entre amigos, como nas Conversas)
+    var an0 = p.authorName || '?', isFr = !mine && S.friends.some(function (x) { return x.uid === p.authorUid; }) && !S.blocks[p.authorUid];
+    var whoB = h('button', { type: 'button', cls: 'pwho', 'aria-label': T('view') + ': ' + an0, title: T('view'), on: { click: function () { showProfile(p.authorUid, an0); } } }, [memAv(p.authorUid, p.authorName), h('b', { text: an0 })]);
+    var dmB = isFr ? h('button', { type: 'button', cls: 'pact pdm', 'aria-label': T('msg') + ': ' + an0, title: T('msg'), on: { click: function () { openChat(p.authorUid, an0, null); } } }, [ic('chat')]) : null;
+    kids.push(h('div', { cls: 'row phd' }, [whoB, dmB, h('span', { cls: 'sp' }), h('span', { cls: 'sub', 'data-ts': String(p.createdAt || p.playedAt || 0), title: fmtWhen(p.createdAt || p.playedAt || 0), text: postWhen(p.createdAt || p.playedAt) })]));
     if (p.result) kids.push(h('div', { cls: 'when', style: 'font-size:20px', text: p.result }));
     var pDay = p.gameId && p.playedAt && dayL(p.playedAt) !== dayL(p.createdAt || p.playedAt) ? dayL(p.playedAt) : '';  // partida de outro dia: mostra quando foi jogada
     if (p.place || pDay) kids.push(h('div', { cls: 'sub', text: [pDay, p.place ? p.place + (p.city ? ' · ' + p.city : '') : ''].filter(Boolean).join(' · ') }));
-    var tg = (p.tags || []).map(function (u) { return (p.tagNames || {})[u]; }).filter(Boolean); if (tg.length) kids.push(h('div', { cls: 'ptg', text: Tf('tg_with', tg.join(', ')) }));
+    var tgU = (p.tags || []).filter(function (u) { return (p.tagNames || {})[u]; });
+    if (tgU.length) {   // 7.55: os nomes marcados também abrem o perfil
+      var tgEl = h('div', { cls: 'ptg' }), parts = Tf('tg_with', '\u0001').split('\u0001');
+      tgEl.appendChild(document.createTextNode(parts[0] || ''));
+      tgU.forEach(function (u, i) { if (i) tgEl.appendChild(document.createTextNode(', ')); var nm = p.tagNames[u]; tgEl.appendChild(h('button', { type: 'button', cls: 'ptgn', title: T('view'), 'aria-label': T('view') + ': ' + nm, text: nm, on: { click: function () { showProfile(u, nm); } } })); });
+      tgEl.appendChild(document.createTextNode(parts[1] || '')); kids.push(tgEl);
+    }
     if (p.hasPhoto) { var im = h('img', { cls: 'ph', alt: '', loading: 'lazy' }); kids.push(im); if ('IntersectionObserver' in window) { var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { io.disconnect(); loadPhoto(p, im); } }); setTimeout(function () { io.observe(im); }, 0); } else loadPhoto(p, im); }
     if (p.caption) kids.push(capText(p));
     if (mine && p.vis === 'public') kids.push(h('div', { cls: 'sub', text: T('vis_pub') + ((p.reporters || []).length >= 3 ? ' · ' + T('in_rev') : '') }));
     // 7.27: curtir e comentar com ícones desenhados (antes ♥ e 💬); apagar a própria publicação foi para o ⋯
     var acts = [h('button', { type: 'button', cls: 'pact' + (liked ? ' on' : ''), 'aria-pressed': String(liked), 'aria-label': T('like'), on: { click: function () { toggleLike(p); } } }, [ic('heart'), h('span', { text: String((p.likes || []).length) })]),
       h('button', { type: 'button', cls: 'pact', 'aria-label': T('cm_h'), on: { click: function () { openComments(p); } } }, [ic('bubble'), h('span', { text: String(p.cN || 0) })])];
-    if (!mine) acts.push(vwBtn(p.authorUid, p.authorName || '?'));
     if (mine) acts.push(h('button', { type: 'button', cls: 'pact pmore', 'aria-label': T('more_opts'), title: T('more_opts'), on: { click: function () { cardMenu([[T('rm_feed'), 'trash', 'bad', function () { removePost(p); }]]); } } }, [ic('dots')])); else { if (p.vis === 'public') acts.push(h('button', { type: 'button', cls: 'btn' + (S.follows[p.authorUid] ? ' on' : ''), 'aria-pressed': String(!!S.follows[p.authorUid]), text: T(S.follows[p.authorUid] ? 'unfollow' : 'follow'), on: { click: function () { S.follows[p.authorUid] ? unfollow(p.authorUid) : follow(p.authorUid, p.authorName); } } })); acts.push(moreBtn(p.authorUid, p.authorName, { id: p.gameId, postId: p.id })); if ((p.tags || []).indexOf(uid) >= 0) acts.push(twoTap('t' + p.id, T('tg_rm'), 'bad', function () { untag(p); })); }
     kids.push(h('div', { cls: 'row' }, acts));
     return h('article', { cls: 'card' }, kids);
