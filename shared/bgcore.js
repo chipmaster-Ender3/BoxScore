@@ -133,7 +133,7 @@
   var S = null;
   function sessionStart(json) {
     var o = typeof json === 'string' ? JSON.parse(json) : json;
-    S = { G: o.G, settings: o.settings || {}, bands: o.bands || [], mode: MODES[o.mode] ? o.mode : 'fast', lock: 0, changed: false, n: 0 };
+    S = { G: o.G, settings: o.settings || {}, bands: o.bands || [], mode: MODES[o.mode] ? o.mode : 'fast', lock: 0, changed: false, n: 0, live: o.live || null };
     return JSON.stringify({ ok: true, info: info(S.G) });
   }
   function teamOf(id) { for (var i = 0; i < S.bands.length; i++) if (S.bands[i].id === id) return S.bands[i].team; return -1; }
@@ -169,12 +169,58 @@
     if (!S) return JSON.stringify({ ok: false });
     return JSON.stringify(a === 'undo' ? run(0, 'undo', now || Date.now()) : (a === 'p0' || a === 'p1') ? run(a === 'p0' ? 0 : 1, 'point', now || Date.now()) : { ok: false });
   }
+  /* ---------- 7.49: placar ao vivo (documento live/{id}) ----------
+     O mesmo formato que o Placar grava (ver shared/live.js). base = { owner, ownerName, ann, aud[], startedAt, endedAt }.
+     Com a tela bloqueada, o nativo pede sessionLive() a cada ponto e grava pelo Firestore REST (o corpo já sai no formato REST). */
+  var LIVE_MS = 6 * 3600e3, AFTER_MS = 3 * 3600e3;
+  // 7.50: números da partida a partir do registro ponto a ponto (o mesmo que o Placar usa nas estatísticas)
+  function liveStats(m) {
+    var L = m.plog, z = function () { return [0, 0]; }, st = { pts: z(), ace: z(), sp: z(), spw: z(), rp: z(), rpw: z(), bpO: z(), bpC: z() };
+    if (!L || !L.length) return { st: st, last: null };
+    L.forEach(function (x) {
+      var w = x[0], sv = x[1], rc = 1 - sv; if ((w !== 0 && w !== 1) || (sv !== 0 && sv !== 1)) return;
+      st.pts[w]++; st.sp[sv]++; st.rp[rc]++;
+      if (w === sv) { st.spw[sv]++; if (x[11]) st.ace[sv]++; } else st.rpw[rc]++;
+      if (x[7]) { st.bpO[rc]++; if (w === rc) st.bpC[rc]++; }
+    });
+    var l = L[L.length - 1];
+    return { st: st, last: { w: l[0], ace: !!l[11], n: L.length } };
+  }
+  function liveDoc(base, G, now, ins) {
+    var s = G.state, m = G.meta, d = E().display(s), over = s.winner !== null, ended = over ? (base.endedAt || now) : 0, ls = liveStats(m);
+    return {
+      owner: String(base.owner || ''), ownerName: String(base.ownerName || '').slice(0, 80), on: true, ann: !!base.ann,
+      audience: base.ann ? (base.aud || []).slice(0, 400) : [], names: [String(m.names[0] || '').slice(0, 80), String(m.names[1] || '').slice(0, 80)],
+      mode: s.cfg.mode === 'doubles' ? 'doubles' : 'singles', place: String(m.place || '').slice(0, 80),
+      sc: { sets: (s.sets || []).map(setText), g: s.games.slice(), p: over ? ['', ''] : [String(d.points[0]), String(d.points[1])], srv: over ? -1 : d.server, tb: !!d.tiebreak, w: over ? s.winner : -1, sw: s.setsWon.slice(),
+        st: ls.st, last: ls.last || { w: -1, ace: false, n: 0 } },
+      sport: 'tennis', surf: String(m.surface || '').slice(0, 20), playAt: m.playStart || m.startedAt || base.startedAt || now,
+      ins: over ? (ins || []) : [], startedAt: base.startedAt || now, updatedAt: now, endedAt: ended,
+      expAt: over ? ended + AFTER_MS : now + LIVE_MS
+    };
+  }
+  function restVal(v) {
+    if (v === null || v === undefined) return { nullValue: null };
+    if (typeof v === 'boolean') return { booleanValue: v };
+    if (typeof v === 'number') return (isFinite(v) && v % 1 === 0) ? { integerValue: String(v) } : { doubleValue: v };
+    if (typeof v === 'string') return { stringValue: v };
+    if (Object.prototype.toString.call(v) === '[object Array]') return { arrayValue: v.length ? { values: v.map(restVal) } : {} };
+    var f = {}; Object.keys(v).forEach(function (k) { f[k] = restVal(v[k]); }); return { mapValue: { fields: f } };
+  }
+  function liveRest(doc) { return JSON.stringify({ fields: restVal(doc).mapValue.fields }); }
+  function sessionLive(now) {
+    if (!S || !S.live || !S.live.id) return 'null';
+    now = now || Date.now();
+    if (S.G.state.winner !== null) { if (!S.live.endedAt) S.live.endedAt = now; } else S.live.endedAt = 0;
+    return JSON.stringify({ id: S.live.id, body: liveRest(liveDoc(S.live, S.G, now, [])) });
+  }
   function sessionTake() { if (!S) return JSON.stringify({ ok: false }); var o = { ok: true, changed: S.changed, points: S.n, G: S.G }; return JSON.stringify(o); }
 
   return {
     LOCK_MS: LOCK_MS, MODES: MODES, GN: GN,
     spokenDur: spokenDur, restLine: restLine, speakNames: speakNames, alertInfo: alertInfo, alertText: alertText, serveLine: serveLine, setText: setText,
     applyPoint: applyPoint, applyUndo: applyUndo, info: info,
-    sessionStart: sessionStart, sessionGesture: sessionGesture, sessionAction: sessionAction, sessionTake: sessionTake
+    sessionStart: sessionStart, sessionGesture: sessionGesture, sessionAction: sessionAction, sessionTake: sessionTake,
+    liveDoc: liveDoc, liveRest: liveRest, sessionLive: sessionLive
   };
 });
