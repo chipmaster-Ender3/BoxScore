@@ -1046,7 +1046,7 @@ html.nfy .bar { padding-right: max(230px, env(safe-area-inset-right, 0px)); }
       <div class="actions"><button class="btn" type="button" id="sManage">Gerenciar dados salvos</button></div>
       <label class="check srow"><span class="sic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><input type="checkbox" id="sTel"> Enviar estatísticas de uso</label>
       <span class="hint" id="sTelHint">Só contagens anônimas de uso dos recursos (ex.: quantas partidas, se usou a pulseira), para melhorar o app. Nunca nomes, placares, mensagens, fotos ou local.</span>
-      <p class="note" id="verNote">BoxScore Beta 7.40 · Placar 4.46.1</p>
+      <p class="note" id="verNote">BoxScore Beta 7.41 · Placar 4.47.0</p>
     </div>
     <div class="actions"><button class="btn primary" type="button" data-close>Pronto</button></div>
   </div>
@@ -1701,7 +1701,7 @@ try { I18N.applyDom(); } catch (e) {}
       .sort(function (a, b) { return a[0] - b[0]; });
     var hh = function (t) { var d = new Date(t), z = function (n) { return (n < 10 ? '0' : '') + n; }; return z(d.getDate()) + '/' + z(d.getMonth() + 1) + ' ' + z(d.getHours()) + ':' + z(d.getMinutes()) + ':' + z(d.getSeconds()); };
     var ua = (navigator.userAgent || '').replace(/^.*?\(([^)]*)\).*$/, '$1');
-    return ['BoxScore 7.40 · ' + ua].concat(rows.map(function (r) {
+    return ['BoxScore 7.41 · ' + ua].concat(rows.map(function (r) {
       return hh(r[0]) + ' ' + r[1] + (r[1] === 'tick' ? ' x' + r[2] + ' até ' + hh(r[3]).slice(6) : (r[2] ? ' ' + r[2] : ''));
     })).join('\n');
   }
@@ -1731,7 +1731,7 @@ try { I18N.applyDom(); } catch (e) {}
     bgLast = k;
     bg.update(info);
   }
-  // 7.37 iPhone: com a tela bloqueada a página congela. Ao ir para segundo plano, entrega a partida ao nativo
+  // 7.37 iPhone (7.41 Android também): com a tela bloqueada a página congela. Ao ir para segundo plano, entrega a partida ao nativo
   // (que roda engine.js + bgcore.js no JavaScriptCore, ouve as pulseiras e fala); ao voltar, retoma o que ele marcou.
   var bgHanded = false;
   function bgI18n() {
@@ -1745,11 +1745,12 @@ try { I18N.applyDom(); } catch (e) {}
     var session = { G: G, mode: (P.bands && P.bands.mode) || 'fast', bands: BAND.handList(), i18n: bgI18n(), at: Date.now(),
       settings: { voice: st.voice, nameOnPoint: st.nameOnPoint, stakes: st.stakes, aceSay: st.aceSay, serveCall: st.serveCall, alertBP: st.alertBP, alertGP: st.alertGP, rate: st.rate, volume: st.volume, voiceName: st.voiceName } };
     bgHanded = true; persist();
-    bg.handoff(session).catch(function () { bgHanded = false; });
+    bg.handoff(session).then(function () { dlog('handoff', session.bands.length + ' pulseira(s)'); }, function (e) { bgHanded = false; dlog('handoff-erro', e && e.message); });
   }
   function bgTake() {
     var bg = window.BXBg; if (!bg || bg.mode !== 'handoff' || !bgHanded) return;
     bg.take().then(function (res) {
+      dlog('take', res && res.changed ? (res.points || 0) + ' ponto(s)' : 'sem mudança');
       if (res && res.last) BAND.setLast(res.last);
       if (res && res.changed && res.G && res.G.state) {
         var was = G.state.winner !== null;
@@ -4557,7 +4558,7 @@ try { I18N.applyDom(); } catch (e) {}
     b.disabled = true; err.textContent = '';
     var doc = { topic: $('ctTopic').value, msg: msg.slice(0, 2000), email: em.slice(0, 120), uid: sy.user ? sy.user.uid : null,
       name: String((P.sync.acct && P.sync.acct.name) || '').slice(0, 80), lang: String(P.settings.lang || 'pt-BR').slice(0, 8),
-      build: '7.40', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
+      build: '7.41', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
     sy.db.collection('contact').add(doc).then(function () {
       b.disabled = false; $('ctMsg').value = ''; closeSheets(); showToast(T("Mensagem enviada. Obrigado! Responderemos pelo e-mail informado."));
     }, function (e) { b.disabled = false; err.textContent = Tf("Não foi possível enviar ({0}). Tente de novo.", (e && e.code) || T("erro")); });
@@ -5386,7 +5387,7 @@ try { I18N.applyDom(); } catch (e) {}
   // Beta 7.8: telemetria de uso (shared/telemetry.js) e versão da ponte do app nativo na linha de versão
   try {
     if (window.BXTel) {
-      BXTel.init({ module: 'placar', build: '7.40', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
+      BXTel.init({ module: 'placar', build: '7.41', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
       tel('p_open');
       $('sTel').checked = BXTel.isOn();
       $('sTel').addEventListener('change', function () { BXTel.setOn(this.checked); showToast(this.checked ? T("Estatísticas de uso ligadas. Obrigado!") : T("Estatísticas de uso desligadas.")); });
