@@ -1062,7 +1062,7 @@ html.nfy .bar { padding-right: max(230px, env(safe-area-inset-right, 0px)); }
       <div class="actions"><button class="btn" type="button" id="sManage">Gerenciar dados salvos</button></div>
       <label class="check srow"><span class="sic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><input type="checkbox" id="sTel"> Enviar estatísticas de uso</label>
       <span class="hint" id="sTelHint">Só contagens anônimas de uso dos recursos (ex.: quantas partidas, se usou a pulseira), para melhorar o app. Nunca nomes, placares, mensagens, fotos ou local.</span>
-      <p class="note" id="verNote">BoxScore Beta 7.48 · Placar 4.52.0</p>
+      <p class="note" id="verNote">BoxScore Beta 7.49 · Placar 4.53.0</p>
     </div>
     <div class="actions"><button class="btn primary" type="button" data-close>Pronto</button></div>
   </div>
@@ -1728,7 +1728,7 @@ try { I18N.applyDom(); } catch (e) {}
       .sort(function (a, b) { return a[0] - b[0]; });
     var hh = function (t) { var d = new Date(t), z = function (n) { return (n < 10 ? '0' : '') + n; }; return z(d.getDate()) + '/' + z(d.getMonth() + 1) + ' ' + z(d.getHours()) + ':' + z(d.getMinutes()) + ':' + z(d.getSeconds()); };
     var ua = (navigator.userAgent || '').replace(/^.*?\(([^)]*)\).*$/, '$1');
-    return ['BoxScore 7.48 · ' + ua].concat(rows.map(function (r) {
+    return ['BoxScore 7.49 · ' + ua].concat(rows.map(function (r) {
       return hh(r[0]) + ' ' + r[1] + (r[1] === 'tick' ? ' x' + r[2] + ' até ' + hh(r[3]).slice(6) : (r[2] ? ' ' + r[2] : ''));
     })).join('\n');
   }
@@ -1745,19 +1745,25 @@ try { I18N.applyDom(); } catch (e) {}
      com "Anunciar na Comunidade", amigos e seguidores veem a faixa "Ao vivo agora" no feed e um item em Avisos. */
   var LV = { id: null, key: '', t: null, lastW: 0 }, LIVE_GAP = 1500;
   function liveOf() { var L = G.meta && G.meta.live; return L && L.on ? L : null; }
+  function liveBase(L) { return { owner: myUid(), ownerName: String((me() && me().name) || (sy.user && sy.user.displayName) || '').slice(0, 80), ann: !!L.ann, aud: L.aud || [], startedAt: L.startedAt, endedAt: L.endedAt || 0 }; }
   function liveSnap(L) {
-    var s = G.state, d = E.display(s), m = G.meta, over = s.winner !== null, now = Date.now();
+    var over = G.state.winner !== null, now = Date.now();
     if (over && !L.endedAt) L.endedAt = now; if (!over && L.endedAt) L.endedAt = 0;   // desfazer depois do fim volta a "em andamento"
     var ins = [];
     if (over && P.settings.sumOn !== false) { try { var I = insights(entryFrom(G, true), true); if (I) ins = I.lines.slice(0, 4).map(function (t) { return String(t).slice(0, 200); }); } catch (x) {} }
-    return {
-      owner: myUid(), ownerName: String((me() && me().name) || (sy.user && sy.user.displayName) || '').slice(0, 80), on: true, ann: !!L.ann,
-      audience: L.ann ? (L.aud || []).slice(0, 400) : [], names: [String(m.names[0] || '').slice(0, 80), String(m.names[1] || '').slice(0, 80)],
-      mode: s.cfg.mode === 'doubles' ? 'doubles' : 'singles', place: String(m.place || '').slice(0, 80),
-      sc: { sets: (s.sets || []).map(setText), g: s.games.slice(), p: over ? ['', ''] : [String(d.points[0]), String(d.points[1])], srv: over ? -1 : d.server, tb: !!d.tiebreak, w: over ? s.winner : -1, sw: s.setsWon.slice() },
-      ins: ins, startedAt: L.startedAt || now, updatedAt: now, endedAt: L.endedAt || 0,
-      expAt: over ? L.endedAt + BXLive.AFTER_MS : now + BXLive.LIVE_MS
-    };
+    return BXCore.liveDoc(liveBase(L), G, now, ins);   // 7.49: o mesmo formato que o nativo grava com a tela bloqueada
+  }
+  // 7.49: com a tela bloqueada a página congela e quem grava o ao vivo é o nativo (Firestore REST com o login da pessoa).
+  // Guardamos um token de acesso renovado (no máximo 20 min de idade) para entregar junto com a partida.
+  function liveToken() {
+    var L = liveOf(); if (!L || !sy.user || !sy.user.getIdToken) return;
+    if (LV.tokAt && Date.now() - LV.tokAt < 20 * 60e3) return;
+    LV.tokAt = Date.now();
+    sy.user.getIdToken(true).then(function (t) { LV.tok = t; LV.tokAt = Date.now(); }, function () { LV.tokAt = 0; });
+  }
+  function liveHand() {
+    var L = liveOf(); if (!L || !sy.user || !LV.tok) return null;
+    return { live: Object.assign({ id: L.id }, liveBase(L)), liveAuth: { token: LV.tok, tokenAt: LV.tokAt, refresh: sy.user.refreshToken || '', key: FB_CFG.apiKey, project: FB_CFG.projectId } };
   }
   function liveWrite() {
     var L = liveOf(); if (!L || !sy.db || !sy.user || !window.BXLive) return;
@@ -1784,7 +1790,7 @@ try { I18N.applyDom(); } catch (e) {}
     var tag = $('liveTag');
     if (tag) { tag.hidden = !L; if (L) tag.classList.toggle('ended', G.state.winner !== null); }
     if (!L) return;
-    LV.id = L.id; liveWrite();
+    LV.id = L.id; liveWrite(); liveToken();
   }
   // amigos (links aceitos) + seguidores (follows com to = eu), até 400
   function liveAudience() {
@@ -1888,6 +1894,7 @@ try { I18N.applyDom(); } catch (e) {}
     var st = P.settings;
     var session = { G: G, mode: (P.bands && P.bands.mode) || 'fast', bands: BAND.handList(), i18n: bgI18n(), at: Date.now(),
       settings: { voice: st.voice, nameOnPoint: st.nameOnPoint, stakes: st.stakes, aceSay: st.aceSay, serveCall: st.serveCall, alertBP: st.alertBP, alertGP: st.alertGP, rate: st.rate, volume: st.volume, voiceName: st.voiceName } };
+    var lh = liveHand(); if (lh) { session.live = lh.live; session.liveAuth = lh.liveAuth; }   // 7.49: ao vivo continua com a tela bloqueada
     bgHanded = true; persist();
     bg.handoff(session).then(function () { dlog('handoff', session.bands.length + ' pulseira(s)'); }, function (e) { bgHanded = false; dlog('handoff-erro', e && e.message); });
   }
@@ -4808,7 +4815,7 @@ try { I18N.applyDom(); } catch (e) {}
     b.disabled = true; err.textContent = '';
     var doc = { topic: $('ctTopic').value, msg: msg.slice(0, 2000), email: em.slice(0, 120), uid: sy.user ? sy.user.uid : null,
       name: String((P.sync.acct && P.sync.acct.name) || '').slice(0, 80), lang: String(P.settings.lang || 'pt-BR').slice(0, 8),
-      build: '7.48', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
+      build: '7.49', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
     sy.db.collection('contact').add(doc).then(function () {
       b.disabled = false; $('ctMsg').value = ''; closeSheets(); showToast(T("Mensagem enviada. Obrigado! Responderemos pelo e-mail informado."));
     }, function (e) { b.disabled = false; err.textContent = Tf("Não foi possível enviar ({0}). Tente de novo.", (e && e.code) || T("erro")); });
@@ -5637,7 +5644,7 @@ try { I18N.applyDom(); } catch (e) {}
   // Beta 7.8: telemetria de uso (shared/telemetry.js) e versão da ponte do app nativo na linha de versão
   try {
     if (window.BXTel) {
-      BXTel.init({ module: 'placar', build: '7.48', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
+      BXTel.init({ module: 'placar', build: '7.49', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
       tel('p_open');
       $('sTel').checked = BXTel.isOn();
       $('sTel').addEventListener('change', function () { BXTel.setOn(this.checked); showToast(this.checked ? T("Estatísticas de uso ligadas. Obrigado!") : T("Estatísticas de uso desligadas.")); });
