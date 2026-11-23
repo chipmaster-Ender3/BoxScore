@@ -19,7 +19,8 @@
     gamesPerSet: 6,
     tiebreak: true,           // tie-break quando chega a gamesPerSet iguais
     tiebreakPoints: 7,
-    finalSet: 'same',         // 'same' | 'super' | 'advantage' (set decisivo)
+    finalSet: 'same',         // 'same' | 'super' | 'advantage' (set decisivo; em 1 set vale para o 6-6: tie-break, super tie-break ou sem tie-break)
+    stb: false,               // 7.59: a partida é só um super tie-break
     superTiebreakPoints: 10,
     noAd: false,              // ponto decisivo no 40 iguais
     firstServer: 0
@@ -32,9 +33,11 @@
     var n = setsToWin(s.cfg);
     return s.cfg.bestOf > 1 && s.setsWon[0] === n - 1 && s.setsWon[1] === n - 1;
   }
+  // 7.59: em partida de 1 set, o "set decisivo" é o próprio set (super = super tie-break no 6-6)
+  function onlySet(s) { return s.cfg.bestOf === 1 && !s.cfg.stb; }
 
   function hasTiebreak(s) {
-    return s.cfg.tiebreak && !(isDeciding(s) && s.cfg.finalSet === 'advantage');
+    return s.cfg.tiebreak && !((isDeciding(s) || onlySet(s)) && s.cfg.finalSet === 'advantage');
   }
 
   // ---- saque -------------------------------------------------------------
@@ -86,7 +89,8 @@
       winner: null,
       pointsPlayed: 0
     };
-    startGame(s, cfg.firstServer);
+    if (cfg.stb) { cfg.bestOf = 1; startTb(s, 'super', cfg.superTiebreakPoints, cfg.firstServer); }   // 7.59: só um super tie-break
+    else startGame(s, cfg.firstServer);
     return s;
   }
 
@@ -196,8 +200,9 @@
     if (a >= gps && a - b >= 2) {
       endSet(s, w, ev, { games: s.games.slice(), tb: null, kind: 'normal' }, gameServer);
     } else if (hasTiebreak(s) && a === gps && b === gps) {
-      ev.push({ type: 'tiebreakStart', kind: 'normal' });
-      startTb(s, 'normal', s.cfg.tiebreakPoints, 1 - gameServer);
+      var big = onlySet(s) && s.cfg.finalSet === 'super';   // 7.59: 1 set com super tie-break no 6-6
+      ev.push({ type: 'tiebreakStart', kind: big ? 'super' : 'normal' });
+      startTb(s, 'normal', big ? s.cfg.superTiebreakPoints : s.cfg.tiebreakPoints, 1 - gameServer);
     } else {
       if ((a + b) % 2 === 1) ev.push({ type: 'changeEnds' });
       startGame(s, 1 - gameServer);
@@ -271,7 +276,7 @@
       // lado do saque: direita (quadra de iguais) nos pontos pares, esquerda nos ímpares
       serveSide: (s.points[0] + s.points[1]) % 2 === 0 ? 'right' : 'left',
       tiebreak: !!s.tb,
-      tbKind: s.tb ? s.tb.kind : null, deuce: false, advantage: null, deciding: false,
+      tbKind: s.tb ? (s.tb.kind === 'normal' && s.tb.target >= 10 ? 'super' : s.tb.kind) : null, deuce: false, advantage: null, deciding: false,
       winner: s.winner, matchPoint: null, setPoint: null
     };
     if (s.winner !== null) { out.points = ['', '']; return out; }
