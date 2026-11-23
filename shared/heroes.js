@@ -258,6 +258,8 @@
       arc(c, 700, 262, 700, 140, 700, 86, 'rgba(255,255,255,.7)'); ball(c, 700, 58, 22, true); rk(c, 820, 190, .36, 0.75, 'a'); target(c, 450, 230, 56); arc(c, 682, 66, 520, 70, 462, 214, 'rgba(228,255,79,.75)'); },
     rest_troca: function (c, r) { surface(c, 'dusk', r); lines(c, [[120, 120, W, 120], [120, 120, 120, H]], 7, 'rgba(255,255,255,.55)');
       bench(c, 760, 200, 300); towel(c, 820, 178, 90); bottle(c, 560, 210, .62); swap(c, 640, 62, 70); },
+    // 7.66: janela "Sair do BoxScore?" (fim do treino: raquete no banco, garrafa e a bola parada)
+    sair: function (c, r) { surface(c, 'dusk', r); lines(c, [[120, 120, W, 120], [120, 120, 120, H]], 7, 'rgba(255,255,255,.55)'); bench(c, 740, 210, 320); rk(c, 760, 168, .3, 1.5, 'b'); bottle(c, 560, 215, .55); ball(c, 900, 262, 20); },
     rest_set: function (c, r) { surface(c, 'night', r); board(c, 600, 40, 320, 160, [[6, 3], [4, 6]]); bottle(c, 520, 200, .66); rk(c, 790, 262, .28, 1.45, 'b'); ball(c, 900, 250, 20); },
     live_saibro: function (c, r) { liveCourt(c, r, 'clay'); },
     live_rapida: function (c, r) { liveCourt(c, r, 'hard'); },
