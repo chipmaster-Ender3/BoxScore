@@ -69,6 +69,7 @@ html[data-board="night"] .side .pts { text-shadow: 0 0 30px rgba(140,180,255,.35
 <script src="../shared/modules.js"></script>
 <script src="../shared/telemetry.js"></script>
 <script src="../shared/heroes.js"></script>
+<script src="../shared/geo.js"></script>
 <script src="../shared/sharecard.js"></script>
 <script src="../legal/config.js"></script>
 </head><body>
@@ -509,6 +510,19 @@ textarea.copybox { width: 100%; min-height: 84px; border: 1px solid var(--line);
 .field.need .seg { outline: 3px solid var(--warn); outline-offset: 2px; }
 .btn.mini { min-height: 40px; font-size: 14px; padding: 0 14px; justify-self: start; }
 .btn.mini .ico { width: 18px; height: 18px; flex: none; }
+/* 7.68: País › Estado › Cidade › Bairro (shared/geo.js) */
+.geo { display: grid; gap: 10px; }
+.geo .two { gap: 10px; }
+.geo-f { display: grid; gap: 6px; min-width: 0; }
+.geo-f > .flabel { font: 700 13px/1.2 var(--ui); color: var(--muted); }
+.geo-f select, .geo-f input { width: 100%; min-width: 0; }
+.geo-sug { display: flex; flex-wrap: wrap; gap: 6px; }
+.geo-sug:empty { display: none; }
+.geo-sug .btn.mini { min-height: 38px; font-weight: 600; }
+.geo-sug .geo-add { border-style: dashed; }
+.geo-none { font: 600 13px/1.3 var(--ui); color: var(--muted); align-self: center; }
+.geo-msg { font: 500 12px/1.3 var(--ui); color: var(--muted); }
+.geo-msg:empty { display: none; }
 
 @media (max-height: 480px) {
   .card { --px: 18px; --pb: 16px; padding-top: 12px; }
@@ -989,7 +1003,7 @@ html.nfy .bar { padding-right: max(230px, env(safe-area-inset-right, 0px)); }
     <div class="tabs ptabs" id="pnTabs" role="tablist" aria-label="Perfil"><button type="button" role="tab" data-pt="me" aria-label="Pessoal"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg><span class="tl">Pessoal</span></button><button type="button" role="tab" data-pt="tn" aria-label="Tênis"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="9.5" cy="9.5" rx="5" ry="7" transform="rotate(-45 9.5 9.5)"/><path d="M6.5 9.5l3-3M9.5 12.5l3-3"/><path d="M14 14l5.5 5.5" stroke-width="3.4"/></svg><span class="tl">Tênis</span></button><button type="button" role="tab" data-pt="stats" aria-label="Estatísticas"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-6"/></svg><span class="tl">Estatísticas</span></button><button type="button" role="tab" data-pt="games" aria-label="Jogos"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 20v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1"/><circle cx="9.5" cy="7.5" r="3.5"/><path d="M21 20v-1a4 4 0 0 0-3-3.9M16 4.1a3.5 3.5 0 0 1 0 6.8"/></svg><span class="tl">Jogos</span></button></div>
     <p class="hint" id="pHint" style="margin:0 0 8px;color:var(--muted);font-size:13px"></p>
     <div data-pane="me"><div class="pgrid">
-<div class="pcard wide"><div class="ph"><span class="opt-ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span><span class="opt-t"><b>Onde você joga</b><small>Bairro, cidade e estado, nunca o endereço. Ajuda a sugerir parceiros perto de você.</small></span></div><input type="text" id="pHood" maxlength="60" autocomplete="off" autocapitalize="words" placeholder="Bairro (opcional)" aria-label="Bairro" style="margin-bottom:8px"><div class="two"><input type="text" id="pCity" maxlength="60" autocomplete="address-level2" autocapitalize="words" placeholder="Sua cidade" aria-label="Cidade"><input type="text" id="pUF" maxlength="40" list="ufList" autocomplete="address-level1" autocapitalize="characters" placeholder="Estado (ex.: SP)" aria-label="Estado"><datalist id="ufList"><option value="AC"><option value="AL"><option value="AP"><option value="AM"><option value="BA"><option value="CE"><option value="DF"><option value="ES"><option value="GO"><option value="MA"><option value="MT"><option value="MS"><option value="MG"><option value="PA"><option value="PB"><option value="PR"><option value="PE"><option value="PI"><option value="RJ"><option value="RN"><option value="RS"><option value="RO"><option value="RR"><option value="SC"><option value="SP"><option value="SE"><option value="TO"></datalist></div></div>
+<div class="pcard wide"><div class="ph"><span class="opt-ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span><span class="opt-t"><b>Onde você joga</b><small>Bairro, cidade e estado, nunca o endereço. Ajuda a sugerir parceiros perto de você.</small></span></div><div id="pGeo"></div></div>
 <div class="pcard"><div class="ph"><span class="opt-ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span><span class="opt-t"><b>Nascimento</b><small id="pAgeOut"></small></span></div><input type="date" id="pBirth" min="1900-01-01" aria-label="Data de nascimento"></div>
 <div class="pcard"><div class="ph"><span class="opt-ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="14" r="5"/><path d="M14 10l6-6M15 4h5v5"/></svg></span><span class="opt-t"><b>Sexo</b></span></div><div class="seg" data-pkey="sex"><button type="button" data-v="M">Masc.</button><button type="button" data-v="F">Fem.</button><button type="button" data-v="O">Outro</button></div></div>
 <div class="pcard"><div class="ph"><span class="opt-ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M8 7l4-4 4 4M8 17l4 4 4-4"/></svg></span><span class="opt-t"><b id="pHeightL">Estatura (m)</b></span></div><input type="text" id="pHeight" inputmode="text" maxlength="6" autocomplete="off" aria-label="Estatura"></div>
@@ -1124,7 +1138,7 @@ html.nfy .bar { padding-right: max(230px, env(safe-area-inset-right, 0px)); }
       <div class="actions"><button class="btn" type="button" id="sManage">Gerenciar dados salvos</button></div>
       <label class="check srow"><span class="sic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><input type="checkbox" id="sTel"> Enviar estatísticas de uso</label>
       <span class="hint" id="sTelHint">Só contagens anônimas de uso dos recursos (ex.: quantas partidas, se usou a pulseira), para melhorar o app. Nunca nomes, placares, mensagens, fotos ou local.</span>
-      <p class="note" id="verNote">BoxScore Beta 7.66 · Placar 4.60.0</p>
+      <p class="note" id="verNote">BoxScore Beta 7.69 · Placar 4.61.0</p>
     </div>
     <div class="actions"><button class="btn primary" type="button" data-close>Pronto</button></div>
   </div>
@@ -1805,7 +1819,7 @@ try { I18N.applyDom(); } catch (e) {}
       .sort(function (a, b) { return a[0] - b[0]; });
     var hh = function (t) { var d = new Date(t), z = function (n) { return (n < 10 ? '0' : '') + n; }; return z(d.getDate()) + '/' + z(d.getMonth() + 1) + ' ' + z(d.getHours()) + ':' + z(d.getMinutes()) + ':' + z(d.getSeconds()); };
     var ua = (navigator.userAgent || '').replace(/^.*?\(([^)]*)\).*$/, '$1');
-    return ['BoxScore 7.66 · ' + ua].concat(rows.map(function (r) {
+    return ['BoxScore 7.69 · ' + ua].concat(rows.map(function (r) {
       return hh(r[0]) + ' ' + r[1] + (r[1] === 'tick' ? ' x' + r[2] + ' até ' + hh(r[3]).slice(6) : (r[2] ? ' ' + r[2] : ''));
     })).join('\n');
   }
@@ -3248,8 +3262,7 @@ try { I18N.applyDom(); } catch (e) {}
     $('pNWa').checked = !!f.nWa; $('pNMail').checked = !!f.nMail;
     if (act !== $('pRBrand')) $('pRBrand').value = f.racketBrand || '';
     if (act !== $('pRModel')) $('pRModel').value = f.racketModel || '';
-    if (act !== $('pHood')) $('pHood').value = f.hood || '';
-    if (act !== $('pCity')) $('pCity').value = f.city || ''; if (act !== $('pUF')) $('pUF').value = f.state || '';
+    geoMount(f);
     if (act !== $('pBirth')) $('pBirth').value = f.birth || '';
     $('pAgeOut').textContent = ageOf(f.birth) !== null ? Tf("{0} anos hoje", ageOf(f.birth)) : T("A idade é calculada a partir da data.");
     Array.prototype.forEach.call(document.querySelectorAll('[data-pkey]'), function (seg) {
@@ -3310,6 +3323,20 @@ try { I18N.applyDom(); } catch (e) {}
       b.addEventListener('click', function () { viewId = o.id; ui.profTab = 'stats'; renderProf(); try { $('hProf').scrollIntoView({ block: 'start' }); } catch (e) {} });
       li.appendChild(b); ul.appendChild(li);
     });
+  }
+  // 7.68: Onde você joga = País › Estado › Cidade › Bairro em listas (shared/geo.js); o perfil guarda os códigos
+  var GEO = { pid: null, pk: null };
+  var GEO_KEYS = ['country', 'state', 'stateName', 'city', 'cityId', 'hood'];
+  function geoMount(f) {
+    var host = $('pGeo'), pid = (f && f.id) || '-';
+    if (!host || !window.BXGeo || (GEO.pid === pid && host.firstChild)) return;
+    GEO.pid = pid; host.innerHTML = '';
+    var val = {}; GEO_KEYS.forEach(function (k) { val[k] = (f && f[k]) || ''; });
+    function wrap(l, el) { var d = document.createElement('div'); d.className = 'field geo-f'; var lb = document.createElement('span'); lb.className = 'flabel'; lb.textContent = l; d.appendChild(lb); d.appendChild(el); return d; }
+    function save(v) { if (GEO.pid !== pid) return; GEO_KEYS.forEach(function (k) { var pl = profPlayer(); if (pl && (pl[k] || '') !== (v[k] || '')) saveField(k, v[k] || ''); }); }
+    GEO.pk = BXGeo.picker(host, { value: val, db: sy.ready ? sy.db : null, wrap: wrap, itemCls: 'btn mini', onChange: save });
+    // perfil antigo: a cidade digitada vira a da lista (com código) quando existe
+    GEO.pk.ready.then(function () { var v = GEO.pk.value(); if (f && f.id && (v.cityId !== (f.cityId || '') || v.country !== (f.country || ''))) save(v); });
   }
   function profPlayer() {            // jogador sendo editado; cria o meu perfil na primeira digitação
     var pl = viewId && P.players[viewId];
@@ -3397,7 +3424,7 @@ try { I18N.applyDom(); } catch (e) {}
   }
   function placeText(c, st) { return [String(c || '').trim(), String(st || '').trim()].filter(Boolean).join(' - '); }
   function bindProf() {
-    var map = { pWa: 'wa', pMailN: 'mailN', pName: 'name', pHeight: 'height', pWeight: 'weight', pBirth: 'birth', pRBrand: 'racketBrand', pRModel: 'racketModel', pStart: 'start', pCity: 'city', pUF: 'state', pHood: 'hood' };
+    var map = { pWa: 'wa', pMailN: 'mailN', pName: 'name', pHeight: 'height', pWeight: 'weight', pBirth: 'birth', pRBrand: 'racketBrand', pRModel: 'racketModel', pStart: 'start' };
     Object.keys(map).forEach(function (id) {
       var el = $(id);
       el.addEventListener('input', function () {
@@ -3408,11 +3435,10 @@ try { I18N.applyDom(); } catch (e) {}
           if (pv === null) return; v = pv === '' ? '' : String(pv);
         }
         if (id === 'pWa') { v = v.replace(/[^0-9]/g, '').slice(0, 15); }
-        if (id === 'pCity' || id === 'pUF' || id === 'pHood') v = v.replace(/\s+/g, ' ').slice(0, id === 'pUF' ? 40 : 60);
         saveField(map[id], v);
         if (id === 'pStart') { var dl2 = durLabel(v); $('pStartOut').textContent = dl2 ? Tf("Joga há {0}", dl2) : T("Mês e ano em que começou a jogar"); }
       });
-      el.addEventListener('blur', function () { if (id === 'pUF') { var nv = normUF(el.value); if (nv !== el.value.trim()) { el.value = nv; saveField('state', nv); } } if (id === 'pCity') { var cv = el.value.trim(); if (cv !== el.value) { el.value = cv; saveField('city', cv); } } renderProf(); });
+      el.addEventListener('blur', function () { renderProf(); });
       el.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); el.blur(); } });
       el.addEventListener('focus', function () { setTimeout(function () { try { el.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {} }, 300); });
     });
@@ -5103,7 +5129,7 @@ try { I18N.applyDom(); } catch (e) {}
     b.disabled = true; err.textContent = '';
     var doc = { topic: $('ctTopic').value, msg: msg.slice(0, 2000), email: em.slice(0, 120), uid: sy.user ? sy.user.uid : null,
       name: String((P.sync.acct && P.sync.acct.name) || '').slice(0, 80), lang: String(P.settings.lang || 'pt-BR').slice(0, 8),
-      build: '7.66', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
+      build: '7.69', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
     sy.db.collection('contact').add(doc).then(function () {
       b.disabled = false; $('ctMsg').value = ''; closeSheets(); showToast(T("Mensagem enviada. Obrigado! Responderemos pelo e-mail informado."));
     }, function (e) { b.disabled = false; err.textContent = Tf("Não foi possível enviar ({0}). Tente de novo.", (e && e.code) || T("erro")); });
@@ -5232,7 +5258,7 @@ try { I18N.applyDom(); } catch (e) {}
   function playerByUid(u) { var r = null; Object.keys(P.players).forEach(function (id) { var p = P.players[id]; if (!p.deleted && p.linkedUserId === u) r = p; }); return r; }
   function profSig() {
     var m = me(); if (!m) return '';
-    return JSON.stringify([m.name, (m.photo || '').length, (m.photo || '').slice(-24), m.hand, m.backhand, m.racketBrand, m.racketModel, P.sync.searchable !== false, m.height, m.weight, m.city, m.state, m.hood, m.sex, m.lvSys, m.lvVal, m.freq, m.start, ageOf(m.birth), m.privacy || null, m.wa, m.mailN, m.nWa, m.nMail, histSig()]);
+    return JSON.stringify([m.name, (m.photo || '').length, (m.photo || '').slice(-24), m.hand, m.backhand, m.racketBrand, m.racketModel, P.sync.searchable !== false, m.height, m.weight, m.city, m.state, m.hood, m.country, m.cityId, m.sex, m.lvSys, m.lvVal, m.freq, m.start, ageOf(m.birth), m.privacy || null, m.wa, m.mailN, m.nWa, m.nMail, histSig()]);
   }
   function thumbOf(url) {
     return new Promise(function (res) {
@@ -5302,7 +5328,7 @@ try { I18N.applyDom(); } catch (e) {}
     if (ok('photo')) d.photo = th;
     if (ok('style')) { d.hand = m.hand || ''; d.backhand = m.backhand || ''; }
     if (ok('racket')) d.racket = [m.racketBrand, m.racketModel].filter(Boolean).join(' ');
-    if (ok('place')) { d.city = m.city || ''; d.state = m.state || ''; d.hood = m.hood || ''; }
+    if (ok('place')) { d.city = m.city || ''; d.state = m.state || ''; d.hood = m.hood || ''; d.country = m.country || ''; d.stateName = m.stateName || ''; d.cityId = m.cityId || ''; }
     if (ok('body')) { d.height = m.height || ''; d.weight = m.weight || ''; }
     if (ok('level')) { d.lvSys = m.lvSys || ''; d.lvVal = m.lvVal || ''; d.freq = m.freq == null ? '' : String(m.freq); d.start = m.start || ''; var sd0 = lvSeed(m); if (sd0 != null) d.lvD = Math.round(sd0 * 100) / 100; }
     // 7.63: nível calculado publicado (escala interna, a mesma do declarado) para sugerir parceiros; privacidade própria
@@ -5721,7 +5747,7 @@ try { I18N.applyDom(); } catch (e) {}
     avatarInto($('usAv'), p); $('usName').textContent = p.name; $('usCode').textContent = Tf("CÓDIGO {0}", p.code);
     var g = $('usGrid'); g.innerHTML = '';
     var has = function (k) { return p[k] !== undefined; }, hidden = 0;
-    if (has('city')) g.appendChild(roField(T("Cidade / estado"), placeText(p.city, p.state)));
+    if (has('city')) g.appendChild(roField(T("Cidade / estado"), placeText(p.city, p.country && p.country !== 'BR' ? (p.stateName || p.state) : p.state)));
     if (has('height')) g.appendChild(roField(T("Estatura"), fmtH(p.height, true))); else hidden++;
     if (has('weight')) g.appendChild(roField(T("Peso"), fmtW(p.weight, true)));
     if (has('lvSys')) { g.appendChild(roField(T("Nível de jogo"), lvLabel(p.lvSys, p.lvVal))); g.appendChild(roField(T("Frequência de prática"), freqLabel(p.freq))); g.appendChild(roField(T("Tempo de prática"), durLabel(p.start))); } else hidden++;
@@ -5934,7 +5960,7 @@ try { I18N.applyDom(); } catch (e) {}
   // Beta 7.8: telemetria de uso (shared/telemetry.js) e versão da ponte do app nativo na linha de versão
   try {
     if (window.BXTel) {
-      BXTel.init({ module: 'placar', build: '7.66', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
+      BXTel.init({ module: 'placar', build: '7.69', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
       tel('p_open');
       $('sTel').checked = BXTel.isOn();
       $('sTel').addEventListener('change', function () { BXTel.setOn(this.checked); showToast(this.checked ? T("Estatísticas de uso ligadas. Obrigado!") : T("Estatísticas de uso desligadas.")); });

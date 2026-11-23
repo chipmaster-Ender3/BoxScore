@@ -116,11 +116,15 @@ header.hero #navBack{align-self:flex-start;flex:none;width:44px;height:44px;min-
 .lvShT{display:flex;align-items:center;justify-content:space-between;gap:10px}.lvShT .lvX{min-height:44px;width:44px;padding:0}
 .lvQR{display:flex;justify-content:center;margin:10px 0}.lvQR svg{background:#fff;padding:8px;border-radius:12px;width:200px;height:200px}
 .lvUrl{display:block;font:13px/1.35 ui-monospace,Menlo,monospace;word-break:break-all;padding:8px 10px;border-radius:10px;border:1px solid var(--line, #ddd);user-select:all}
+
+/* 7.68: País › Estado › Cidade › Bairro (shared/geo.js) */
+.geobox .geo{display:grid;gap:10px}.geobox .geo-sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.geobox .geo-sug:empty{display:none}.geobox .geo-sug .btn{min-height:38px;padding:0 14px;font-size:14px;font-weight:600}.geobox .geo-add{border-style:dashed}.geobox .geo-none{color:var(--muted);font:600 13px var(--ui);align-self:center}.geobox .geo-msg{color:var(--muted);font:500 12px var(--ui)}.geobox .geo-msg:empty{display:none}.geobox select,.geobox input{min-width:0}
 </style>
 <script src="../shared/modules.js"></script>
 <script src="../shared/profile-view.js"></script>
 <script src="../shared/telemetry.js"></script>
 <script src="../shared/heroes.js"></script>
+<script src="../shared/geo.js"></script>
 <script src="../shared/sharecard.js"></script>
 <script src="../shared/live.js"></script>
 <script src="../shared/qr.js"></script>
@@ -242,7 +246,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
 <div id="notices" style="display:grid;gap:10px"></div>
 <section id="pHome"><div id="lHome" style="display:grid;gap:10px"></div></section>
 <section id="pGroups" hidden><div id="lGroups" style="display:grid;gap:10px"></div></section>
-<section id="pFind" hidden><div class="two" style="margin-bottom:10px"><input id="fCity" type="search"></div><div id="lFind" style="display:grid;gap:10px"></div></section>
+<section id="pFind" hidden><div id="lFind" style="display:grid;gap:10px"></div></section>
 <section id="pMine" hidden><div id="lMine" style="display:grid;gap:10px"></div></section>
 <section id="pNew" hidden></section>
 <section id="pSet" hidden><div id="lSet" style="display:grid;gap:12px"></div></section>
@@ -254,7 +258,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
 (function () {
   'use strict';
   BXMods.mark('rede');
-  var VERSION = '0.61.0';
+  var VERSION = '0.63.0';
   var FB_CFG = { apiKey: 'AIzaSyD_L90YxJAVRuTfPqwNbETJlbV9BYdnuYI', authDomain: 'boxsocore.firebaseapp.com', projectId: 'boxsocore', storageBucket: 'boxsocore.firebasestorage.app', messagingSenderId: '639383913161', appId: '1:639383913161:web:a9bb75fcf99f4b03378318' };
   var FB_VER = '10.12.2', FB_LIBS = ['app', 'auth', 'firestore'];
   var HOUR = 3600000;
@@ -641,6 +645,8 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
   Object.keys(KJ18).forEach(function (l) { if (D[l]) Object.assign(D[l], KJ18[l]); });
   var KJ19 = {"pt-BR": {"sg_btn": "Ver jogadores sugeridos", "sg_hide": "Esconder sugeridos", "sg_wait": "Procurando parceiros para você…", "sg_none": "Sem sugestões por enquanto. Entre em grupos e siga jogadores para ver mais gente aqui.", "sg_h": "Sugeridos pelo nível, pela proximidade, por quem joga mais e pelo equilíbrio de resultados. Veja o perfil antes de convidar.", "sg_lv": "nível parecido", "sg_hood": "mesmo bairro", "sg_city": "mesma cidade", "sg_act": "{0} jogos no último mês", "sg_bal": "resultados equilibrados", "sg_friend": "seu amigo", "sg_near": "da sua rede", "inv_add": "Convidar"}, "pt-PT": {"sg_btn": "Ver jogadores sugeridos", "sg_hide": "Esconder sugeridos", "sg_wait": "A procurar parceiros para si…", "sg_none": "Sem sugestões por agora. Entre em grupos e siga jogadores para ver mais pessoas aqui.", "sg_h": "Sugeridos pelo nível, proximidade, quem joga mais e equilíbrio de resultados. Veja o perfil antes de convidar.", "sg_lv": "nível parecido", "sg_hood": "mesmo bairro", "sg_city": "mesma cidade", "sg_act": "{0} jogos no último mês", "sg_bal": "resultados equilibrados", "sg_friend": "seu amigo", "sg_near": "da sua rede", "inv_add": "Convidar"}, "en": {"sg_btn": "See suggested players", "sg_hide": "Hide suggestions", "sg_wait": "Looking for partners for you…", "sg_none": "No suggestions yet. Join groups and follow players to see more people here.", "sg_h": "Suggested by level, distance, how often they play and how balanced the results are. Check the profile before inviting.", "sg_lv": "similar level", "sg_hood": "same neighbourhood", "sg_city": "same city", "sg_act": "{0} games last month", "sg_bal": "balanced results", "sg_friend": "your friend", "sg_near": "in your network", "inv_add": "Invite"}, "es": {"sg_btn": "Ver jugadores sugeridos", "sg_hide": "Ocultar sugeridos", "sg_wait": "Buscando compañeros para ti…", "sg_none": "Sin sugerencias por ahora. Únete a grupos y sigue jugadores para ver más gente aquí.", "sg_h": "Sugeridos por nivel, cercanía, quién juega más y resultados equilibrados. Mira el perfil antes de invitar.", "sg_lv": "nivel parecido", "sg_hood": "mismo barrio", "sg_city": "misma ciudad", "sg_act": "{0} partidos el último mes", "sg_bal": "resultados equilibrados", "sg_friend": "tu amigo", "sg_near": "de tu red", "inv_add": "Invitar"}, "fr": {"sg_btn": "Voir les joueurs suggérés", "sg_hide": "Masquer les suggestions", "sg_wait": "Recherche de partenaires pour vous…", "sg_none": "Pas de suggestion pour l’instant. Rejoignez des groupes et suivez des joueurs pour voir plus de monde ici.", "sg_h": "Suggérés selon le niveau, la proximité, l’activité et l’équilibre des résultats. Voyez le profil avant d’inviter.", "sg_lv": "niveau proche", "sg_hood": "même quartier", "sg_city": "même ville", "sg_act": "{0} matchs le mois dernier", "sg_bal": "résultats équilibrés", "sg_friend": "votre ami", "sg_near": "de votre réseau", "inv_add": "Inviter"}, "de": {"sg_btn": "Vorgeschlagene Spieler", "sg_hide": "Vorschläge ausblenden", "sg_wait": "Suche Partner für dich…", "sg_none": "Noch keine Vorschläge. Tritt Gruppen bei und folge Spielern, um hier mehr Leute zu sehen.", "sg_h": "Vorgeschlagen nach Niveau, Nähe, Aktivität und ausgeglichenen Ergebnissen. Sieh dir das Profil vor der Einladung an.", "sg_lv": "ähnliches Niveau", "sg_hood": "gleicher Stadtteil", "sg_city": "gleiche Stadt", "sg_act": "{0} Spiele im letzten Monat", "sg_bal": "ausgeglichene Ergebnisse", "sg_friend": "dein Freund", "sg_near": "aus deinem Netzwerk", "inv_add": "Einladen"}};   // 7.63: jogadores sugeridos
   Object.keys(KJ19).forEach(function (l) { if (D[l]) Object.assign(D[l], KJ19[l]); });
+  var KJ21 = {"pt-BR": {"ff_n": "{0} de {1} jogos", "f_state": "Estado", "f_hood": "Bairro", "ff_st": "Estado", "ff_city": "Cidade", "ff_hood": "Bairro", "ff_lvl": "Nível", "ff_lv_all": "Todos os níveis", "ff_lv_me": "Para o meu nível", "ff_lv_free": "Sem restrição de nível", "ff_clr": "Limpar filtros"}, "pt-PT": {"ff_n": "{0} de {1} jogos", "f_state": "Distrito / estado", "f_hood": "Bairro", "ff_st": "Distrito / estado", "ff_city": "Cidade", "ff_hood": "Bairro", "ff_lvl": "Nível", "ff_lv_all": "Todos os níveis", "ff_lv_me": "Para o meu nível", "ff_lv_free": "Sem restrição de nível", "ff_clr": "Limpar filtros"}, "en": {"ff_n": "{0} of {1} games", "f_state": "State", "f_hood": "Neighborhood", "ff_st": "State", "ff_city": "City", "ff_hood": "Neighborhood", "ff_lvl": "Level", "ff_lv_all": "All levels", "ff_lv_me": "For my level", "ff_lv_free": "No level limit", "ff_clr": "Clear filters"}, "es": {"ff_n": "{0} de {1} partidos", "f_state": "Estado / provincia", "f_hood": "Barrio", "ff_st": "Estado / provincia", "ff_city": "Ciudad", "ff_hood": "Barrio", "ff_lvl": "Nivel", "ff_lv_all": "Todos los niveles", "ff_lv_me": "Para mi nivel", "ff_lv_free": "Sin límite de nivel", "ff_clr": "Borrar filtros"}, "fr": {"ff_n": "{0} sur {1} matchs", "f_state": "Région", "f_hood": "Quartier", "ff_st": "Région", "ff_city": "Ville", "ff_hood": "Quartier", "ff_lvl": "Niveau", "ff_lv_all": "Tous les niveaux", "ff_lv_me": "Pour mon niveau", "ff_lv_free": "Sans limite de niveau", "ff_clr": "Effacer les filtres"}, "de": {"ff_n": "{0} von {1} Spielen", "f_state": "Bundesland", "f_hood": "Stadtteil", "ff_st": "Bundesland", "ff_city": "Stadt", "ff_hood": "Stadtteil", "ff_lvl": "Niveau", "ff_lv_all": "Alle Niveaus", "ff_lv_me": "Für mein Niveau", "ff_lv_free": "Ohne Niveaugrenze", "ff_clr": "Filter löschen"}};   // 7.67: filtros de Entrar num jogo (estado, cidade, bairro, nível) e estado/bairro no jogo
+  Object.keys(KJ21).forEach(function (l) { if (D[l]) Object.assign(D[l], KJ21[l]); });
   var KJ20 = {"pt-BR": {"ex_t": "Sair do BoxScore?", "ex_d": "Toque em Sair para fechar o app.", "ex_go": "Sair", "ex_stay": "Continuar no app"}, "pt-PT": {"ex_t": "Sair do BoxScore?", "ex_d": "Toque em Sair para fechar a app.", "ex_go": "Sair", "ex_stay": "Continuar na app"}, "en": {"ex_t": "Exit BoxScore?", "ex_d": "Tap Exit to close the app.", "ex_go": "Exit", "ex_stay": "Stay in the app"}, "es": {"ex_t": "¿Salir de BoxScore?", "ex_d": "Toca Salir para cerrar la app.", "ex_go": "Salir", "ex_stay": "Seguir en la app"}, "fr": {"ex_t": "Quitter BoxScore ?", "ex_d": "Touchez Quitter pour fermer l'app.", "ex_go": "Quitter", "ex_stay": "Rester dans l'app"}, "de": {"ex_t": "BoxScore beenden?", "ex_d": "Tippe auf Beenden, um die App zu schließen.", "ex_go": "Beenden", "ex_stay": "In der App bleiben"}};   // 7.66: voltar do Android pede confirmação
   Object.keys(KJ20).forEach(function (l) { if (D[l]) Object.assign(D[l], KJ20[l]); });
   var K23 = {"pt-BR": {"pay_yes": "Inscrição paga", "pay_no": "Inscrição pendente", "pay_on": "Inscrição marcada como paga.", "pay_off": "Inscrição marcada como pendente.", "pay_tap": "Toque para marcar pago ou pendente", "pay_sum": "Pagos: {0} de {1} · {2}", "pay_h": "Toque no selo de cada jogador na classificação para marcar o pagamento."}, "pt-PT": {"pay_yes": "Inscrição paga", "pay_no": "Inscrição pendente", "pay_on": "Inscrição marcada como paga.", "pay_off": "Inscrição marcada como pendente.", "pay_tap": "Toque para marcar paga ou pendente", "pay_sum": "Pagas: {0} de {1} · {2}", "pay_h": "Toque no selo de cada jogador na classificação para marcar o pagamento."}, "en": {"pay_yes": "Fee paid", "pay_no": "Fee pending", "pay_on": "Fee marked as paid.", "pay_off": "Fee marked as pending.", "pay_tap": "Tap to mark paid or pending", "pay_sum": "Paid: {0} of {1} · {2}", "pay_h": "Tap each player's badge in the standings to mark the payment."}, "es": {"pay_yes": "Inscripción pagada", "pay_no": "Inscripción pendiente", "pay_on": "Inscripción marcada como pagada.", "pay_off": "Inscripción marcada como pendiente.", "pay_tap": "Toca para marcar pagada o pendiente", "pay_sum": "Pagadas: {0} de {1} · {2}", "pay_h": "Toca la etiqueta de cada jugador en la clasificación para marcar el pago."}, "fr": {"pay_yes": "Inscription payée", "pay_no": "Inscription en attente", "pay_on": "Inscription marquée comme payée.", "pay_off": "Inscription marquée en attente.", "pay_tap": "Touchez pour marquer payée ou en attente", "pay_sum": "Payées : {0} sur {1} · {2}", "pay_h": "Touchez le badge de chaque joueur dans le classement pour noter le paiement."}, "de": {"pay_yes": "Startgeld bezahlt", "pay_no": "Startgeld offen", "pay_on": "Startgeld als bezahlt markiert.", "pay_off": "Startgeld als offen markiert.", "pay_tap": "Tippen für bezahlt oder offen", "pay_sum": "Bezahlt: {0} von {1} · {2}", "pay_h": "Tippe in der Tabelle auf das Abzeichen jedes Spielers, um die Zahlung zu markieren."}};
@@ -672,6 +678,10 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
   var CUR = { 'pt-BR': 'BRL', 'pt-PT': 'EUR', en: 'USD', es: 'EUR', fr: 'EUR', de: 'EUR' };
   var LV = { cls: ['P', '5', '4', '3', '2', '1'], abc: ['C', 'B', 'A'], ntrp: ['1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0', '5.5', '6.0', '6.5', '7.0'] };
   function lvL(sys, v) { if (!sys || !v) return ''; if (sys === 'cls') return v === 'P' ? T('lv_p') : Tf('lv_cls', v); if (sys === 'abc') return Tf('lv_abc', v); return 'NTRP ' + v; }
+  // 7.67: estado (sigla no Brasil) e onde é o jogo
+  var UFS = { AC: 'acre', AL: 'alagoas', AP: 'amapa', AM: 'amazonas', BA: 'bahia', CE: 'ceara', DF: 'distrito federal', ES: 'espirito santo', GO: 'goias', MA: 'maranhao', MT: 'mato grosso', MS: 'mato grosso do sul', MG: 'minas gerais', PA: 'para', PB: 'paraiba', PR: 'parana', PE: 'pernambuco', PI: 'piaui', RJ: 'rio de janeiro', RN: 'rio grande do norte', RS: 'rio grande do sul', RO: 'rondonia', RR: 'roraima', SC: 'santa catarina', SP: 'sao paulo', SE: 'sergipe', TO: 'tocantins' };
+  function normUF(v) { v = String(v || '').trim().replace(/\s+/g, ' '); if (!v) return ''; var k = v.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(), u = k.toUpperCase(); if (UFS[u]) return u; for (var c in UFS) if (UFS[c] === k) return c; return v; }
+  function gWhere(g) { return [g.place, window.BXGeo ? BXGeo.label(g) : g.city].filter(Boolean).join(' · '); }
   function lvRange(g) { if (!g.lvSys) return ''; var a = lvL(g.lvSys, g.lvFrom), b = lvL(g.lvSys, g.lvTo); return !a ? '' : (!b || b === a ? a : a + ' – ' + b); }
   function money(v, cur) { try { return new Intl.NumberFormat(LG, { style: 'currency', currency: cur || CUR[LG] || 'BRL' }).format(v); } catch (e) { return (cur || '') + ' ' + Number(v).toFixed(2); } }
   function nPlayers(g) { return g.mode === 'doubles' ? 4 : 2; }
@@ -697,10 +707,18 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
   function placar() { try { return JSON.parse(localStorage.getItem('boxscore.placar.v1') || 'null') || {}; } catch (e) { return {}; } }
   function myCode() { var p = placar(); return (p.sync && p.sync.code) || S.pcode || ''; }
   function lsGet(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
+  // 7.68: lugar do perfil do Placar (País › Estado › Cidade › Bairro, com códigos)
+  function myLoc() { var pl = placar(), mp = pl.players && pl.meId ? pl.players[pl.meId] || {} : {}; return { country: mp.country || '', state: mp.state || '', stateName: mp.stateName || '', city: mp.city || myCity() || '', cityId: mp.cityId || '', hood: mp.hood || '' }; }
+  function geoBox(f) {
+    var host = h('div', { cls: 'geobox' });
+    if (window.BXGeo) BXGeo.picker(host, { value: f.loc, db: S.db, itemCls: 'btn opt', wrap: function (l, el) { return h('label', { cls: 'f' }, [l, el]); }, onChange: function (v) { f.loc = v; } });
+    return host;
+  }
+  function myWhere() { var pl = placar(), mp = pl.players && pl.meId ? pl.players[pl.meId] || {} : {}; return { state: mp.state || '', hood: mp.hood || '', city: mp.city || '' }; }
   function myCity() { return P.city || lsGet('boxscore.profile.city') || lsGet('boxscore.rede.city'); }
   function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
 
-  var S = { wg: {}, wgBad: {}, dq: { n: '', c: '', k: '' }, groups: {}, disc: {}, gReqs: {}, sentReq: {}, gid: '', gtab: 'sum', ranks: {}, rkBusy: {}, rkTry: {}, gf: 'mine', dcity: true, discAt: 0, discLoading: false, gLoaded: false, user: null, db: null, auth: null, posts: {}, pub: {}, follows: {}, fmode: 'friends', pubAt: 0, pubLoading: false, blocks: {}, chats: [], friends: [], friendsLoaded: false, games: {}, jt: 'play', jf: { p: 'all', o: '', r: '', l: '' }, jx: {}, tab: 'feed', loading: false, err: false, form: null, armed: '' };
+  var S = { wg: {}, wgBad: {}, dq: { n: '', c: '', k: '' }, groups: {}, disc: {}, gReqs: {}, sentReq: {}, gid: '', gtab: 'sum', ranks: {}, rkBusy: {}, rkTry: {}, gf: 'mine', dcity: true, discAt: 0, discLoading: false, gLoaded: false, user: null, db: null, auth: null, posts: {}, pub: {}, follows: {}, fmode: 'friends', pubAt: 0, pubLoading: false, blocks: {}, chats: [], friends: [], friendsLoaded: false, games: {}, jt: 'play', jf: { p: 'all', o: '', r: '', l: '' }, ff: { s: '', c: '', b: '', l: '' }, jx: {}, tab: 'feed', loading: false, err: false, form: null, armed: '' };
   var ICONS = {
     smile: '<circle cx="12" cy="12" r="9"/><path d="M8.5 14.5c1 1.3 2.2 2 3.5 2s2.5-.7 3.5-2"/><path d="M9 9.5h.01M15 9.5h.01"/>',   // 7.30
     kbd: '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h.01M11 10h.01M15 10h.01M7 14h10"/>',
@@ -784,7 +802,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     return loadFB().then(function () {
       firebase.initializeApp(FB_CFG);
       S.auth = firebase.auth(); S.db = firebase.firestore();
-      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.66', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
+      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.69', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
       try { S.db.settings({ experimentalAutoDetectLongPolling: true, merge: true }); } catch (e) {}
       try { S.auth.getRedirectResult().catch(function () {}); } catch (e) {}
       S.auth.onAuthStateChanged(function (u) { S.user = u || null; paintGate(); if (u) { loadFriends(); loadFollows(); loadBlocks().then(reload); ensureProfile(); } });
@@ -878,7 +896,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     });
   }
   function create(f) {
-    var place = f.place.trim(), city = f.city.trim();
+    var place = f.place.trim(), L = f.loc || {}, city = String(L.city || '').trim();
     if (!place) { f.err = T('need_place'); paint(); return; }
     var at = new Date(f.date + 'T' + f.time).getTime();
     if (!isFinite(at) || at < Date.now()) { f.err = T('need_when'); paint(); return; }
@@ -898,7 +916,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     var pl = placar(), mp = pl.players && pl.meId ? pl.players[pl.meId] || {} : {};
     var i = me(), doc = {
       kind: 'friendly', hostUid: uid, hostName: i.name, hostCode: i.code, hostLvSys: mp.lvSys || '', hostLvVal: mp.lvVal || '',
-      mode: f.mode, startAt: at, place: place.slice(0, 80), city: city.slice(0, 60), cityKey: norm(city),
+      mode: f.mode, startAt: at, place: place.slice(0, 80), city: city.slice(0, 60), cityKey: norm(city), country: L.country || '', state: (L.country === 'BR' || !L.country ? normUF(L.state) : String(L.state || '')).slice(0, 40), stateName: String(L.stateName || '').slice(0, 60), cityId: String(L.cityId || '').slice(0, 20), hood: String(L.hood || '').trim().replace(/\s+/g, ' ').slice(0, 60), hoodKey: window.BXGeo ? BXGeo.key(L.hood) : '',
       lvSys: f.lvSys, lvFrom: f.lvSys ? f.lvFrom : '', lvTo: f.lvSys ? f.lvTo : '', band: 'any',
       slots: slots, slotsLeft: slots, visibility: pick ? 'invite' : f.vis, audience: aud.slice(0, 400),
       groupId: grp ? grp.id : '', groupName: grp ? grp.name : '', catId: gcat, season: gseason,
@@ -947,7 +965,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
       h('h2', { text: T('inv_title') }), av,
       h('div', { cls: 'who2', text: Tf('inv_from', g.hostName + (g.hostLvSys ? ' · ' + lvL(g.hostLvSys, g.hostLvVal) : '')) }),
       h('div', { cls: 'big', text: fmtWhen(g.startAt) }),
-      h('div', { cls: 'sub', text: g.place + (g.city ? ' · ' + g.city : ''), style: 'font-size:17px' }),
+      h('div', { cls: 'sub', text: gWhere(g), style: 'font-size:17px' }),
       h('div', { cls: 'rowc' }, chips.map(function (c) { return h('span', { cls: 'chip', text: c }); })),
       g.note ? h('div', { cls: 'sub', text: '“' + g.note + '”', style: 'font-size:16px' }) : null
     ]);
@@ -1785,7 +1803,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     var vis = g.visibility === 'open' ? T('open') : g.groupName ? Tf('grp_chip', g.groupName) : g.visibility === 'invite' ? T('vis_i') : g.groupName ? Tf('grp_chip', g.groupName) : T('friends');
     var out = [
       h('div', { cls: 'row' }, [h('div', { cls: 'when', text: fmtWhen(g.startAt) }), h('span', { cls: 'chip ' + cls, 'data-st': st, text: T('st_' + st) })]),
-      h('div', { cls: 'sub', text: g.place + (g.city ? ' · ' + g.city : '') }),
+      h('div', { cls: 'sub', text: gWhere(g) }),
       // 7.27: detalhes numa linha com ícones (antes eram 5 etiquetas iguais); só o status tem cor
       h('div', { cls: 'meta' }, [mtI('users', T(g.mode === 'doubles' ? 'doubles' : 'singles') + ' · ' + T('kind_f')), mtI('bars', lv),
         st !== 'finished' && st !== 'cancelled' && (g.slotsLeft || 0) > 0 ? mtI('plus', g.slotsLeft === 1 ? T('mt_v1') : Tf('mt_vn', g.slotsLeft)) : null,
@@ -1850,6 +1868,61 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     } else return out;
     if (out.a !== out.b) out.win = out.a > out.b;
     return out;
+  }
+  // 7.67: Entrar num jogo — filtros em cascata (estado → cidade → bairro) e nível. Cada lista só mostra o que existe nos jogos abertos.
+  function ffKey(v) { return norm(v || ''); }
+  function myLv() { var pl = placar(), mp = pl.players && pl.meId ? pl.players[pl.meId] || {} : {}; return mp.lvSys && mp.lvVal && LV[mp.lvSys] ? { sys: mp.lvSys, v: String(mp.lvVal) } : null; }
+  function lvFits(g, m) {
+    if (!g.lvSys) return true; if (!m || g.lvSys !== m.sys) return false;
+    var L = LV[g.lvSys], a = L.indexOf(String(g.lvFrom)), b = L.indexOf(String(g.lvTo)), x = L.indexOf(m.v);
+    if (a < 0 || b < 0 || x < 0) return false; return x >= Math.min(a, b) && x <= Math.max(a, b);
+  }
+  function paintFindFilters(host, base) {
+    var F = S.ff, me = myLv();
+    // 7.68: compara por código (país-estado, código da cidade) e pela chave de grafia do bairro; jogos antigos, pelo texto
+    function stK(g) { return g.state ? (g.country || (normUF(g.state) === g.state && g.state.length === 2 ? 'BR' : '')) + ':' + g.state : ''; }
+    function stN(g) { var nm = window.BXGeo ? BXGeo.stLab(g) : g.state; return g.country && g.country !== 'BR' && g.country !== myLoc().country && window.BXGeo ? nm + ' (' + BXGeo.cname(g.country) + ')' : nm; }
+    function nk(g) { return window.BXGeo ? BXGeo.key(g.city) : norm(g.city); }
+    var NK = {}; base.forEach(function (g) { if (g.city && stK(g)) (NK[nk(g)] = NK[nk(g)] || {})[stK(g)] = 1; });
+    // jogo antigo sem estado: junta com a cidade de mesmo nome, se ela só existe em um estado
+    function ctK(g) { if (!g.city) return ''; var st = stK(g); if (!st) { var o = Object.keys(NK[nk(g)] || {}); if (o.length === 1) st = o[0]; } return st + '|' + nk(g); }
+    function hdK(g) { return g.hood ? (g.hoodKey || (window.BXGeo ? BXGeo.key(g.hood) : norm(g.hood))) : ''; }
+    function opts(list, kf, nf) { var m = {}, off = {}; list.forEach(function (g) { var k = kf(g); if (!k) return; if (!m[k] || (g.cityId && !off[k])) { m[k] = nf(g); if (g.cityId) off[k] = 1; } }); return Object.keys(m).sort(function (a, b) { return m[a].localeCompare(m[b]); }).map(function (k) { return [k, m[k]]; }); }
+    var stL = base, ctL = stL.filter(function (g) { return !F.s || stK(g) === F.s; }), hdL = ctL.filter(function (g) { return !F.c || ctK(g) === F.c; }), lvL0 = hdL.filter(function (g) { return !F.b || hdK(g) === F.b; });
+    var sts = opts(stL, stK, stN), cts = opts(ctL, ctK, function (g) { return g.city; }), hds = opts(hdL, hdK, function (g) { return g.hood; });
+    // um filtro que deixou de existir (o jogo saiu da lista) volta para "Todos"
+    if (F.s && !sts.some(function (o) { return o[0] === F.s; })) F.s = '';
+    if (F.c && !cts.some(function (o) { return o[0] === F.c; })) F.c = '';
+    if (F.b && !hds.some(function (o) { return o[0] === F.b; })) F.b = '';
+    var lvs = [['', T('ff_lv_all')]];
+    if (me) lvs.push(['me', T('ff_lv_me')]);
+    if (lvL0.some(function (g) { return !g.lvSys; })) lvs.push(['free', T('ff_lv_free')]);
+    var rg = {}; lvL0.forEach(function (g) { var r = lvRange(g); if (r) rg['r:' + r] = r; });
+    Object.keys(rg).sort().forEach(function (k) { lvs.push([k, rg[k]]); });
+    if (F.l && !lvs.some(function (o) { return o[0] === F.l; })) F.l = '';
+    function sel(key, lbl, icon, list, reset) {
+      var s0 = h('select', { 'data-ff': key, 'aria-label': lbl, on: { change: function () { F[key] = s0.value; (reset || []).forEach(function (r) { F[r] = ''; }); paint(); } } });
+      list.forEach(function (o) { var op = document.createElement('option'); op.value = o[0]; op.textContent = o[1]; if (F[key] === o[0]) op.selected = true; s0.appendChild(op); });
+      if (list.length < 2) s0.disabled = true;
+      return h('label', { cls: 'jff' }, [h('span', { cls: 'jfl' }, [ic(icon), h('span', { text: lbl })]), s0]);
+    }
+    var any = [['', T('jf_any')]];
+    host.appendChild(h('div', { cls: 'jf', id: 'ffBox' }, [
+      sel('s', T('ff_st'), 'pin', any.concat(sts), ['c', 'b']),
+      sel('c', T('ff_city'), 'pin', any.concat(cts), ['b']),
+      sel('b', T('ff_hood'), 'pin', any.concat(hds)),
+      sel('l', T('ff_lvl'), 'bars', lvs)]));
+    var vis = lvL0.filter(function (g) {
+      if (F.l === 'me') return lvFits(g, me);
+      if (F.l === 'free') return !g.lvSys;
+      if (F.l) return 'r:' + lvRange(g) === F.l;
+      return true;
+    });
+    var on = F.s || F.c || F.b || F.l;
+    if (on) host.appendChild(h('div', { cls: 'jdn', style: 'display:flex;align-items:center;justify-content:space-between;gap:10px' }, [h('span', { text: Tf('ff_n', vis.length, base.length) }),
+      h('button', { type: 'button', cls: 'btn', id: 'ffClr', text: T('ff_clr'), on: { click: function () { S.ff = { s: '', c: '', b: '', l: '' }; paint(); } } })]));
+    if (!vis.length) { note(host, T('e_flt')); return; }
+    vis.forEach(function (g) { host.appendChild(cardFind(g)); });
   }
   function paintDone(host, all, uid, now) {
     var list = doneList(all, uid, now), F = S.jf;
@@ -2163,10 +2236,14 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     var host = $('pNew'); host.textContent = ''; loadFriends();
     if (!S.form) {
       var d = new Date(Date.now() + 86400000), p = function (n) { return (n < 10 ? '0' : '') + n; };
-      S.form = { mode: 'singles', date: d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()), time: '18:00', place: (placar().places || [])[0] || '', city: myCity(), slots: 1, lvSys: '', lvFrom: '', lvTo: '', vis: 'invite', gwho: 'pick', invited: [], code: '', res: null, note: '', price: '', hours: '1', cur: P.cur || lsGet('boxscore.rede.cur') || CUR[LG] || 'BRL', err: '' };
+      S.form = { mode: 'singles', date: d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()), time: '18:00', place: (placar().places || [])[0] || '', city: '', loc: myLoc(), slots: 1, lvSys: '', lvFrom: '', lvTo: '', vis: 'invite', gwho: 'pick', invited: [], code: '', res: null, note: '', price: '', hours: '1', cur: P.cur || lsGet('boxscore.rede.cur') || CUR[LG] || 'BRL', err: '' };
     }
     if (S.pre) { Object.assign(S.form, S.pre); S.pre = null; }
     var f = S.form, mg = myGroups();
+    if (!f.loc) f.loc = myLoc();
+    // cidade que veio do grupo (texto): troca a do perfil, mantendo país e estado
+    if (f.city && window.BXGeo && BXGeo.key(f.city) !== BXGeo.key(f.loc.city)) f.loc = { country: f.loc.country, state: f.loc.state, stateName: f.loc.stateName, city: f.city, cityId: '', hood: '' };
+    f.city = '';
     if (f.vis === 'group' && (S.groups || {})[f.gid] && !CX.teams[f.gid]) try { loadRank(S.groups[f.gid]); } catch (e) {}
     if (f.vis === 'group' && !mg.length) f.vis = 'invite';
     if (f.vis === 'group' && !(S.groups || {})[f.gid] && mg.length) f.gid = mg[0].id;
@@ -2258,7 +2335,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
       blk('mine', T('fb_when'), whenTxt() || ' ', [
         h('div', { cls: 'two' }, [lab(T('f_date'), dIn), lab(T('f_time'), tIn)]),
         lab(T('f_place'), inp('place', 'text', { list: 'plList', maxlength: '80', autocomplete: 'off' })), dl,
-        lab(T('f_city'), inp('city', 'text', { maxlength: '60' }))]),
+        geoBox(f)]),
       blk('bars', T('fb_lvl'), '', [
         lab(T('f_level'), sel('lvSys', [['', T('lv_any')], ['cls', T('sys_cls')], ['abc', T('sys_abc')], ['ntrp', T('sys_ntrp')]], function () { f.lvFrom = ''; f.lvTo = ''; paintForm(); })), lvRow]),
       blk('coin', T('f_cost'), '', [
@@ -4157,10 +4234,9 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     var lg = $('lGroups'); lg.textContent = ''; if (S.tab === 'groups') paintGroups(lg);
     var lf = $('lFind'); lf.textContent = '';
     if (S.tab === 'find') {
-      var q = norm($('fCity').value);
-      var list = all.filter(function (g) { return g.hostUid !== uid && !isInv(g, uid) && (g.accepted || []).indexOf(uid) < 0 && (g.declined || []).indexOf(uid) < 0 && g.status === 'open' && g.startAt > now - 3 * HOUR && (!P.days || g.startAt < now + P.days * 86400000) && (!q || norm(g.city).indexOf(q) >= 0 || norm(g.place).indexOf(q) >= 0); }).sort(function (a, b) { return a.startAt - b.startAt; });
-      if (S.loading && !all.length) note(lf, T('loading')); else if (S.err) note(lf, T('err')); else if (!list.length) empty(lf, 'find', T('ev_find_t'), T('ev_find_d'), T('ev_go_new'), function () { S.tab = 'neu'; paint(); });
-      list.forEach(function (g) { lf.appendChild(cardFind(g)); });
+      var base = all.filter(function (g) { return g.hostUid !== uid && !isInv(g, uid) && (g.accepted || []).indexOf(uid) < 0 && (g.declined || []).indexOf(uid) < 0 && g.status === 'open' && g.startAt > now - 3 * HOUR && (!P.days || g.startAt < now + P.days * 86400000); }).sort(function (a, b) { return a.startAt - b.startAt; });
+      if (S.loading && !all.length) note(lf, T('loading')); else if (S.err) note(lf, T('err')); else if (!base.length) empty(lf, 'find', T('ev_find_t'), T('ev_find_d'), T('ev_go_new'), function () { S.tab = 'neu'; paint(); });
+      else paintFindFilters(lf, base);
     }
     var lm = $('lMine'); lm.textContent = '';
     if (S.tab === 'mine') {
@@ -4188,8 +4264,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
   $('chatB').addEventListener('click', function () { S.tab = 'chat'; paint(); reload(); });
   $('setB').addEventListener('click', function () { if (S.tab !== 'set') tel('r_settings'); S.tab = S.tab === 'set' ? 'home' : 'set'; paint(); });
   $('login').textContent = T('login'); $('login').addEventListener('click', login);
-  $('fCity').placeholder = T('city_f'); $('fCity').addEventListener('input', paint);
-  $('fCity').value = '';
+
   $('gateT').textContent = T('loading'); $('gate').hidden = false;
   document.addEventListener('visibilitychange', function () { if (!document.hidden && S.user && !CH.root) reload(); });
   // Beta 5.12.1: teclado do celular — telas sobrepostas acompanham a área visível (visualViewport) para a caixa de texto não ficar escondida
