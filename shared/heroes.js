@@ -1,4 +1,4 @@
-/* BoxScore — imagens dos cabeçalhos (shared 1.5.1, Beta 7.20; 7.50: cenas live_* da página ao vivo, por piso)
+/* BoxScore — imagens dos cabeçalhos (shared 1.5.1, Beta 7.20; 7.50: cenas live_* da página ao vivo, por piso; 7.64: warm_* e rest_*)
  * Cada janela do Placar e cada tela da Comunidade tem uma ilustração de tênis ligada ao seu título,
  * desenhada aqui no canvas (sem fotos de terceiros, funciona sem internet). O assunto fica à direita;
  * o título vai à esquerda, sobre um escurecimento feito no CSS.
@@ -172,6 +172,45 @@
   }
   function dotted(c, pts) { c.save(); c.strokeStyle = 'rgba(255,255,255,.75)'; c.lineWidth = 5; c.setLineDash([3, 14]); c.lineCap = 'round'; c.beginPath(); c.moveTo(pts[0], pts[1]); c.quadraticCurveTo(pts[2], pts[3], pts[4], pts[5]); c.stroke(); c.restore(); }
 
+  // ---------- 7.64: aquecimento e descanso ----------
+  // quadra vista de cima, rede na vertical no meio; boxes = destaca os quadrados de saque
+  function courtTop(c, x0, y0, x1, y1, boxes, col) {
+    var w = x1 - x0, h = y1 - y0, mx = x0 + w / 2, al = h * .125, sv = w * .269, ya = y0 + al, yb = y1 - al;
+    if (boxes) { c.fillStyle = 'rgba(255,255,255,.18)'; c.fillRect(mx - sv, ya, sv * 2, yb - ya); }
+    lines(c, [[x0, y0, x1, y0], [x0, y1, x1, y1], [x0, y0, x0, y1], [x1, y0, x1, y1], [x0, ya, x1, ya], [x0, yb, x1, yb],
+      [mx - sv, ya, mx - sv, yb], [mx + sv, ya, mx + sv, yb], [mx - sv, (y0 + y1) / 2, mx + sv, (y0 + y1) / 2]], 6, col);
+    c.save(); c.shadowColor = 'rgba(0,0,0,.4)'; c.shadowBlur = 10; c.fillStyle = '#F4F2EC'; c.fillRect(mx - 4, y0 - 16, 8, h + 32);
+    c.fillStyle = '#2A2F36'; c.fillRect(mx - 7, y0 - 24, 14, 12); c.fillRect(mx - 7, y1 + 12, 14, 12); c.restore();
+  }
+  function arc(c, x0, y0, cx, cy, x1, y1, col, wd) { c.save(); c.strokeStyle = col || 'rgba(255,255,255,.85)'; c.lineWidth = wd || 6; c.setLineDash([4, 14]); c.lineCap = 'round'; c.beginPath(); c.moveTo(x0, y0); c.quadraticCurveTo(cx, cy, x1, y1); c.stroke(); c.restore(); }
+  function swoosh(c, x, y, r, a0, a1) { c.save(); c.lineCap = 'round'; [0, 1, 2].forEach(function (i) { c.strokeStyle = 'rgba(255,255,255,' + (.55 - i * .15) + ')'; c.lineWidth = 10 - i * 3; c.beginPath(); c.arc(x, y, r + i * 26, a0, a1); c.stroke(); }); c.restore(); }
+  function target(c, x, y, r) { c.save(); [1, .66, .33].forEach(function (k, i) { c.fillStyle = i % 2 ? 'rgba(255,255,255,.85)' : 'rgba(228,255,79,.85)'; c.beginPath(); c.ellipse(x, y, r * k, r * k * .55, 0, 0, Math.PI * 2); c.fill(); }); c.restore(); }
+  function bench(c, x, y, w) {
+    c.save(); c.shadowColor = 'rgba(0,0,0,.45)'; c.shadowBlur = 18; c.shadowOffsetY = 10;
+    c.fillStyle = '#2A2F36'; c.fillRect(x - w / 2 + 20, y, 14, 80); c.fillRect(x + w / 2 - 34, y, 14, 80);
+    var g = c.createLinearGradient(0, y - 22, 0, y + 6); g.addColorStop(0, '#2D63AD'); g.addColorStop(1, '#1E4A86'); c.fillStyle = g; rr(c, x - w / 2, y - 22, w, 28, 8); c.fill();
+    c.fillStyle = '#2D63AD'; rr(c, x - w / 2, y - 92, w, 40, 8); c.fill(); c.fillStyle = '#2A2F36'; c.fillRect(x - w / 2 + 20, y - 56, 14, 40); c.fillRect(x + w / 2 - 34, y - 56, 14, 40);
+    c.restore();
+  }
+  function bottle(c, x, y, s) {
+    c.save(); c.translate(x, y); c.scale(s, s); c.shadowColor = 'rgba(0,0,0,.4)'; c.shadowBlur = 14; c.shadowOffsetY = 6;
+    var g = c.createLinearGradient(-34, 0, 34, 0); g.addColorStop(0, '#5FB0E8'); g.addColorStop(.45, '#BFE6FF'); g.addColorStop(1, '#3E8CC4'); c.fillStyle = g;
+    rr(c, -34, -70, 68, 150, 22); c.fill(); c.shadowColor = 'transparent';
+    c.fillStyle = '#E2572B'; rr(c, -22, -100, 44, 34, 8); c.fill(); c.fillStyle = '#F4F2EC'; rr(c, -34, -10, 68, 30, 4); c.fill();
+    c.restore();
+  }
+  function towel(c, x, y, w) { c.save(); c.shadowColor = 'rgba(0,0,0,.35)'; c.shadowBlur = 10; c.fillStyle = '#F4F2EC'; c.beginPath(); c.moveTo(x, y); c.lineTo(x + w, y); c.lineTo(x + w - 8, y + 70); c.lineTo(x + 6, y + 64); c.closePath(); c.fill();
+    c.shadowColor = 'transparent'; c.fillStyle = '#E2572B'; c.fillRect(x + 4, y + 46, w - 10, 7); c.restore(); }
+  function swap(c, x, y, r) {      // duas setas curvas trocando de lado
+    c.save(); c.strokeStyle = '#E4FF4F'; c.fillStyle = '#E4FF4F'; c.lineWidth = 12; c.lineCap = 'round'; c.shadowColor = 'rgba(0,0,0,.4)'; c.shadowBlur = 10;
+    c.beginPath(); c.arc(x, y + r * .5, r, Math.PI * 1.15, Math.PI * 1.85); c.stroke();
+    c.beginPath(); c.arc(x, y - r * .5, r, Math.PI * .15, Math.PI * .85); c.stroke();
+    function head(px, py, a) { c.save(); c.translate(px, py); c.rotate(a); c.beginPath(); c.moveTo(14, 0); c.lineTo(-12, -16); c.lineTo(-12, 16); c.closePath(); c.fill(); c.restore(); }
+    head(x + r * Math.cos(Math.PI * 1.85), y + r * .5 + r * Math.sin(Math.PI * 1.85), Math.PI * 1.85 + Math.PI / 2);
+    head(x + r * Math.cos(Math.PI * .85), y - r * .5 + r * Math.sin(Math.PI * .85), Math.PI * .85 + Math.PI / 2);
+    c.restore();
+  }
+
   // ---------- cenas (assunto à direita) ----------
   var SCENES = {
     'new': function (c, r) { surface(c, 'clay', r); lines(c, [[0, 230, W, 230], [700, 0, 700, 230]]); dotted(c, [560, 250, 640, 30, 800, 70]); rk(c, 600, 210, .48, -0.7, 'a'); ball(c, 805, 72, 26); },
@@ -204,6 +243,22 @@
     jogador: function (c, r) { surface(c, 'hard', r); lines(c, [[120, 40, W, 40], [520, 40, 520, H], [120, 200, W, 200]]); rk(c, 880, 200, .5, 0.45, 'c'); avatar(c, 720, 150, 92); ball(c, 610, 240, 22); },
     trofeu: function (c, r) { surface(c, 'night', r); trophy(c, 740, 150, 1.0); ball(c, 870, 240, 22, true); },
     // 7.50: página do placar ao vivo, uma por piso (quadra com linhas, rede, raquete e bola)
+
+    // 7.64: aquecimento (uma imagem por exercício) e descanso
+    warm_pronto: function (c, r) { surface(c, 'clay', r); lines(c, [[0, 250, W, 250], [420, 0, 420, 250]]); basket(c, 650, 150, .78, r); rk(c, 800, 175, .42, 0.32, 'b'); ball(c, 540, 258, 22); ball(c, 860, 268, 20); },
+    warm_quad: function (c, r) { surface(c, 'hard', r); courtTop(c, 340, 60, 920, 262, true);
+      arc(c, 530, 205, 625, 20, 712, 128); rk(c, 505, 238, .2, -1.05, 'a'); rk(c, 742, 112, .2, 1.1, 'c'); ball(c, 668, 82, 18); },
+    warm_fundo: function (c, r) { surface(c, 'clay', r); courtTop(c, 330, 60, 930, 262, false);
+      arc(c, 352, 120, 630, -70, 905, 205); arc(c, 905, 232, 630, 330, 352, 190, 'rgba(255,255,255,.5)'); rk(c, 360, 212, .21, -0.95, 'b'); rk(c, 900, 112, .21, 1.0, 'a'); ball(c, 560, 62, 20); },
+    warm_vol: function (c, r) { surface(c, 'grass', r); net(c, 168, 330, 940, 76);
+      arc(c, 360, 40, 470, 60, 590, 118); rk(c, 700, 92, .36, 0.18, 'c'); ball(c, 612, 124, 22); },
+    warm_smash: function (c, r) { surface(c, 'night', r); lines(c, [[120, 50, W, 50], [120, 50, 120, H]], 8, 'rgba(220,232,255,.75)');
+      swoosh(c, 760, 210, 110, -2.3, -1.2); rk(c, 760, 120, .34, 0.55, 'd'); ball(c, 640, 62, 22, true); arc(c, 628, 82, 560, 210, 470, 280, 'rgba(228,255,79,.85)', 7); },
+    warm_saq: function (c, r) { surface(c, 'red', r); lines(c, [[300, 280, W, 280]], 10);
+      arc(c, 700, 262, 700, 140, 700, 86, 'rgba(255,255,255,.7)'); ball(c, 700, 58, 22, true); rk(c, 820, 190, .36, 0.75, 'a'); target(c, 450, 230, 56); arc(c, 682, 66, 520, 70, 462, 214, 'rgba(228,255,79,.75)'); },
+    rest_troca: function (c, r) { surface(c, 'dusk', r); lines(c, [[120, 120, W, 120], [120, 120, 120, H]], 7, 'rgba(255,255,255,.55)');
+      bench(c, 760, 200, 300); towel(c, 820, 178, 90); bottle(c, 560, 210, .62); swap(c, 640, 62, 70); },
+    rest_set: function (c, r) { surface(c, 'night', r); board(c, 600, 40, 320, 160, [[6, 3], [4, 6]]); bottle(c, 520, 200, .66); rk(c, 790, 262, .28, 1.45, 'b'); ball(c, 900, 250, 20); },
     live_saibro: function (c, r) { liveCourt(c, r, 'clay'); },
     live_rapida: function (c, r) { liveCourt(c, r, 'hard'); },
     live_grama: function (c, r) { liveCourt(c, r, 'grass'); },
