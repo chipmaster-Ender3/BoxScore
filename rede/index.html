@@ -258,7 +258,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
 (function () {
   'use strict';
   BXMods.mark('rede');
-  var VERSION = '0.63.2';
+  var VERSION = '0.63.3';
   var FB_CFG = { apiKey: 'AIzaSyD_L90YxJAVRuTfPqwNbETJlbV9BYdnuYI', authDomain: 'boxsocore.firebaseapp.com', projectId: 'boxsocore', storageBucket: 'boxsocore.firebasestorage.app', messagingSenderId: '639383913161', appId: '1:639383913161:web:a9bb75fcf99f4b03378318' };
   var FB_VER = '10.12.2', FB_LIBS = ['app', 'auth', 'firestore'];
   var HOUR = 3600000;
@@ -803,7 +803,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     return loadFB().then(function () {
       firebase.initializeApp(FB_CFG);
       S.auth = firebase.auth(); S.db = firebase.firestore();
-      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.71', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
+      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.72', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
       try { S.db.settings({ experimentalAutoDetectLongPolling: true, merge: true }); } catch (e) {}
       try { S.auth.getRedirectResult().catch(function () {}); } catch (e) {}
       S.auth.onAuthStateChanged(function (u) { S.user = u || null; paintGate(); if (u) { loadFriends(); loadFollows(); loadBlocks().then(reload); ensureProfile(); } });
@@ -1336,6 +1336,13 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     if (!P.photos && !force && img.parentNode) { var sb = h('button', { type: 'button', cls: 'btn', text: T('ph_show'), on: { click: function () { sb.remove(); loadPhoto(p, img, true); } } }); img.parentNode.insertBefore(sb, img); return; }
     S.db.collection('posts').doc(p.id).collection('media').doc('p').get().then(function (d) { if (d.exists && d.data().data) { PH[p.id] = d.data().data; img.src = PH[p.id]; } else img.remove(); }).catch(function () { img.remove(); });
   }
+  // 7.72: o feed é redesenhado a cada novidade do banco; os cartões que não mudaram são reaproveitados (a foto não some e volta, a tela não pula)
+  var CPC = {};
+  function cardPostC(p) {
+    var sig; try { sig = JSON.stringify(p) + '|' + (S.friends.some(function (x) { return x.uid === p.authorUid; }) ? 1 : 0) + (S.blocks[p.authorUid] ? 1 : 0) + (P.photos ? 1 : 0) + LG; } catch (e) { return cardPost(p); }
+    var c = CPC[p.id]; if (c && c.sig === sig) return c.el;
+    var el = cardPost(p); CPC[p.id] = { sig: sig, el: el }; return el;
+  }
   function cardPost(p) {
     var uid = S.user.uid, mine = p.authorUid === uid, liked = (p.likes || []).indexOf(uid) >= 0, kids = [];
     // 7.55: tocar na foto ou no nome abre o perfil; ao lado do nome, ícone de mensagem direta (só entre amigos, como nas Conversas)
@@ -1353,7 +1360,8 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
       tgU.forEach(function (u, i) { if (i) tgEl.appendChild(document.createTextNode(', ')); var nm = p.tagNames[u]; tgEl.appendChild(h('button', { type: 'button', cls: 'ptgn', title: T('view'), 'aria-label': T('view') + ': ' + nm, text: nm, on: { click: function () { showProfile(u, nm); } } })); });
       tgEl.appendChild(document.createTextNode(parts[1] || '')); kids.push(tgEl);
     }
-    if (p.hasPhoto) { var im = h('img', { cls: 'ph', alt: '', loading: 'lazy' }); kids.push(im); if ('IntersectionObserver' in window) { var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { io.disconnect(); loadPhoto(p, im); } }); setTimeout(function () { io.observe(im); }, 0); } else loadPhoto(p, im); }
+    if (p.hasPhoto && PH[p.id]) { kids.push(h('img', { cls: 'ph', alt: '', src: PH[p.id] })); }   // 7.72: foto já carregada entra pronta
+    else if (p.hasPhoto) { var im = h('img', { cls: 'ph', alt: '', loading: 'lazy' }); kids.push(im); if ('IntersectionObserver' in window) { var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { io.disconnect(); loadPhoto(p, im); } }); setTimeout(function () { io.observe(im); }, 0); } else loadPhoto(p, im); }
     if (p.caption) kids.push(capText(p));
     if (mine && p.vis === 'public') kids.push(h('div', { cls: 'sub', text: T('vis_pub') + ((p.reporters || []).length >= 3 ? ' · ' + T('in_rev') : '') }));
     // 7.27: curtir e comentar com ícones desenhados (antes ♥ e 💬); apagar a própria publicação foi para o ⋯
@@ -1453,7 +1461,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
       empty(host, 'feed', T('ev_feed_t'), T(mode === 'discover' ? 'e_dis' : mode === 'following' ? 'e_fol' : 'e_feed'), mode !== 'discover' ? T('fe_go_dis') : '', function () { S.fmode = 'discover'; savePref('feedStart', 'discover'); loadPublic(); paint(); });
       return;
     }
-    list.forEach(function (p) { host.appendChild(cardPost(p)); });
+    list.forEach(function (p) { host.appendChild(p.id ? cardPostC(p) : cardPost(p)); });
   }
   // ---------- conversas diretas (Beta 5.7) ----------
   var CH = { unsub: null, root: null, id: '' };

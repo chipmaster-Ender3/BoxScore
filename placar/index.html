@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}.h-tour{display:flex;align-items:center;gap:6px;font:700 13px/1.3 var(--ui,inherit);color:var(--muted,#888);margin-top:4px}.h-tour .ico{width:16px;height:16px;flex:none}
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content"><script>/* 7.72: aplica o visual do placar (tema da quadra, cores, claro/escuro) antes de desenhar, para não piscar o Clássico */try{var L=JSON.parse(localStorage.getItem('boxscore.placar.look')||'null');if(L){var R=document.documentElement;if(L.b)R.setAttribute('data-board',L.b);if(L.t)R.setAttribute('data-theme',L.t);if(L.s)R.style.cssText=L.s;}}catch(e){}</script><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}.h-tour{display:flex;align-items:center;gap:6px;font:700 13px/1.3 var(--ui,inherit);color:var(--muted,#888);margin-top:4px}.h-tour .ico{width:16px;height:16px;flex:none}
 .acebtn{position:absolute;top:10px;right:10px;z-index:5;display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:999px;border:2px solid currentColor;background:var(--ball,#c8e02a);color:#20290a;font:800 16px/1 var(--ui,system-ui);box-shadow:0 4px 14px rgba(0,0,0,.25);animation:acein .18s ease-out}.acebtn .ico{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2}
 .acemark{pointer-events:none;font-size:20px;padding:12px 20px}.acemark .ico{width:24px;height:24px}.acehold{overflow:hidden;font-size:16px}.acehold::after{content:'';position:absolute;left:0;bottom:0;height:5px;width:0;background:#20290a;animation:acefill var(--d,650ms) linear forwards}@keyframes acefill{to{width:100%}}@keyframes acein{from{transform:scale(.8);opacity:0}to{transform:none;opacity:1}}
 .ssec{display:flex;align-items:center;gap:10px;margin:18px 0 6px;font:800 13px var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.ssec .ico{width:18px;height:18px}.spane>.ssec:first-child{margin-top:4px}.srow{gap:12px;padding:6px 0;border-bottom:1px solid var(--line);min-height:56px}.srow input[type=checkbox]{order:3;margin-left:auto;width:24px;height:24px;flex:none}.sic{display:inline-grid;place-items:center;width:38px;height:38px;flex:none;border-radius:12px;background:var(--bg);color:var(--ink)}.sic .ico{width:20px;height:20px}.field.srowf{display:flex;flex-direction:row;align-items:center;gap:12px;padding:6px 0;margin:0;border-bottom:1px solid var(--line)}.srowf .sgrow{flex:1;min-width:0;display:grid;gap:4px}.srowf .sgrow label{font:400 16px/1.25 var(--ui);letter-spacing:0;text-transform:none;color:var(--ink)}.srowf select{width:100%}#sTest .ico{width:18px;height:18px;vertical-align:-3px}
@@ -1138,7 +1138,7 @@ html.nfy .bar { padding-right: max(230px, env(safe-area-inset-right, 0px)); }
       <div class="actions"><button class="btn" type="button" id="sManage">Gerenciar dados salvos</button></div>
       <label class="check srow"><span class="sic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><input type="checkbox" id="sTel"> Enviar estatísticas de uso</label>
       <span class="hint" id="sTelHint">Só contagens anônimas de uso dos recursos (ex.: quantas partidas, se usou a pulseira), para melhorar o app. Nunca nomes, placares, mensagens, fotos ou local.</span>
-      <p class="note" id="verNote">BoxScore Beta 7.71 · Placar 4.62.1</p>
+      <p class="note" id="verNote">BoxScore Beta 7.72 · Placar 4.62.2</p>
     </div>
     <div class="actions"><button class="btn primary" type="button" data-close>Pronto</button></div>
   </div>
@@ -1616,6 +1616,7 @@ try { I18N.applyDom(); } catch (e) {}
   }
   function applyColors() {
     try { applyBoard(); } catch (x) {}
+    setTimeout(saveLook, 0);
     var c = P.settings.colors, st = document.documentElement.style;
     ['p1', 'p2'].forEach(function (k) {
       if (c[k].toUpperCase() === DEFAULT_COLORS[k]) { st.removeProperty('--' + k); st.removeProperty('--' + k + 't'); }
@@ -1654,8 +1655,15 @@ try { I18N.applyDom(); } catch (e) {}
     } catch (x) { BTEX[t] = ''; }
     return BTEX[t];
   }
+  // 7.72: guarda o visual aplicado (atributos e variáveis do <html>) para o começo da página usar na próxima abertura
+  var LOOK0 = '';
+  function saveLook() {
+    try { var R = document.documentElement, j = JSON.stringify({ b: R.getAttribute('data-board') || '', t: R.getAttribute('data-theme') || '', s: R.style.cssText || '' });
+      if (j !== LOOK0) { LOOK0 = j; localStorage.setItem('boxscore.placar.look', j); } } catch (e) {}
+  }
   function applyBoard() {
     var t = boardTheme(), root = document.documentElement;
+    setTimeout(saveLook, 0);
     if (t === 'classic') { root.removeAttribute('data-board'); root.style.removeProperty('--court-tex'); }
     else { root.setAttribute('data-board', t); var u = boardTex(t); if (u) root.style.setProperty('--court-tex', 'url("' + u + '")'); }
     var host = $('bThemes'); if (!host) return;
@@ -1819,7 +1827,7 @@ try { I18N.applyDom(); } catch (e) {}
       .sort(function (a, b) { return a[0] - b[0]; });
     var hh = function (t) { var d = new Date(t), z = function (n) { return (n < 10 ? '0' : '') + n; }; return z(d.getDate()) + '/' + z(d.getMonth() + 1) + ' ' + z(d.getHours()) + ':' + z(d.getMinutes()) + ':' + z(d.getSeconds()); };
     var ua = (navigator.userAgent || '').replace(/^.*?\(([^)]*)\).*$/, '$1');
-    return ['BoxScore 7.71 · ' + ua].concat(rows.map(function (r) {
+    return ['BoxScore 7.72 · ' + ua].concat(rows.map(function (r) {
       return hh(r[0]) + ' ' + r[1] + (r[1] === 'tick' ? ' x' + r[2] + ' até ' + hh(r[3]).slice(6) : (r[2] ? ' ' + r[2] : ''));
     })).join('\n');
   }
@@ -5162,7 +5170,7 @@ try { I18N.applyDom(); } catch (e) {}
     b.disabled = true; err.textContent = '';
     var doc = { topic: $('ctTopic').value, msg: msg.slice(0, 2000), email: em.slice(0, 120), uid: sy.user ? sy.user.uid : null,
       name: String((P.sync.acct && P.sync.acct.name) || '').slice(0, 80), lang: String(P.settings.lang || 'pt-BR').slice(0, 8),
-      build: '7.71', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
+      build: '7.72', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
     sy.db.collection('contact').add(doc).then(function () {
       b.disabled = false; $('ctMsg').value = ''; closeSheets(); showToast(T("Mensagem enviada. Obrigado! Responderemos pelo e-mail informado."));
     }, function (e) { b.disabled = false; err.textContent = Tf("Não foi possível enviar ({0}). Tente de novo.", (e && e.code) || T("erro")); });
@@ -5993,7 +6001,7 @@ try { I18N.applyDom(); } catch (e) {}
   // Beta 7.8: telemetria de uso (shared/telemetry.js) e versão da ponte do app nativo na linha de versão
   try {
     if (window.BXTel) {
-      BXTel.init({ module: 'placar', build: '7.71', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
+      BXTel.init({ module: 'placar', build: '7.72', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
       tel('p_open');
       $('sTel').checked = BXTel.isOn();
       $('sTel').addEventListener('change', function () { BXTel.setOn(this.checked); showToast(this.checked ? T("Estatísticas de uso ligadas. Obrigado!") : T("Estatísticas de uso desligadas.")); });
