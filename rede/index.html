@@ -258,7 +258,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
 (function () {
   'use strict';
   BXMods.mark('rede');
-  var VERSION = '0.63.1';
+  var VERSION = '0.63.2';
   var FB_CFG = { apiKey: 'AIzaSyD_L90YxJAVRuTfPqwNbETJlbV9BYdnuYI', authDomain: 'boxsocore.firebaseapp.com', projectId: 'boxsocore', storageBucket: 'boxsocore.firebasestorage.app', messagingSenderId: '639383913161', appId: '1:639383913161:web:a9bb75fcf99f4b03378318' };
   var FB_VER = '10.12.2', FB_LIBS = ['app', 'auth', 'firestore'];
   var HOUR = 3600000;
@@ -803,7 +803,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     return loadFB().then(function () {
       firebase.initializeApp(FB_CFG);
       S.auth = firebase.auth(); S.db = firebase.firestore();
-      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.70', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
+      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.71', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
       try { S.db.settings({ experimentalAutoDetectLongPolling: true, merge: true }); } catch (e) {}
       try { S.auth.getRedirectResult().catch(function () {}); } catch (e) {}
       S.auth.onAuthStateChanged(function (u) { S.user = u || null; paintGate(); if (u) { loadFriends(); loadFollows(); loadBlocks().then(reload); ensureProfile(); } });
@@ -4073,7 +4073,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     var city = h('input', { type: 'text', maxlength: '60', value: P.city || '', placeholder: lsGet('boxscore.profile.city') || '', autocapitalize: 'words', 'aria-label': T('s_city') });
     city.addEventListener('change', function () { savePref('city', city.value.trim().slice(0, 60)); });
     // Perfil (no topo, com a foto)
-    var prof = link('user', T('s_prof_go'), T('s_prof_h'), null, function () { BXMods.mark('placar'); location.href = '../placar/#perfil-rede'; }, 'st-prof', 'stProf');
+    var prof = link('user', T('s_prof_go'), T('s_prof_h'), null, function () { try { sessionStorage.setItem('bx.ret', JSON.stringify({ m: 'rede', snap: navSnap(), y: window.scrollY, at: Date.now() })); } catch (e) {} BXMods.mark('placar'); location.href = '../placar/#perfil-rede'; }, 'st-prof', 'stProf');
     prof.replaceChild(h('span', { cls: 'st-ic st-av' }, [memAv(S.user.uid, S.user.displayName || '?')]), prof.firstChild);
     host.appendChild(box([prof]));
     // Feed
@@ -4217,7 +4217,12 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
   });
   try { new MutationObserver(function () { navGuard(); }).observe(document.body, { childList: true }); } catch (e) {}
   $('navBack').addEventListener('click', navBack);
+  // 7.71: ao voltar da Política/Termos (a página legal recarrega a Comunidade), volta para a mesma tela e posição
+  var RET = (function () { try { var r = JSON.parse(sessionStorage.getItem('bx.ret') || 'null'); if (r && r.m === 'rede') sessionStorage.removeItem('bx.ret'); return r && r.m === 'rede' && Date.now() - r.at < 1800000 ? r : null; } catch (e) { return null; } })();
+  document.addEventListener('click', function (e) { var a = e.target && e.target.closest ? e.target.closest('a[href*="../legal/"]') : null; if (a) try { sessionStorage.setItem('bx.ret', JSON.stringify({ m: 'rede', snap: navSnap(), y: window.scrollY, at: Date.now() })); } catch (x) {} }, true);
+  window.addEventListener('pageshow', function (e) { if (e.persisted) try { sessionStorage.removeItem('bx.ret'); } catch (x) {} });
   function paint() {
+    if (RET && S.user) { var rt = RET; RET = null; ['tab', 'gid', 'gtab', 'tid', 'ttab', 'gf'].forEach(function (k) { if (rt.snap && rt.snap[k] !== undefined) S[k] = rt.snap[k]; }); setTimeout(function () { window.scrollTo(0, rt.y || 0); }, 80); setTimeout(function () { window.scrollTo(0, rt.y || 0); }, 400); }
     if (!S.user) return;
     paintTabs(); paintNotices();
     $('pHome').hidden = S.tab !== 'home'; $('pGroups').hidden = S.tab !== 'groups'; $('pFind').hidden = S.tab !== 'find'; $('pMine').hidden = S.tab !== 'mine'; $('pNew').hidden = S.tab !== 'neu'; $('pChat').hidden = S.tab !== 'chat'; $('pFeed').hidden = S.tab !== 'feed'; $('pSet').hidden = S.tab !== 'set';

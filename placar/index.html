@@ -1138,7 +1138,7 @@ html.nfy .bar { padding-right: max(230px, env(safe-area-inset-right, 0px)); }
       <div class="actions"><button class="btn" type="button" id="sManage">Gerenciar dados salvos</button></div>
       <label class="check srow"><span class="sic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><input type="checkbox" id="sTel"> Enviar estatísticas de uso</label>
       <span class="hint" id="sTelHint">Só contagens anônimas de uso dos recursos (ex.: quantas partidas, se usou a pulseira), para melhorar o app. Nunca nomes, placares, mensagens, fotos ou local.</span>
-      <p class="note" id="verNote">BoxScore Beta 7.70 · Placar 4.62.0</p>
+      <p class="note" id="verNote">BoxScore Beta 7.71 · Placar 4.62.1</p>
     </div>
     <div class="actions"><button class="btn primary" type="button" data-close>Pronto</button></div>
   </div>
@@ -1819,7 +1819,7 @@ try { I18N.applyDom(); } catch (e) {}
       .sort(function (a, b) { return a[0] - b[0]; });
     var hh = function (t) { var d = new Date(t), z = function (n) { return (n < 10 ? '0' : '') + n; }; return z(d.getDate()) + '/' + z(d.getMonth() + 1) + ' ' + z(d.getHours()) + ':' + z(d.getMinutes()) + ':' + z(d.getSeconds()); };
     var ua = (navigator.userAgent || '').replace(/^.*?\(([^)]*)\).*$/, '$1');
-    return ['BoxScore 7.70 · ' + ua].concat(rows.map(function (r) {
+    return ['BoxScore 7.71 · ' + ua].concat(rows.map(function (r) {
       return hh(r[0]) + ' ' + r[1] + (r[1] === 'tick' ? ' x' + r[2] + ' até ' + hh(r[3]).slice(6) : (r[2] ? ' ' + r[2] : ''));
     })).join('\n');
   }
@@ -5129,7 +5129,19 @@ try { I18N.applyDom(); } catch (e) {}
 
   /* ---------- Beta 7.9: privacidade, termos, fale conosco e excluir conta ---------- */
   var LGL = window.BX_LEGAL || {}, delBusy = false;
-  function openLegal(page) { location.href = '../legal/' + page + '.html'; }
+  // 7.71: ao voltar da Política/Termos, reabre Ajustes na mesma aba e posição (a página legal recarrega o Placar)
+  function openLegal(page) {
+    try { var sh = curSheet(), cd = sh && sh.querySelector('.card'); sessionStorage.setItem('bx.ret', JSON.stringify({ m: 'placar', sheet: sh ? sh.id : '', tab: ui.setTab || '', top: cd ? cd.scrollTop : 0, at: Date.now() })); } catch (e) {}
+    location.href = '../legal/' + page + '.html';
+  }
+  function legalReturn() {
+    var r = null; try { r = JSON.parse(sessionStorage.getItem('bx.ret') || 'null'); sessionStorage.removeItem('bx.ret'); } catch (e) {}
+    if (!r || r.m !== 'placar' || Date.now() - r.at > 1800000 || r.sheet !== 'shSet') return;
+    $('bSet').click(); if (r.tab) setSetTab(r.tab);
+    var cd = $('shSet').querySelector('.card'); if (cd) { cd.scrollTop = r.top; requestAnimationFrame(function () { cd.scrollTop = r.top; }); }
+  }
+  // voltou sem recarregar (página guardada pelo navegador): a tela já está como estava
+  window.addEventListener('pageshow', function (e) { if (e.persisted) try { sessionStorage.removeItem('bx.ret'); } catch (x) {} });
   $('lgPriv').addEventListener('click', function () { openLegal('privacidade'); });
   $('lgTerms').addEventListener('click', function () { openLegal('termos'); });
   if (LGL.email) { $('lgMail').hidden = false; $('lgMail').textContent = Tf("Ou escreva para {0}", LGL.email); }
@@ -5150,7 +5162,7 @@ try { I18N.applyDom(); } catch (e) {}
     b.disabled = true; err.textContent = '';
     var doc = { topic: $('ctTopic').value, msg: msg.slice(0, 2000), email: em.slice(0, 120), uid: sy.user ? sy.user.uid : null,
       name: String((P.sync.acct && P.sync.acct.name) || '').slice(0, 80), lang: String(P.settings.lang || 'pt-BR').slice(0, 8),
-      build: '7.70', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
+      build: '7.71', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
     sy.db.collection('contact').add(doc).then(function () {
       b.disabled = false; $('ctMsg').value = ''; closeSheets(); showToast(T("Mensagem enviada. Obrigado! Responderemos pelo e-mail informado."));
     }, function (e) { b.disabled = false; err.textContent = Tf("Não foi possível enviar ({0}). Tente de novo.", (e && e.code) || T("erro")); });
@@ -5981,7 +5993,7 @@ try { I18N.applyDom(); } catch (e) {}
   // Beta 7.8: telemetria de uso (shared/telemetry.js) e versão da ponte do app nativo na linha de versão
   try {
     if (window.BXTel) {
-      BXTel.init({ module: 'placar', build: '7.70', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
+      BXTel.init({ module: 'placar', build: '7.71', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
       tel('p_open');
       $('sTel').checked = BXTel.isOn();
       $('sTel').addEventListener('change', function () { BXTel.setOn(this.checked); showToast(this.checked ? T("Estatísticas de uso ligadas. Obrigado!") : T("Estatísticas de uso desligadas.")); });
@@ -5989,6 +6001,7 @@ try { I18N.applyDom(); } catch (e) {}
   } catch (e) {}
   if (window.BX_NATIVE_VER) $('verNote').textContent += ' · ' + Tf("App nativo {0}", window.BX_NATIVE_VER);
   setTimeout(legalHash, 400); window.addEventListener('hashchange', legalHash);
+  setTimeout(legalReturn, 350);
 
   if (synth) { loadVoices(); synth.onvoiceschanged = loadVoices; [600, 1800, 4000].forEach(function (ms) { setTimeout(loadVoices, ms); }); }
   render(); persist(); wake();
