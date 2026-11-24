@@ -57,22 +57,28 @@
     if (!CACHE[rel]) CACHE[rel] = fetch(BASE + rel, { cache: 'force-cache' }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).catch(function () { delete CACHE[rel]; return null; });
     return CACHE[rel];
   }
-  function cname(cc) { try { return new Intl.DisplayNames([lang()], { type: 'region' }).of(cc) || cc; } catch (e) { return cc; } }
-  function countries() { return ISO.map(function (cc) { return [cc, cname(cc)]; }).sort(function (a, b) { return a[1].localeCompare(b[1], lang()); }); }
+  // 7.70: cache em memória (o tablet levava ~80 ms montando os 250 nomes de país a cada abertura do perfil)
+  var DN = {}, CL = {};
+  function cname(cc) { var l = lang(); try { if (!DN[l]) DN[l] = new Intl.DisplayNames([l], { type: 'region' }); return DN[l].of(cc) || cc; } catch (e) { return cc; } }
+  function countries() { var l = lang(); if (!CL[l]) { var col = new Intl.Collator(l); CL[l] = ISO.map(function (cc) { return [cc, cname(cc)]; }).sort(function (a, b) { return col.compare(a[1], b[1]); }); } return CL[l]; }
   function defCountry() { var l = String(lang()), m = /-([A-Z]{2})$/.exec(l); if (m) return m[1]; return { pt: 'BR', en: 'US', es: 'ES', fr: 'FR', de: 'DE' }[l.slice(0, 2)] || 'BR'; }
   function states(cc) { return getJSON('a1.json').then(function (a) { return (a && a[cc]) || (cc === 'BR' ? BR_UF : []); }); }
   function hasCities(cc) { return getJSON('index.json').then(function (x) { return !!(x && (x.cities || []).indexOf(cc) >= 0); }); }
   function cityFile(cc, a1) { return hasCities(cc).then(function (y) { return y ? getJSON('c/' + cc + '-' + String(a1).replace(/[^A-Za-z0-9]/g, '_') + '.json') : null; }); }
   function cid(loc) { return loc && loc.country && loc.state && loc.cityId ? loc.country + '-' + loc.state + '-' + loc.cityId : ''; }
   // bairros da lista + os cadastrados pelos jogadores (sem repetir grafias)
+  var HM = {};      // bairros por cidade, guardados por 10 min (evita consultar o Firestore a cada abertura)
   function hoods(loc, db) {
     var id = cid(loc); if (!id) return Promise.resolve([]);
+    var hm = HM[id]; if (hm && Date.now() - hm.at < 600000 && (hm.db || !db)) return hm.p;
     var fromFile = cityFile(loc.country, loc.state).then(function (f) { return (f && f.b && f.b[loc.cityId]) || []; });
     var fromDb = db ? db.collection('hoods').doc(id).collection('n').limit(2000).get().then(function (q) { return q.docs.map(function (d) { return (d.data() || {}).name || ''; }); }, function () { return []; }) : Promise.resolve([]);
-    return Promise.all([fromFile, fromDb]).then(function (r) {
+    var p = Promise.all([fromFile, fromDb]).then(function (r) {
       var seen = {}, out = []; r[0].concat(r[1]).forEach(function (nm) { var k = key(nm); if (k && !seen[k]) { seen[k] = 1; out.push(nm); } });
       return out.sort(function (a, b) { return a.localeCompare(b, lang()); });
     });
+    HM[id] = { p: p, at: Date.now(), db: !!db };
+    return p;
   }
   function clean(s) { s = String(s || '').replace(/\s+/g, ' ').trim().slice(0, 60); return s.replace(/(^|[\s-])(\S)/g, function (m, a, b) { return a + b.toUpperCase(); }).replace(/\b(De|Da|Do|Dos|Das|E)\b/g, function (w) { return w.toLowerCase(); }).replace(/^(\S)/, function (c) { return c.toUpperCase(); }); }
   function addHood(loc, name, db) {
@@ -80,6 +86,7 @@
     var uid = null; try { uid = g.firebase && g.firebase.auth().currentUser ? g.firebase.auth().currentUser.uid : null; } catch (e) {}
     if (!uid) return Promise.resolve(nm);
     // um documento por bairro (hoods/{país-estado-cidade}/n/{chave}): só cria, ninguém troca nem apaga; se a chave já existe, fica o nome que já estava
+    delete HM[id];
     return db.collection('hoods').doc(id).collection('n').doc(k.replace(/ /g, '-').slice(0, 60)).set({ name: nm, by: uid, at: g.firebase.firestore.FieldValue.serverTimestamp() }).then(function () { return nm; }, function () { return nm; });
   }
   function stLab(loc) { return loc.country && loc.country !== 'BR' ? (loc.stateName || '') : (loc.state || ''); }
@@ -97,6 +104,9 @@
     });
   }
 
+  function idle(fn) { if (g.requestIdleCallback) g.requestIdleCallback(function () { fn(); }, { timeout: 4000 }); else setTimeout(fn, 1200); }
+  // pré-carrega num momento livre o que o perfil vai pedir (lista de países, estados e o arquivo do estado da pessoa)
+  function warm(loc) { idle(function () { countries(); getJSON('index.json'); getJSON('a1.json'); if (loc && loc.country && loc.state) cityFile(loc.country, loc.state); }); }
   // ---------- componente: País › Estado › Cidade › Bairro ----------
   // opts.wrap(rotulo, elemento) devolve o campo no estilo do módulo; opts.itemCls = classe dos botões de sugestão
   function picker(host, opts) {
@@ -115,9 +125,16 @@
     root.appendChild(fC); root.appendChild(fH); root.appendChild(msg);
     host.appendChild(root);
     var cities = null, hl = [], seq = 0;
-    function fire() { if (opts.onChange) opts.onChange(Object.assign({}, v)); }
+    var last = JSON.stringify(v);
+    function fire() { var j = JSON.stringify(v); if (j === last) return; last = j; if (opts.onChange) opts.onChange(Object.assign({}, v)); }
     function btn(txt, fn, extra) { var b = el('button', { type: 'button', class: item + (extra ? ' ' + extra : '') }); b.textContent = txt; b.addEventListener('click', fn); return b; }
-    countries().forEach(function (c) { var o = el('option', { value: c[0] }); o.textContent = c[1]; if (c[0] === v.country) o.selected = true; selC.appendChild(o); });
+    // a lista dos ~250 países só é montada quando a pessoa abre a caixa (ou num momento livre); até lá, só o país escolhido
+    var full = false;
+    function oneCountry() { selC.innerHTML = ''; var o = el('option', { value: v.country }); o.textContent = cname(v.country); selC.appendChild(o); selC.value = v.country; }
+    function allCountries() { if (full) return; full = true; var frag = document.createDocumentFragment(); countries().forEach(function (c) { var o = el('option', { value: c[0] }); o.textContent = c[1]; if (c[0] === v.country) o.selected = true; frag.appendChild(o); }); selC.innerHTML = ''; selC.appendChild(frag); selC.value = v.country; }
+    oneCountry();
+    ['pointerdown', 'focus', 'keydown'].forEach(function (ev) { selC.addEventListener(ev, allCountries); });
+    idle(allCountries);
     function fillStates() {
       var my = ++seq; selS.innerHTML = ''; selS.appendChild(el('option', { value: '', text: t('pick') }));
       return states(v.country).then(function (l) {
@@ -175,9 +192,9 @@
     });
     function addNew(txt) { addHood(v, txt, opts.db).then(function (nm) { if (!same(hl, nm)) hl.push(nm); pickHood(nm); }); }
     inH.addEventListener('blur', function () { setTimeout(function () { if (cities && v.cityId && !v.hood && inH.value.trim()) { var hit = same(hl, inH.value); if (hit) pickHood(hit); } }, 250); });
-    var ready = resolve(v).then(function (r) { v = Object.assign(v, r); selC.value = v.country; return fillStates(); });
+    var ready = resolve(v).then(function (r) { v = Object.assign(v, r); last = JSON.stringify(v); if (full) selC.value = v.country; else oneCountry(); return fillStates(); });
     return { root: root, ready: ready, value: function () { return Object.assign({}, v); } };
   }
 
-  g.BXGeo = { base: BASE, t: t, norm: norm, key: key, near: near, same: same, search: search, countries: countries, defCountry: defCountry, states: states, hasCities: hasCities, cityFile: cityFile, cid: cid, hoods: hoods, addHood: addHood, clean: clean, label: label, stLab: stLab, resolve: resolve, picker: picker, cname: cname };
+  g.BXGeo = { base: BASE, t: t, norm: norm, key: key, near: near, same: same, search: search, countries: countries, defCountry: defCountry, states: states, hasCities: hasCities, cityFile: cityFile, cid: cid, hoods: hoods, addHood: addHood, clean: clean, label: label, stLab: stLab, resolve: resolve, picker: picker, cname: cname, warm: warm };
 })(window);

@@ -258,7 +258,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
 (function () {
   'use strict';
   BXMods.mark('rede');
-  var VERSION = '0.63.0';
+  var VERSION = '0.63.1';
   var FB_CFG = { apiKey: 'AIzaSyD_L90YxJAVRuTfPqwNbETJlbV9BYdnuYI', authDomain: 'boxsocore.firebaseapp.com', projectId: 'boxsocore', storageBucket: 'boxsocore.firebasestorage.app', messagingSenderId: '639383913161', appId: '1:639383913161:web:a9bb75fcf99f4b03378318' };
   var FB_VER = '10.12.2', FB_LIBS = ['app', 'auth', 'firestore'];
   var HOUR = 3600000;
@@ -709,6 +709,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
   function lsGet(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
   // 7.68: lugar do perfil do Placar (País › Estado › Cidade › Bairro, com códigos)
   function myLoc() { var pl = placar(), mp = pl.players && pl.meId ? pl.players[pl.meId] || {} : {}; return { country: mp.country || '', state: mp.state || '', stateName: mp.stateName || '', city: mp.city || myCity() || '', cityId: mp.cityId || '', hood: mp.hood || '' }; }
+  setTimeout(function () { try { if (window.BXGeo) BXGeo.warm(myLoc()); } catch (e) {} }, 2500);   // 7.70: pré-carrega para o Marcar um jogo abrir leve
   function geoBox(f) {
     var host = h('div', { cls: 'geobox' });
     if (window.BXGeo) BXGeo.picker(host, { value: f.loc, db: S.db, itemCls: 'btn opt', wrap: function (l, el) { return h('label', { cls: 'f' }, [l, el]); }, onChange: function (v) { f.loc = v; } });
@@ -802,7 +803,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     return loadFB().then(function () {
       firebase.initializeApp(FB_CFG);
       S.auth = firebase.auth(); S.db = firebase.firestore();
-      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.69', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
+      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.70', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
       try { S.db.settings({ experimentalAutoDetectLongPolling: true, merge: true }); } catch (e) {}
       try { S.auth.getRedirectResult().catch(function () {}); } catch (e) {}
       S.auth.onAuthStateChanged(function (u) { S.user = u || null; paintGate(); if (u) { loadFriends(); loadFollows(); loadBlocks().then(reload); ensureProfile(); } });

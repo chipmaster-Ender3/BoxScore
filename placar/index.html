@@ -1138,7 +1138,7 @@ html.nfy .bar { padding-right: max(230px, env(safe-area-inset-right, 0px)); }
       <div class="actions"><button class="btn" type="button" id="sManage">Gerenciar dados salvos</button></div>
       <label class="check srow"><span class="sic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><input type="checkbox" id="sTel"> Enviar estatísticas de uso</label>
       <span class="hint" id="sTelHint">Só contagens anônimas de uso dos recursos (ex.: quantas partidas, se usou a pulseira), para melhorar o app. Nunca nomes, placares, mensagens, fotos ou local.</span>
-      <p class="note" id="verNote">BoxScore Beta 7.69 · Placar 4.61.0</p>
+      <p class="note" id="verNote">BoxScore Beta 7.70 · Placar 4.62.0</p>
     </div>
     <div class="actions"><button class="btn primary" type="button" data-close>Pronto</button></div>
   </div>
@@ -1819,7 +1819,7 @@ try { I18N.applyDom(); } catch (e) {}
       .sort(function (a, b) { return a[0] - b[0]; });
     var hh = function (t) { var d = new Date(t), z = function (n) { return (n < 10 ? '0' : '') + n; }; return z(d.getDate()) + '/' + z(d.getMonth() + 1) + ' ' + z(d.getHours()) + ':' + z(d.getMinutes()) + ':' + z(d.getSeconds()); };
     var ua = (navigator.userAgent || '').replace(/^.*?\(([^)]*)\).*$/, '$1');
-    return ['BoxScore 7.69 · ' + ua].concat(rows.map(function (r) {
+    return ['BoxScore 7.70 · ' + ua].concat(rows.map(function (r) {
       return hh(r[0]) + ' ' + r[1] + (r[1] === 'tick' ? ' x' + r[2] + ' até ' + hh(r[3]).slice(6) : (r[2] ? ' ' + r[2] : ''));
     })).join('\n');
   }
@@ -2618,14 +2618,23 @@ try { I18N.applyDom(); } catch (e) {}
     if (cur && cur.id !== id && !SH_NOSTACK[cur.id]) { SHSTACK = SHSTACK.filter(function (x) { return x.id !== cur.id && x.id !== id; }); SHSTACK.push({ id: cur.id, top: sheetScroll(cur) }); }
     else if (!cur) SHSTACK = [];
     Array.prototype.forEach.call(document.querySelectorAll('.sheet'), function (s) { s.hidden = true; });
-    $(id).hidden = false; fitSheets(); var f = $(id).querySelector('button, input'); if (f && id !== 'shNew') try { f.focus({ preventScroll: true }); } catch (e) {}
+    $(id).hidden = false; fitSheets();
+    if (id === 'shProf' && GEO.pend) { var gp = GEO.pend; GEO.pend = null; geoMount(gp.f); } var f = $(id).querySelector('button, input'); if (f && id !== 'shNew') try { f.focus({ preventScroll: true }); } catch (e) {}
   }
   function closeSheets() { SHSTACK = []; Array.prototype.forEach.call(document.querySelectorAll('.sheet'), function (s) { s.hidden = true; }); }
   // fechar (X, tocar fora, Esc, voltar do Android): volta para a janela anterior, se houver
   function sheetBack() {
+    // 7.70: dentro do perfil, fechar o perfil de outro jogador volta para o perfil de onde ele foi aberto (na mesma aba e posição)
+    var vis = curSheet();
+    if (vis && vis.id === 'shProf' && PROFHIST.length) {
+      var hp = PROFHIST.pop(), cd = vis.querySelector('.card'); viewId = hp.v; ui.profTab = hp.t; renderProf();
+      if (cd) { cd.scrollTop = hp.top; requestAnimationFrame(function () { cd.scrollTop = hp.top; }); }
+      return;
+    }
     Array.prototype.forEach.call(document.querySelectorAll('.sheet'), function (s) { s.hidden = true; });
     var prev = SHSTACK.pop(); if (!prev || !$(prev.id)) return;
     var sh = $(prev.id); sh.hidden = false; fitSheets();
+    if (prev.id === 'shProf' && GEO.pend) { var gp = GEO.pend; GEO.pend = null; geoMount(gp.f); }
     var c = sh.querySelector('.card'); if (c) { c.scrollTop = prev.top; requestAnimationFrame(function () { c.scrollTop = prev.top; }); }
   }
   // Com o teclado aberto, a janela passa a ocupar só a área visível, para o botão Começar não ficar escondido.
@@ -3019,6 +3028,7 @@ try { I18N.applyDom(); } catch (e) {}
 
   /* ---------- perfil e estatísticas ---------- */
   var viewId = null;           // jogador exibido na janela de perfil
+  var PROFHIST = [];           // 7.70: perfis abertos de dentro do perfil (Meu perfil › Jogos › Adversário): fechar volta um
   function pct(a, b) { return b > 0 ? Math.round(a * 1000 / b) / 10 : null; }
   function fmtPct(v) { return v === null ? '–' : String(v).replace('.', ',') + '%'; }
   function sideOf(e, pl) {
@@ -3262,7 +3272,8 @@ try { I18N.applyDom(); } catch (e) {}
     $('pNWa').checked = !!f.nWa; $('pNMail').checked = !!f.nMail;
     if (act !== $('pRBrand')) $('pRBrand').value = f.racketBrand || '';
     if (act !== $('pRModel')) $('pRModel').value = f.racketModel || '';
-    geoMount(f);
+    // 7.70: o seletor de lugar só é montado com o perfil aberto (antes era montado na abertura do app, junto com o placar)
+    if ($('shProf').hidden) GEO.pend = { f: f }; else geoMount(f);
     if (act !== $('pBirth')) $('pBirth').value = f.birth || '';
     $('pAgeOut').textContent = ageOf(f.birth) !== null ? Tf("{0} anos hoje", ageOf(f.birth)) : T("A idade é calculada a partir da data.");
     Array.prototype.forEach.call(document.querySelectorAll('[data-pkey]'), function (seg) {
@@ -3320,12 +3331,12 @@ try { I18N.applyDom(); } catch (e) {}
       var n = document.createElement('span'); n.className = 'pn'; n.textContent = o.name + (o.id === P.meId ? T(" (eu)") : '');
       var hr2 = pl ? h2h(pl, o) : null, r = document.createElement('span'); r.className = 'pr'; r.textContent = hr2 && hr2.n ? hr2.aw + 'V ' + hr2.bw + 'D' : '';
       b.appendChild(a); b.appendChild(n); b.appendChild(r);
-      b.addEventListener('click', function () { viewId = o.id; ui.profTab = 'stats'; renderProf(); try { $('hProf').scrollIntoView({ block: 'start' }); } catch (e) {} });
+      b.addEventListener('click', function () { var cd = $('shProf').querySelector('.card'); PROFHIST.push({ v: viewId, t: ui.profTab, top: cd ? cd.scrollTop : 0 }); viewId = o.id; ui.profTab = 'stats'; renderProf(); try { $('hProf').scrollIntoView({ block: 'start' }); } catch (e) {} });
       li.appendChild(b); ul.appendChild(li);
     });
   }
   // 7.68: Onde você joga = País › Estado › Cidade › Bairro em listas (shared/geo.js); o perfil guarda os códigos
-  var GEO = { pid: null, pk: null };
+  var GEO = { pid: null, pk: null, pend: null };
   var GEO_KEYS = ['country', 'state', 'stateName', 'city', 'cityId', 'hood'];
   function geoMount(f) {
     var host = $('pGeo'), pid = (f && f.id) || '-';
@@ -3333,7 +3344,15 @@ try { I18N.applyDom(); } catch (e) {}
     GEO.pid = pid; host.innerHTML = '';
     var val = {}; GEO_KEYS.forEach(function (k) { val[k] = (f && f[k]) || ''; });
     function wrap(l, el) { var d = document.createElement('div'); d.className = 'field geo-f'; var lb = document.createElement('span'); lb.className = 'flabel'; lb.textContent = l; d.appendChild(lb); d.appendChild(el); return d; }
-    function save(v) { if (GEO.pid !== pid) return; GEO_KEYS.forEach(function (k) { var pl = profPlayer(); if (pl && (pl[k] || '') !== (v[k] || '')) saveField(k, v[k] || ''); }); }
+    // 7.70: grava tudo de uma vez (antes eram até 6 gravações e 6 redesenhos do placar a cada letra)
+    function save(v) {
+      if (GEO.pid !== pid) return; var pl = profPlayer(); if (!pl) return;
+      var ch = GEO_KEYS.filter(function (k) { return (pl[k] || '') !== (v[k] || ''); }); if (!ch.length) return;
+      ch.forEach(function (k) { pl[k] = v[k] || ''; });
+      touch(pl);
+      if (pl.id === P.meId) ['city', 'state'].forEach(function (k) { try { localStorage.setItem('boxscore.profile.' + k, String(pl[k] || '')); } catch (e) {} });
+      clearTimeout(GEO.rt); GEO.rt = setTimeout(render, 400);     // um redesenho só, quando a pessoa para de mexer
+    }
     GEO.pk = BXGeo.picker(host, { value: val, db: sy.ready ? sy.db : null, wrap: wrap, itemCls: 'btn mini', onChange: save });
     // perfil antigo: a cidade digitada vira a da lista (com código) quando existe
     GEO.pk.ready.then(function () { var v = GEO.pk.value(); if (f && f.id && (v.cityId !== (f.cityId || '') || v.country !== (f.country || ''))) save(v); });
@@ -3466,7 +3485,7 @@ try { I18N.applyDom(); } catch (e) {}
       this.value = '';
     });
     $('pPhotoDel').addEventListener('click', function () { var pl = profPlayer(); if (pl) { pl.photo = ''; pl.photoSrc = 'none'; touch(pl); renderProf(); render(); } });
-    $('pBack').addEventListener('click', function () { viewId = null; ui.profTab = 'me'; renderProf(); });
+    $('pBack').addEventListener('click', function () { PROFHIST = []; viewId = null; ui.profTab = 'me'; renderProf(); });
     // 7.25: saiu o "Copiar meus dados (JSON)" do Perfil (portabilidade continua por pedido, como diz a Política de Privacidade)
   }
   var crop = null;
@@ -4712,7 +4731,9 @@ try { I18N.applyDom(); } catch (e) {}
   });
   $('bHist').addEventListener('click', function () { tel('p_hist'); pendingDelete = null; hfReset(); renderHistory(); openSheet('shHist'); });
   $('bNew').addEventListener('click', openNew);
-  $('bProf').addEventListener('click', function () { tel('p_prof'); viewId = null; ui.profTab = 'me'; renderProf(); openSheet('shProf'); });
+  // 7.70: deixa pronto, num momento livre, o que o perfil vai usar (países, estados, cidades do estado da pessoa)
+  try { var me0 = P.players[P.meId]; if (window.BXGeo) BXGeo.warm(me0 ? { country: me0.country || 'BR', state: me0.state } : null); } catch (e) {}
+  $('bProf').addEventListener('click', function () { tel('p_prof'); PROFHIST = []; viewId = null; ui.profTab = 'me'; renderProf(); openSheet('shProf'); });
   (function () {
     if (!/[#&]perfil-rede\b/.test(location.hash)) return;
     var back = function () { try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} if (window.BXMods) BXMods.mark('rede'); location.href = '../rede/'; };
@@ -5129,7 +5150,7 @@ try { I18N.applyDom(); } catch (e) {}
     b.disabled = true; err.textContent = '';
     var doc = { topic: $('ctTopic').value, msg: msg.slice(0, 2000), email: em.slice(0, 120), uid: sy.user ? sy.user.uid : null,
       name: String((P.sync.acct && P.sync.acct.name) || '').slice(0, 80), lang: String(P.settings.lang || 'pt-BR').slice(0, 8),
-      build: '7.69', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
+      build: '7.70', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
     sy.db.collection('contact').add(doc).then(function () {
       b.disabled = false; $('ctMsg').value = ''; closeSheets(); showToast(T("Mensagem enviada. Obrigado! Responderemos pelo e-mail informado."));
     }, function (e) { b.disabled = false; err.textContent = Tf("Não foi possível enviar ({0}). Tente de novo.", (e && e.code) || T("erro")); });
@@ -5960,7 +5981,7 @@ try { I18N.applyDom(); } catch (e) {}
   // Beta 7.8: telemetria de uso (shared/telemetry.js) e versão da ponte do app nativo na linha de versão
   try {
     if (window.BXTel) {
-      BXTel.init({ module: 'placar', build: '7.69', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
+      BXTel.init({ module: 'placar', build: '7.70', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
       tel('p_open');
       $('sTel').checked = BXTel.isOn();
       $('sTel').addEventListener('change', function () { BXTel.setOn(this.checked); showToast(this.checked ? T("Estatísticas de uso ligadas. Obrigado!") : T("Estatísticas de uso desligadas.")); });
