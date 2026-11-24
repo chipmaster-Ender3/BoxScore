@@ -265,7 +265,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
 (function () {
   'use strict';
   BXMods.mark('rede');
-  var VERSION = '0.67.0';
+  var VERSION = '0.68.0';
   var FB_CFG = { apiKey: 'AIzaSyD_L90YxJAVRuTfPqwNbETJlbV9BYdnuYI', authDomain: 'boxsocore.firebaseapp.com', projectId: 'boxsocore', storageBucket: 'boxsocore.firebasestorage.app', messagingSenderId: '639383913161', appId: '1:639383913161:web:a9bb75fcf99f4b03378318' };
   var FB_VER = '10.12.2', FB_LIBS = ['app', 'auth', 'firestore'];
   var HOUR = 3600000;
@@ -655,12 +655,12 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
   var KJ22 = {"pt-BR": {"tor_hb": "Meus torneios", "tor_pick": "Seus torneios", "tor_conf": "Resultado para confirmar", "tor_enr": "Inscrições abertas", "tor_wait": "Esperando o próximo jogo", "tor_inv": "Convite para jogar em dupla"}, "pt-PT": {"tor_hb": "Os meus torneios", "tor_pick": "Os seus torneios", "tor_conf": "Resultado para confirmar", "tor_enr": "Inscrições abertas", "tor_wait": "À espera do próximo jogo", "tor_inv": "Convite para jogar em dupla"}, "en": {"tor_hb": "My tournaments", "tor_pick": "Your tournaments", "tor_conf": "Result to confirm", "tor_enr": "Registration open", "tor_wait": "Waiting for your next match", "tor_inv": "Invitation to play doubles"}, "es": {"tor_hb": "Mis torneos", "tor_pick": "Tus torneos", "tor_conf": "Resultado por confirmar", "tor_enr": "Inscripciones abiertas", "tor_wait": "Esperando el próximo partido", "tor_inv": "Invitación para jugar en dobles"}, "fr": {"tor_hb": "Mes tournois", "tor_pick": "Vos tournois", "tor_conf": "Résultat à confirmer", "tor_enr": "Inscriptions ouvertes", "tor_wait": "En attente du prochain match", "tor_inv": "Invitation à jouer en double"}, "de": {"tor_hb": "Meine Turniere", "tor_pick": "Deine Turniere", "tor_conf": "Ergebnis bestätigen", "tor_enr": "Anmeldung offen", "tor_wait": "Warten auf das nächste Spiel", "tor_inv": "Einladung zum Doppel"}};   // 7.74: troféu no cabeçalho (atalho para os meus torneios)
   Object.keys(KJ22).forEach(function (l) { if (D[l]) Object.assign(D[l], KJ22[l]); });
   // 7.78: o atalho do cabeçalho também mostra os meus rankings
-  var KJ23 = {"pt-BR": {"tor_hb": "Torneios e rankings", "cp_t": "Torneios e rankings", "cp_tor": "Torneios", "cp_rk": "Rankings", "cp_na": "Ainda sem pontos", "cp_lead": "Líder"},
-    "pt-PT": {"tor_hb": "Torneios e rankings", "cp_t": "Torneios e rankings", "cp_tor": "Torneios", "cp_rk": "Rankings", "cp_na": "Ainda sem pontos", "cp_lead": "Líder"},
-    "en": {"tor_hb": "Tournaments and rankings", "cp_t": "Tournaments and rankings", "cp_tor": "Tournaments", "cp_rk": "Rankings", "cp_na": "No points yet", "cp_lead": "Leader"},
-    "es": {"tor_hb": "Torneos y rankings", "cp_t": "Torneos y rankings", "cp_tor": "Torneos", "cp_rk": "Rankings", "cp_na": "Aún sin puntos", "cp_lead": "Líder"},
-    "fr": {"tor_hb": "Tournois et classements", "cp_t": "Tournois et classements", "cp_tor": "Tournois", "cp_rk": "Classements", "cp_na": "Pas encore de points", "cp_lead": "En tête"},
-    "de": {"tor_hb": "Turniere und Ranglisten", "cp_t": "Turniere und Ranglisten", "cp_tor": "Turniere", "cp_rk": "Ranglisten", "cp_na": "Noch keine Punkte", "cp_lead": "Spitze"}};
+  var KJ23 = {"pt-BR": {"cp_none": "Nenhum torneio ativo nem ranking por enquanto.", "tor_hb": "Torneios e rankings", "cp_t": "Torneios e rankings", "cp_tor": "Torneios", "cp_rk": "Rankings", "cp_na": "Ainda sem pontos", "cp_lead": "Líder"},
+    "pt-PT": {"cp_none": "Nenhum torneio ativo nem ranking por agora.", "tor_hb": "Torneios e rankings", "cp_t": "Torneios e rankings", "cp_tor": "Torneios", "cp_rk": "Rankings", "cp_na": "Ainda sem pontos", "cp_lead": "Líder"},
+    "en": {"cp_none": "No active tournament or ranking yet.", "tor_hb": "Tournaments and rankings", "cp_t": "Tournaments and rankings", "cp_tor": "Tournaments", "cp_rk": "Rankings", "cp_na": "No points yet", "cp_lead": "Leader"},
+    "es": {"cp_none": "Ningún torneo activo ni ranking por ahora.", "tor_hb": "Torneos y rankings", "cp_t": "Torneos y rankings", "cp_tor": "Torneos", "cp_rk": "Rankings", "cp_na": "Aún sin puntos", "cp_lead": "Líder"},
+    "fr": {"cp_none": "Aucun tournoi actif ni classement pour le moment.", "tor_hb": "Tournois et classements", "cp_t": "Tournois et classements", "cp_tor": "Tournois", "cp_rk": "Classements", "cp_na": "Pas encore de points", "cp_lead": "En tête"},
+    "de": {"cp_none": "Noch kein aktives Turnier und keine Rangliste.", "tor_hb": "Turniere und Ranglisten", "cp_t": "Turniere und Ranglisten", "cp_tor": "Turniere", "cp_rk": "Ranglisten", "cp_na": "Noch keine Punkte", "cp_lead": "Spitze"}};
   Object.keys(KJ23).forEach(function (l) { if (D[l]) Object.assign(D[l], KJ23[l]); });
   var KJ21 = {"pt-BR": {"ff_n": "{0} de {1} jogos", "f_state": "Estado", "f_hood": "Bairro", "ff_st": "Estado", "ff_city": "Cidade", "ff_hood": "Bairro", "ff_lvl": "Nível", "ff_lv_all": "Todos os níveis", "ff_lv_me": "Para o meu nível", "ff_lv_free": "Sem restrição de nível", "ff_clr": "Limpar filtros"}, "pt-PT": {"ff_n": "{0} de {1} jogos", "f_state": "Distrito / estado", "f_hood": "Bairro", "ff_st": "Distrito / estado", "ff_city": "Cidade", "ff_hood": "Bairro", "ff_lvl": "Nível", "ff_lv_all": "Todos os níveis", "ff_lv_me": "Para o meu nível", "ff_lv_free": "Sem restrição de nível", "ff_clr": "Limpar filtros"}, "en": {"ff_n": "{0} of {1} games", "f_state": "State", "f_hood": "Neighborhood", "ff_st": "State", "ff_city": "City", "ff_hood": "Neighborhood", "ff_lvl": "Level", "ff_lv_all": "All levels", "ff_lv_me": "For my level", "ff_lv_free": "No level limit", "ff_clr": "Clear filters"}, "es": {"ff_n": "{0} de {1} partidos", "f_state": "Estado / provincia", "f_hood": "Barrio", "ff_st": "Estado / provincia", "ff_city": "Ciudad", "ff_hood": "Barrio", "ff_lvl": "Nivel", "ff_lv_all": "Todos los niveles", "ff_lv_me": "Para mi nivel", "ff_lv_free": "Sin límite de nivel", "ff_clr": "Borrar filtros"}, "fr": {"ff_n": "{0} sur {1} matchs", "f_state": "Région", "f_hood": "Quartier", "ff_st": "Région", "ff_city": "Ville", "ff_hood": "Quartier", "ff_lvl": "Niveau", "ff_lv_all": "Tous les niveaux", "ff_lv_me": "Pour mon niveau", "ff_lv_free": "Sans limite de niveau", "ff_clr": "Effacer les filtres"}, "de": {"ff_n": "{0} von {1} Spielen", "f_state": "Bundesland", "f_hood": "Stadtteil", "ff_st": "Bundesland", "ff_city": "Stadt", "ff_hood": "Stadtteil", "ff_lvl": "Niveau", "ff_lv_all": "Alle Niveaus", "ff_lv_me": "Für mein Niveau", "ff_lv_free": "Ohne Niveaugrenze", "ff_clr": "Filter löschen"}};   // 7.67: filtros de Entrar num jogo (estado, cidade, bairro, nível) e estado/bairro no jogo
   Object.keys(KJ21).forEach(function (l) { if (D[l]) Object.assign(D[l], KJ21[l]); });
@@ -820,7 +820,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     return loadFB().then(function () {
       firebase.initializeApp(FB_CFG);
       S.auth = firebase.auth(); S.db = firebase.firestore();
-      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.78', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
+      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.79', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
       try { S.db.settings({ experimentalAutoDetectLongPolling: true, merge: true }); } catch (e) {}
       try { S.auth.getRedirectResult().catch(function () {}); } catch (e) {}
       S.auth.onAuthStateChanged(function (u) { if (!u || (RT.uid && RT.uid !== u.uid)) rtStop(); S.user = u || null; paintGate(); if (u) { loadFriends(); loadFollows(); loadBlocks().then(reload); ensureProfile(); } });
@@ -2463,7 +2463,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
       Object.keys(m).forEach(function (k) { gPriv(m[k], adm.indexOf(k) >= 0); });
       adm.forEach(function (k) { if (!cats(m[k]).length) { CX.cr[k] = []; return; } S.db.collection('groups').doc(k).collection('catReqs').get().then(function (sn) { CX.cr[k] = sn.docs.map(function (d) { var x = d.data(); x.uid = d.id; return x; }); }).catch(function () { CX.cr[k] = []; }).then(function () { paintTabs(); }); });
       return Promise.all(adm.map(function (k) { return S.db.collection('groups').doc(k).collection('reqs').get().then(function (sn) { S.gReqs[k] = sn.docs.map(function (d) { var x = d.data(); x.id = d.id; return x; }).filter(function (x) { return !S.blocks[x.uid]; }); }).catch(function () { S.gReqs[k] = []; }); }));
-    }).then(function () { S.gLoaded = true; paint(); openHashTor(); }).catch(function () { S.gLoaded = true; });
+    }).then(function () { S.gLoaded = true; paint(); openHashTor(); openHashComp(); }).catch(function () { S.gLoaded = true; });
   }
   function loadDisc(force) {
     if (!S.user || !S.db) return;
@@ -2533,6 +2533,13 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     S.tab = 'feed'; paint(); openComposer(null, d);
   }
   // 7.74: vindo do Placar (Mais › Meu torneio): #tor=grupo/torneio abre o torneio
+  // 7.79: vindo do Placar (Mais › Torneios e rankings): #comp abre a mesma janela do troféu; fechar volta ao Placar
+  function openHashComp() {
+    if (!/[#&]comp\b/.test(location.hash || '') || S.compDone || !S.gLoaded) return; S.compDone = true;
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+    var fp = false; try { fp = Date.now() - (+sessionStorage.getItem('bx.comp') || 0) < 600000; sessionStorage.removeItem('bx.comp'); } catch (e) {}
+    torPick(fp ? function () { if (window.BXMods) BXMods.mark('placar'); location.href = '../placar/'; } : null);
+  }
   function openHashTor() {
     var m = /[#&]tor=([A-Za-z0-9_-]{1,60})\/([A-Za-z0-9_-]{1,60})/.exec(location.hash || ''); if (!m || S.torHashDone) return; S.torHashDone = true;
     try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
@@ -3529,7 +3536,11 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     return T('tor_wait');
   }
   function torHdr() {
-    var b = $('torB'), l = torAct(), rg = rkGroups(); b.hidden = !l.length && !rg.length; if (b.hidden) return;
+    var b = $('torB'), l = torAct(), rg = rkGroups(); b.hidden = !l.length && !rg.length;
+    // 7.79: o Placar (Mais › Torneios e rankings) usa isto para mostrar o botão
+    try { var cn = l.length + rg.length, ck = 'boxscore.rede.comp', co = JSON.parse(localStorage.getItem(ck) || 'null'); if (S.gLoaded && (!co || co.n !== cn || co.uid !== S.user.uid)) localStorage.setItem(ck, JSON.stringify({ uid: S.user.uid, n: cn, at: Date.now() })); } catch (e) {}
+    if (CPW) CPW();
+    if (b.hidden) return;
     var n = l.filter(function (a) { return a.conf || a.inv; }).length;
     b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS.trophy + '</svg>'; b.setAttribute('aria-label', T('tor_hb')); b.title = T('tor_hb');
     if (n) b.appendChild(h('span', { cls: 'dot', text: String(n) }));
@@ -3540,17 +3551,19 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
   function rkGroups() { if (!S.user) return []; return myGroups().filter(function (g) { return !cats(g).length || !!myCatId(g); }); }
   function rkOpen(g) { tel('r_tor_hdr'); S.tab = 'groups'; S.gf = 'mine'; S.gid = g.id; S.gtab = 'rank'; var c = myCatId(g); if (c) CX.sel[g.id] = c; if (RX.view) delete RX.view[g.id]; paint(); window.scrollTo(0, 0); }
   var CPW = null;
-  function torPick() {
-    var l = torAct(), rg = rkGroups(); if (!l.length && !rg.length) return;
+  function torPick(back) {
+    back = typeof back === 'function' ? back : null;
+    var l = torAct(), rg = rkGroups(); if (!l.length && !rg.length) { if (back) toast(T('cp_none')); return; }
     if (l.length === 1 && !rg.length) { torOpen(l[0]); return; }
     if (!l.length && rg.length === 1) { rkOpen(rg[0]); return; }
     tel('r_tor_hdr');
     // 7.77: janela no padrão (imagem no topo, linhas coloridas); 7.78: torneios + rankings
     var root, list = h('div', { cls: 'cl tpk' });
     function close() { CPW = null; if (root) root.remove(); }
+    function closeBack() { close(); if (back) setTimeout(back, 150); }   // depois do navGuard (que volta o histórico) para não cancelar a ida ao Placar
     function sec(icn, t) { return h('div', { cls: 'tps' }, [ic(icn), h('span', { text: t })]); }
     function draw() {
-      list.textContent = '';
+      l = torAct(); rg = rkGroups(); list.textContent = '';
       if (l.length) list.appendChild(sec('trophy', T('cp_tor')));
       l.forEach(function (a) {
         var st = a.conf || a.inv ? 'warn' : a.t.status !== 'run' ? 'full' : a.next ? 'started' : 'open';
@@ -3574,7 +3587,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
         });
     }
     draw(); CPW = function () { if (root && root.isConnected) draw(); else CPW = null; };
-    root = h('div', { cls: 'chat', role: 'dialog' }, [h('div', { cls: 'w' }, [heroCt(h('div', { cls: 'ct' }, [h('button', { type: 'button', cls: 'btn', text: '←', 'aria-label': T('close'), on: { click: close } }), h('b', { text: T(rg.length ? 'cp_t' : 'tor_pick') })]), 'torneios'), list])]);
+    root = h('div', { cls: 'chat', role: 'dialog' }, [h('div', { cls: 'w' }, [heroCt(h('div', { cls: 'ct' }, [h('button', { type: 'button', cls: 'btn', text: '←', 'aria-label': T('close'), on: { click: closeBack } }), h('b', { text: T(rg.length ? 'cp_t' : 'tor_pick') })]), 'torneios'), list])]);
     document.body.appendChild(root);
   }
   function myTorCard(host) {
@@ -4409,7 +4422,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
   // ---------- início ----------
   $('ttl').textContent = 'BoxScore'; $('ver').textContent = 'v' + VERSION; heroTop();
   var b = $('back'); b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS.ball + '</svg>'; b.appendChild(h('span', { text: BXMods.t('placar') })); b.setAttribute('aria-label', BXMods.t('back')); b.addEventListener('click', function () { BXMods.mark('placar'); location.href = '../placar/'; });
-  window.addEventListener('hashchange', function () { S.hashDone = false; S.draftDone = false; S.torHashDone = false; if (S.user) { openHashCode(); openDraft(); if (S.gLoaded) openHashTor(); } });
+  window.addEventListener('hashchange', function () { S.hashDone = false; S.draftDone = false; S.torHashDone = false; S.compDone = false; if (S.user) { openHashCode(); openDraft(); if (S.gLoaded) { openHashTor(); openHashComp(); } } });
   $('torB').addEventListener('click', torPick);
   $('chatB').addEventListener('click', function () { S.tab = 'chat'; paint(); reload(); });
   $('setB').addEventListener('click', function () { if (S.tab !== 'set') tel('r_settings'); S.tab = S.tab === 'set' ? 'home' : 'set'; paint(); });
