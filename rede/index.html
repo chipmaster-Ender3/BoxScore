@@ -204,7 +204,7 @@ main .crow .cn b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .chat .bq .bqn{font-size:13px}.chat .bq .bqt{font-size:13px;opacity:.85;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .chat .rbar{display:flex;align-items:center;gap:8px;padding:8px 12px 0;background:var(--panel);border-top:1px solid var(--line)}.chat .rbar[hidden]{display:none}.chat .rbar .bq{margin:0;flex:1;min-width:0;cursor:default;color:var(--ink)}
 .chat .bub.big{background:transparent;border-color:transparent;padding:0 4px}.chat .bub.big .bt{font-size:44px;line-height:1.1}.chat .bub.big small{float:none;display:block;color:var(--muted);opacity:1;margin:2px 0 0}
-.chat .cf{align-items:center}.chat .cf .emob{width:46px;min-width:46px;height:46px;min-height:46px;color:var(--muted)}
+.chat .cf{align-items:center}.chat .rqbar .btn{flex:1}.chat .cf .emob{width:46px;min-width:46px;height:46px;min-height:46px;color:var(--muted)}
 .chat .emp2{border-top:1px solid var(--line);background:var(--panel);padding:8px 12px 4px;display:grid;gap:6px;max-height:min(46vh,300px)}
 .chat .emp2[hidden]{display:none}
 .chat .emt{display:flex;gap:4px;padding:3px;border-radius:999px;background:var(--segbg)}
@@ -265,7 +265,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
 (function () {
   'use strict';
   BXMods.mark('rede');
-  var VERSION = '0.68.0';
+  var VERSION = '0.69.0';
   var FB_CFG = { apiKey: 'AIzaSyD_L90YxJAVRuTfPqwNbETJlbV9BYdnuYI', authDomain: 'boxsocore.firebaseapp.com', projectId: 'boxsocore', storageBucket: 'boxsocore.firebasestorage.app', messagingSenderId: '639383913161', appId: '1:639383913161:web:a9bb75fcf99f4b03378318' };
   var FB_VER = '10.12.2', FB_LIBS = ['app', 'auth', 'firestore'];
   var HOUR = 3600000;
@@ -379,12 +379,12 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
   };
   Object.keys(K7).forEach(function (l) { Object.assign(D[l], K7[l]); });
   var K8 = {
-    'pt-BR': {leave_game: 'Sair do jogo', host_tag: 'organizador', cancel_new: 'Cancelar', sx_privsec: 'Privacidade e segurança', sx_help: 'Ajuda e conta', sx_policy: 'Política de privacidade', s_legal: 'Privacidade e ajuda', s_priv: 'Política de privacidade', s_terms: 'Termos de uso', s_contact: 'Fale conosco', s_delacc: 'Excluir minha conta', s_tel: 'Enviar estatísticas de uso', s_tel_h: 'Só contagens anônimas de uso dos recursos, para melhorar o app. Nunca nomes, placares, mensagens, fotos ou local.', set_t: 'Ajustes da Comunidade', s_notif: 'Avisos', s_games: 'Jogos', s_feed: 'Feed', s_priv: 'Privacidade', s_inv: 'Convite em tela cheia', s_inv_h: 'Ligado: a tela de convite abre sozinha. Desligado: os convites ficam esperando em Jogos.', s_on: 'Ligado', s_off: 'Desligado', s_snz: 'Mostrar de novo os convites adiados', s_snz_ok: 'Pronto: os convites adiados voltam a aparecer.', s_cur: 'Moeda padrão', s_auto: 'Automática', s_city: 'Cidade padrão', s_city_h: 'Vazio: usa a cidade do seu perfil.', s_days: 'Jogos com vaga para você', s_days_h: 'Jogos de outros jogadores que ainda têm vaga (aba Jogos). Mostrar só os que acontecem nos próximos dias:', s_all: 'Todos', s_nd: '{0} dias', s_fstart: 'Abrir o Feed em', s_ph: 'Fotos do feed', s_ph_on: 'Carregar', s_ph_off: 'Tocar para ver', ph_show: 'Ver foto', s_pvis: 'Ao publicar, começar com', s_blk: 'Bloqueados', s_noblk: 'Ninguém bloqueado.', s_note: 'Os ajustes ficam salvos na sua conta e valem em todos os aparelhos.', set_aria: 'Ajustes'},
-    'pt-PT': {leave_game: 'Sair do jogo', host_tag: 'organizador', cancel_new: 'Cancelar', sx_privsec: 'Privacidade e segurança', sx_help: 'Ajuda e conta', sx_policy: 'Política de privacidade', s_legal: 'Privacidade e ajuda', s_priv: 'Política de privacidade', s_terms: 'Termos de utilização', s_contact: 'Contacte-nos', s_delacc: 'Eliminar a minha conta', s_tel: 'Enviar estatísticas de utilização', s_tel_h: 'Só contagens anónimas de utilização dos recursos, para melhorar a app. Nunca nomes, resultados, mensagens, fotos ou local.', set_t: 'Definições da Comunidade', s_notif: 'Avisos', s_games: 'Jogos', s_feed: 'Feed', s_priv: 'Privacidade', s_inv: 'Convite em ecrã inteiro', s_inv_h: 'Ligado: o ecrã de convite abre sozinho. Desligado: os convites ficam à espera em Jogos.', s_on: 'Ligado', s_off: 'Desligado', s_snz: 'Mostrar de novo os convites adiados', s_snz_ok: 'Pronto: os convites adiados voltam a aparecer.', s_cur: 'Moeda predefinida', s_auto: 'Automática', s_city: 'Cidade predefinida', s_city_h: 'Vazio: usa a cidade do seu perfil.', s_days: 'Jogos com vaga para si', s_days_h: 'Jogos de outros jogadores que ainda têm vaga (separador Jogos). Mostrar só os que acontecem nos próximos dias:', s_all: 'Todos', s_nd: '{0} dias', s_fstart: 'Abrir o Feed em', s_ph: 'Fotos do feed', s_ph_on: 'Carregar', s_ph_off: 'Tocar para ver', ph_show: 'Ver foto', s_pvis: 'Ao publicar, começar com', s_blk: 'Bloqueados', s_noblk: 'Ninguém bloqueado.', s_note: 'As definições ficam guardadas na sua conta e valem em todos os dispositivos.', set_aria: 'Definições'},
-    'en': {leave_game: 'Leave game', host_tag: 'organizer', cancel_new: 'Cancel', sx_privsec: 'Privacy and security', sx_help: 'Help and account', sx_policy: 'Privacy policy', s_legal: 'Privacy and help', s_priv: 'Privacy policy', s_terms: 'Terms of use', s_contact: 'Contact us', s_delacc: 'Delete my account', s_tel: 'Send usage statistics', s_tel_h: 'Only anonymous counts of feature use, to improve the app. Never names, scores, messages, photos or location.', set_t: 'Community settings', s_notif: 'Alerts', s_games: 'Games', s_feed: 'Feed', s_priv: 'Privacy', s_inv: 'Full-screen invitation', s_inv_h: 'On: the invitation screen opens by itself. Off: invitations wait in Games.', s_on: 'On', s_off: 'Off', s_snz: 'Show postponed invitations again', s_snz_ok: 'Done: postponed invitations will show again.', s_cur: 'Default currency', s_auto: 'Automatic', s_city: 'Default city', s_city_h: 'Empty: uses the city from your profile.', s_days: 'Games with an open spot for you', s_days_h: "Other players' games that still have a spot (Games tab). Show only those in the next:", s_all: 'All', s_nd: '{0} days', s_fstart: 'Open the Feed on', s_ph: 'Feed photos', s_ph_on: 'Load', s_ph_off: 'Tap to view', ph_show: 'Show photo', s_pvis: 'When posting, start with', s_blk: 'Blocked', s_noblk: 'Nobody blocked.', s_note: 'Settings are saved to your account and apply on all your devices.', set_aria: 'Settings'},
-    'es': {leave_game: 'Salir del partido', host_tag: 'organizador', cancel_new: 'Cancelar', sx_privsec: 'Privacidad y seguridad', sx_help: 'Ayuda y cuenta', sx_policy: 'Política de privacidad', s_legal: 'Privacidad y ayuda', s_priv: 'Política de privacidad', s_terms: 'Términos de uso', s_contact: 'Contáctanos', s_delacc: 'Eliminar mi cuenta', s_tel: 'Enviar estadísticas de uso', s_tel_h: 'Solo recuentos anónimos de uso de las funciones, para mejorar la app. Nunca nombres, marcadores, mensajes, fotos ni ubicación.', set_t: 'Ajustes de la Comunidad', s_notif: 'Avisos', s_games: 'Partidos', s_feed: 'Feed', s_priv: 'Privacidad', s_inv: 'Invitación a pantalla completa', s_inv_h: 'Activado: la pantalla de invitación se abre sola. Desactivado: las invitaciones esperan en Partidos.', s_on: 'Activado', s_off: 'Desactivado', s_snz: 'Mostrar de nuevo las invitaciones aplazadas', s_snz_ok: 'Listo: las invitaciones aplazadas vuelven a aparecer.', s_cur: 'Moneda predeterminada', s_auto: 'Automática', s_city: 'Ciudad predeterminada', s_city_h: 'Vacío: usa la ciudad de tu perfil.', s_days: 'Partidos con plaza para ti', s_days_h: 'Partidos de otros jugadores que aún tienen plaza (pestaña Partidos). Mostrar solo los de los próximos días:', s_all: 'Todos', s_nd: '{0} días', s_fstart: 'Abrir el Feed en', s_ph: 'Fotos del feed', s_ph_on: 'Cargar', s_ph_off: 'Tocar para ver', ph_show: 'Ver foto', s_pvis: 'Al publicar, empezar con', s_blk: 'Bloqueados', s_noblk: 'Nadie bloqueado.', s_note: 'Los ajustes se guardan en tu cuenta y valen en todos tus dispositivos.', set_aria: 'Ajustes'},
-    'fr': {leave_game: 'Quitter le match', host_tag: 'organisateur', cancel_new: 'Annuler', sx_privsec: 'Confidentialité et sécurité', sx_help: 'Aide et compte', sx_policy: 'Politique de confidentialité', s_legal: 'Confidentialité et aide', s_priv: 'Politique de confidentialité', s_terms: 'Conditions d\'utilisation', s_contact: 'Nous contacter', s_delacc: 'Supprimer mon compte', s_tel: 'Envoyer des statistiques d\'utilisation', s_tel_h: 'Uniquement des comptages anonymes d\'utilisation des fonctions, pour améliorer l\'app. Jamais de noms, scores, messages, photos ni lieu.', set_t: 'Réglages de la Communauté', s_notif: 'Alertes', s_games: 'Matchs', s_feed: 'Fil', s_priv: 'Confidentialité', s_inv: 'Invitation en plein écran', s_inv_h: "Activé : l'écran d'invitation s'ouvre seul. Désactivé : les invitations attendent dans Matchs.", s_on: 'Activé', s_off: 'Désactivé', s_snz: 'Réafficher les invitations reportées', s_snz_ok: 'Fait : les invitations reportées réapparaîtront.', s_cur: 'Devise par défaut', s_auto: 'Automatique', s_city: 'Ville par défaut', s_city_h: 'Vide : utilise la ville de votre profil.', s_days: 'Matchs avec une place pour vous', s_days_h: "Matchs d'autres joueurs où il reste une place (onglet Matchs). Afficher seulement ceux des prochains jours :", s_all: 'Tous', s_nd: '{0} jours', s_fstart: 'Ouvrir le Fil sur', s_ph: 'Photos du fil', s_ph_on: 'Charger', s_ph_off: 'Toucher pour voir', ph_show: 'Voir la photo', s_pvis: 'À la publication, commencer par', s_blk: 'Bloqués', s_noblk: 'Personne de bloqué.', s_note: 'Les réglages sont enregistrés sur votre compte et valent sur tous vos appareils.', set_aria: 'Réglages'},
-    'de': {leave_game: 'Spiel verlassen', host_tag: 'Organisator', cancel_new: 'Abbrechen', sx_privsec: 'Datenschutz und Sicherheit', sx_help: 'Hilfe und Konto', sx_policy: 'Datenschutzerklärung', s_legal: 'Datenschutz und Hilfe', s_priv: 'Datenschutzerklärung', s_terms: 'Nutzungsbedingungen', s_contact: 'Kontakt', s_delacc: 'Mein Konto löschen', s_tel: 'Nutzungsstatistiken senden', s_tel_h: 'Nur anonyme Zählungen der Funktionsnutzung, um die App zu verbessern. Niemals Namen, Spielstände, Nachrichten, Fotos oder Orte.', set_t: 'Community-Einstellungen', s_notif: 'Hinweise', s_games: 'Spiele', s_feed: 'Feed', s_priv: 'Datenschutz', s_inv: 'Einladung im Vollbild', s_inv_h: 'An: Der Einladungsbildschirm öffnet sich selbst. Aus: Einladungen warten unter Spiele.', s_on: 'An', s_off: 'Aus', s_snz: 'Verschobene Einladungen wieder anzeigen', s_snz_ok: 'Erledigt: Verschobene Einladungen erscheinen wieder.', s_cur: 'Standardwährung', s_auto: 'Automatisch', s_city: 'Standardstadt', s_city_h: 'Leer: nimmt die Stadt aus deinem Profil.', s_days: 'Spiele mit freiem Platz für dich', s_days_h: 'Spiele anderer Spieler, bei denen noch ein Platz frei ist (Tab Spiele). Nur die der nächsten Tage zeigen:', s_all: 'Alle', s_nd: '{0} Tage', s_fstart: 'Feed öffnen mit', s_ph: 'Feed-Fotos', s_ph_on: 'Laden', s_ph_off: 'Zum Ansehen tippen', ph_show: 'Foto anzeigen', s_pvis: 'Beim Posten starten mit', s_blk: 'Blockiert', s_noblk: 'Niemand blockiert.', s_note: 'Einstellungen werden in deinem Konto gespeichert und gelten auf allen Geräten.', set_aria: 'Einstellungen'}
+    'pt-BR': {leave_game: 'Sair do jogo', host_tag: 'organizador', cancel_new: 'Cancelar', sx_privsec: 'Privacidade e segurança', sx_help: 'Ajuda e conta', sx_policy: 'Política de privacidade', s_legal: 'Privacidade e ajuda', s_priv: 'Política de privacidade', s_terms: 'Termos de uso', s_contact: 'Fale conosco', s_delacc: 'Excluir minha conta', s_tel: 'Enviar estatísticas de uso', s_tel_h: 'Só contagens anônimas de uso dos recursos, para melhorar o app. Nunca nomes, placares, mensagens, fotos ou local.', set_t: 'Ajustes da Comunidade', s_notif: 'Avisos', s_games: 'Jogos', s_feed: 'Feed', s_priv: 'Privacidade', s_inv: 'Convite em tela cheia', s_inv_h: 'Ligado: a tela de convite abre sozinha. Desligado: os convites ficam esperando em Jogos.', s_on: 'Ligado', s_off: 'Desligado', s_snz: 'Mostrar de novo os convites adiados', s_snz_ok: 'Pronto: os convites adiados voltam a aparecer.', s_cur: 'Moeda padrão', s_auto: 'Automática', s_days: 'Jogos com vaga para você', s_days_h: 'Jogos de outros jogadores que ainda têm vaga (aba Jogos). Mostrar só os que acontecem nos próximos dias:', s_all: 'Todos', s_nd: '{0} dias', s_fstart: 'Abrir o Feed em', s_ph: 'Fotos do feed', s_ph_on: 'Carregar', s_ph_off: 'Tocar para ver', ph_show: 'Ver foto', s_pvis: 'Ao publicar, começar com', s_blk: 'Bloqueados', s_noblk: 'Ninguém bloqueado.', s_note: 'Os ajustes ficam salvos na sua conta e valem em todos os aparelhos.', set_aria: 'Ajustes'},
+    'pt-PT': {leave_game: 'Sair do jogo', host_tag: 'organizador', cancel_new: 'Cancelar', sx_privsec: 'Privacidade e segurança', sx_help: 'Ajuda e conta', sx_policy: 'Política de privacidade', s_legal: 'Privacidade e ajuda', s_priv: 'Política de privacidade', s_terms: 'Termos de utilização', s_contact: 'Contacte-nos', s_delacc: 'Eliminar a minha conta', s_tel: 'Enviar estatísticas de utilização', s_tel_h: 'Só contagens anónimas de utilização dos recursos, para melhorar a app. Nunca nomes, resultados, mensagens, fotos ou local.', set_t: 'Definições da Comunidade', s_notif: 'Avisos', s_games: 'Jogos', s_feed: 'Feed', s_priv: 'Privacidade', s_inv: 'Convite em ecrã inteiro', s_inv_h: 'Ligado: o ecrã de convite abre sozinho. Desligado: os convites ficam à espera em Jogos.', s_on: 'Ligado', s_off: 'Desligado', s_snz: 'Mostrar de novo os convites adiados', s_snz_ok: 'Pronto: os convites adiados voltam a aparecer.', s_cur: 'Moeda predefinida', s_auto: 'Automática', s_days: 'Jogos com vaga para si', s_days_h: 'Jogos de outros jogadores que ainda têm vaga (separador Jogos). Mostrar só os que acontecem nos próximos dias:', s_all: 'Todos', s_nd: '{0} dias', s_fstart: 'Abrir o Feed em', s_ph: 'Fotos do feed', s_ph_on: 'Carregar', s_ph_off: 'Tocar para ver', ph_show: 'Ver foto', s_pvis: 'Ao publicar, começar com', s_blk: 'Bloqueados', s_noblk: 'Ninguém bloqueado.', s_note: 'As definições ficam guardadas na sua conta e valem em todos os dispositivos.', set_aria: 'Definições'},
+    'en': {leave_game: 'Leave game', host_tag: 'organizer', cancel_new: 'Cancel', sx_privsec: 'Privacy and security', sx_help: 'Help and account', sx_policy: 'Privacy policy', s_legal: 'Privacy and help', s_priv: 'Privacy policy', s_terms: 'Terms of use', s_contact: 'Contact us', s_delacc: 'Delete my account', s_tel: 'Send usage statistics', s_tel_h: 'Only anonymous counts of feature use, to improve the app. Never names, scores, messages, photos or location.', set_t: 'Community settings', s_notif: 'Alerts', s_games: 'Games', s_feed: 'Feed', s_priv: 'Privacy', s_inv: 'Full-screen invitation', s_inv_h: 'On: the invitation screen opens by itself. Off: invitations wait in Games.', s_on: 'On', s_off: 'Off', s_snz: 'Show postponed invitations again', s_snz_ok: 'Done: postponed invitations will show again.', s_cur: 'Default currency', s_auto: 'Automatic', s_days: 'Games with an open spot for you', s_days_h: "Other players' games that still have a spot (Games tab). Show only those in the next:", s_all: 'All', s_nd: '{0} days', s_fstart: 'Open the Feed on', s_ph: 'Feed photos', s_ph_on: 'Load', s_ph_off: 'Tap to view', ph_show: 'Show photo', s_pvis: 'When posting, start with', s_blk: 'Blocked', s_noblk: 'Nobody blocked.', s_note: 'Settings are saved to your account and apply on all your devices.', set_aria: 'Settings'},
+    'es': {leave_game: 'Salir del partido', host_tag: 'organizador', cancel_new: 'Cancelar', sx_privsec: 'Privacidad y seguridad', sx_help: 'Ayuda y cuenta', sx_policy: 'Política de privacidad', s_legal: 'Privacidad y ayuda', s_priv: 'Política de privacidad', s_terms: 'Términos de uso', s_contact: 'Contáctanos', s_delacc: 'Eliminar mi cuenta', s_tel: 'Enviar estadísticas de uso', s_tel_h: 'Solo recuentos anónimos de uso de las funciones, para mejorar la app. Nunca nombres, marcadores, mensajes, fotos ni ubicación.', set_t: 'Ajustes de la Comunidad', s_notif: 'Avisos', s_games: 'Partidos', s_feed: 'Feed', s_priv: 'Privacidad', s_inv: 'Invitación a pantalla completa', s_inv_h: 'Activado: la pantalla de invitación se abre sola. Desactivado: las invitaciones esperan en Partidos.', s_on: 'Activado', s_off: 'Desactivado', s_snz: 'Mostrar de nuevo las invitaciones aplazadas', s_snz_ok: 'Listo: las invitaciones aplazadas vuelven a aparecer.', s_cur: 'Moneda predeterminada', s_auto: 'Automática', s_days: 'Partidos con plaza para ti', s_days_h: 'Partidos de otros jugadores que aún tienen plaza (pestaña Partidos). Mostrar solo los de los próximos días:', s_all: 'Todos', s_nd: '{0} días', s_fstart: 'Abrir el Feed en', s_ph: 'Fotos del feed', s_ph_on: 'Cargar', s_ph_off: 'Tocar para ver', ph_show: 'Ver foto', s_pvis: 'Al publicar, empezar con', s_blk: 'Bloqueados', s_noblk: 'Nadie bloqueado.', s_note: 'Los ajustes se guardan en tu cuenta y valen en todos tus dispositivos.', set_aria: 'Ajustes'},
+    'fr': {leave_game: 'Quitter le match', host_tag: 'organisateur', cancel_new: 'Annuler', sx_privsec: 'Confidentialité et sécurité', sx_help: 'Aide et compte', sx_policy: 'Politique de confidentialité', s_legal: 'Confidentialité et aide', s_priv: 'Politique de confidentialité', s_terms: 'Conditions d\'utilisation', s_contact: 'Nous contacter', s_delacc: 'Supprimer mon compte', s_tel: 'Envoyer des statistiques d\'utilisation', s_tel_h: 'Uniquement des comptages anonymes d\'utilisation des fonctions, pour améliorer l\'app. Jamais de noms, scores, messages, photos ni lieu.', set_t: 'Réglages de la Communauté', s_notif: 'Alertes', s_games: 'Matchs', s_feed: 'Fil', s_priv: 'Confidentialité', s_inv: 'Invitation en plein écran', s_inv_h: "Activé : l'écran d'invitation s'ouvre seul. Désactivé : les invitations attendent dans Matchs.", s_on: 'Activé', s_off: 'Désactivé', s_snz: 'Réafficher les invitations reportées', s_snz_ok: 'Fait : les invitations reportées réapparaîtront.', s_cur: 'Devise par défaut', s_auto: 'Automatique', s_days: 'Matchs avec une place pour vous', s_days_h: "Matchs d'autres joueurs où il reste une place (onglet Matchs). Afficher seulement ceux des prochains jours :", s_all: 'Tous', s_nd: '{0} jours', s_fstart: 'Ouvrir le Fil sur', s_ph: 'Photos du fil', s_ph_on: 'Charger', s_ph_off: 'Toucher pour voir', ph_show: 'Voir la photo', s_pvis: 'À la publication, commencer par', s_blk: 'Bloqués', s_noblk: 'Personne de bloqué.', s_note: 'Les réglages sont enregistrés sur votre compte et valent sur tous vos appareils.', set_aria: 'Réglages'},
+    'de': {leave_game: 'Spiel verlassen', host_tag: 'Organisator', cancel_new: 'Abbrechen', sx_privsec: 'Datenschutz und Sicherheit', sx_help: 'Hilfe und Konto', sx_policy: 'Datenschutzerklärung', s_legal: 'Datenschutz und Hilfe', s_priv: 'Datenschutzerklärung', s_terms: 'Nutzungsbedingungen', s_contact: 'Kontakt', s_delacc: 'Mein Konto löschen', s_tel: 'Nutzungsstatistiken senden', s_tel_h: 'Nur anonyme Zählungen der Funktionsnutzung, um die App zu verbessern. Niemals Namen, Spielstände, Nachrichten, Fotos oder Orte.', set_t: 'Community-Einstellungen', s_notif: 'Hinweise', s_games: 'Spiele', s_feed: 'Feed', s_priv: 'Datenschutz', s_inv: 'Einladung im Vollbild', s_inv_h: 'An: Der Einladungsbildschirm öffnet sich selbst. Aus: Einladungen warten unter Spiele.', s_on: 'An', s_off: 'Aus', s_snz: 'Verschobene Einladungen wieder anzeigen', s_snz_ok: 'Erledigt: Verschobene Einladungen erscheinen wieder.', s_cur: 'Standardwährung', s_auto: 'Automatisch', s_days: 'Spiele mit freiem Platz für dich', s_days_h: 'Spiele anderer Spieler, bei denen noch ein Platz frei ist (Tab Spiele). Nur die der nächsten Tage zeigen:', s_all: 'Alle', s_nd: '{0} Tage', s_fstart: 'Feed öffnen mit', s_ph: 'Feed-Fotos', s_ph_on: 'Laden', s_ph_off: 'Zum Ansehen tippen', ph_show: 'Foto anzeigen', s_pvis: 'Beim Posten starten mit', s_blk: 'Blockiert', s_noblk: 'Niemand blockiert.', s_note: 'Einstellungen werden in deinem Konto gespeichert und gelten auf allen Geräten.', set_aria: 'Einstellungen'}
   };
   Object.keys(K8).forEach(function (l) { Object.assign(D[l], K8[l]); });
   var K9 = {
@@ -662,6 +662,9 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     "fr": {"cp_none": "Aucun tournoi actif ni classement pour le moment.", "tor_hb": "Tournois et classements", "cp_t": "Tournois et classements", "cp_tor": "Tournois", "cp_rk": "Classements", "cp_na": "Pas encore de points", "cp_lead": "En tête"},
     "de": {"cp_none": "Noch kein aktives Turnier und keine Rangliste.", "tor_hb": "Turniere und Ranglisten", "cp_t": "Turniere und Ranglisten", "cp_tor": "Turniere", "cp_rk": "Ranglisten", "cp_na": "Noch keine Punkte", "cp_lead": "Spitze"}};
   Object.keys(KJ23).forEach(function (l) { if (D[l]) Object.assign(D[l], KJ23[l]); });
+  // 7.81: pedido de conversa para quem não é amigo
+  var KJ24 = {"pt-BR": {"rq_send": "Enviar pedido", "rq_ph": "Escreva o pedido (só texto)...", "rq_h_req": "Vocês ainda não são amigos. Mande um pedido de conversa: uma mensagem só, de texto. Se {0} aceitar, vocês conversam normalmente.", "rq_h_sent": "Pedido enviado. Quando {0} aceitar, vocês conversam normalmente.", "rq_h_again": "{0} ainda não aceitou o seu pedido. Já se passaram 30 dias: você pode mandar outro.", "rq_h_in": "{0} quer conversar com você e ainda não é seu amigo. Se aceitar, vocês conversam normalmente; se recusar, {0} não fica sabendo. Para bloquear ou denunciar, toque em ⋯.", "rq_h_none": "{0} não recebe pedidos de conversa. Para conversar, adicione como amigo.", "rq_h_grp": "{0} só recebe pedidos de conversa de quem está no mesmo grupo. Para conversar, adicione como amigo.", "rq_ok": "Aceitar", "rq_no": "Recusar", "rq_ok_t": "Pronto: agora vocês podem conversar.", "rq_no_t": "Pedido recusado.", "rq_fail": "Não deu para enviar o pedido.", "rq_list": "Pedidos de conversa", "rq_sent_s": "Pedido enviado", "s_dmq": "Quem pode me pedir conversa", "s_dmq_h": "Vale para quem não é seu amigo. Amigos e jogadores do mesmo jogo sempre podem conversar com você.", "s_dmq_all": "Todos", "s_dmq_grp": "Meus grupos", "s_dmq_none": "Ninguém"}, "pt-PT": {"rq_send": "Enviar pedido", "rq_ph": "Escreva o pedido (só texto)...", "rq_h_req": "Ainda não são amigos. Envie um pedido de conversa: uma única mensagem, só de texto. Se {0} aceitar, podem conversar normalmente.", "rq_h_sent": "Pedido enviado. Quando {0} aceitar, podem conversar normalmente.", "rq_h_again": "{0} ainda não aceitou o seu pedido. Já passaram 30 dias: pode enviar outro.", "rq_h_in": "{0} quer conversar consigo e ainda não é seu amigo. Se aceitar, podem conversar normalmente; se recusar, {0} não fica a saber. Para bloquear ou denunciar, toque em ⋯.", "rq_h_none": "{0} não recebe pedidos de conversa. Para conversar, adicione como amigo.", "rq_h_grp": "{0} só recebe pedidos de conversa de quem está no mesmo grupo. Para conversar, adicione como amigo.", "rq_ok": "Aceitar", "rq_no": "Recusar", "rq_ok_t": "Pronto: agora podem conversar.", "rq_no_t": "Pedido recusado.", "rq_fail": "Não foi possível enviar o pedido.", "rq_list": "Pedidos de conversa", "rq_sent_s": "Pedido enviado", "s_dmq": "Quem me pode pedir conversa", "s_dmq_h": "Vale para quem não é seu amigo. Amigos e jogadores do mesmo jogo podem sempre conversar consigo.", "s_dmq_all": "Todos", "s_dmq_grp": "Os meus grupos", "s_dmq_none": "Ninguém"}, "en": {"rq_send": "Send request", "rq_ph": "Write your request (text only)...", "rq_h_req": "You're not friends yet. Send a chat request: a single text-only message. If {0} accepts, you can chat normally.", "rq_h_sent": "Request sent. When {0} accepts, you can chat normally.", "rq_h_again": "{0} hasn't accepted your request yet. It's been 30 days: you can send another one.", "rq_h_in": "{0} wants to chat with you and isn't your friend yet. If you accept, you can chat normally; if you decline, {0} won't be told. To block or report, tap ⋯.", "rq_h_none": "{0} doesn't accept chat requests. To chat, add them as a friend.", "rq_h_grp": "{0} only accepts chat requests from people in the same group. To chat, add them as a friend.", "rq_ok": "Accept", "rq_no": "Decline", "rq_ok_t": "Done: you can chat now.", "rq_no_t": "Request declined.", "rq_fail": "Couldn't send the request.", "rq_list": "Chat requests", "rq_sent_s": "Request sent", "s_dmq": "Who can request to chat with me", "s_dmq_h": "Applies to people who aren't your friends. Friends and players in the same game can always chat with you.", "s_dmq_all": "Everyone", "s_dmq_grp": "My groups", "s_dmq_none": "Nobody"}, "es": {"rq_send": "Enviar solicitud", "rq_ph": "Escribe la solicitud (solo texto)...", "rq_h_req": "Todavía no son amigos. Envía una solicitud de conversación: un solo mensaje, solo de texto. Si {0} acepta, podrán conversar con normalidad.", "rq_h_sent": "Solicitud enviada. Cuando {0} acepte, podrán conversar con normalidad.", "rq_h_again": "{0} aún no aceptó tu solicitud. Ya pasaron 30 días: puedes enviar otra.", "rq_h_in": "{0} quiere conversar contigo y aún no es tu amigo. Si aceptas, podrán conversar con normalidad; si rechazas, {0} no se entera. Para bloquear o denunciar, toca ⋯.", "rq_h_none": "{0} no recibe solicitudes de conversación. Para conversar, agrégalo como amigo.", "rq_h_grp": "{0} solo recibe solicitudes de conversación de quien está en el mismo grupo. Para conversar, agrégalo como amigo.", "rq_ok": "Aceptar", "rq_no": "Rechazar", "rq_ok_t": "Listo: ya pueden conversar.", "rq_no_t": "Solicitud rechazada.", "rq_fail": "No se pudo enviar la solicitud.", "rq_list": "Solicitudes de conversación", "rq_sent_s": "Solicitud enviada", "s_dmq": "Quién puede pedirme conversación", "s_dmq_h": "Vale para quien no es tu amigo. Los amigos y los jugadores del mismo partido siempre pueden conversar contigo.", "s_dmq_all": "Todos", "s_dmq_grp": "Mis grupos", "s_dmq_none": "Nadie"}, "fr": {"rq_send": "Envoyer la demande", "rq_ph": "Écrivez la demande (texte seulement)...", "rq_h_req": "Vous n'êtes pas encore amis. Envoyez une demande de discussion : un seul message, texte uniquement. Si {0} accepte, vous pourrez discuter normalement.", "rq_h_sent": "Demande envoyée. Quand {0} acceptera, vous pourrez discuter normalement.", "rq_h_again": "{0} n'a pas encore accepté votre demande. 30 jours sont passés : vous pouvez en envoyer une autre.", "rq_h_in": "{0} veut discuter avec vous et n'est pas encore votre ami. Si vous acceptez, vous pourrez discuter normalement ; si vous refusez, {0} n'en saura rien. Pour bloquer ou signaler, touchez ⋯.", "rq_h_none": "{0} ne reçoit pas de demandes de discussion. Pour discuter, ajoutez-le comme ami.", "rq_h_grp": "{0} ne reçoit des demandes de discussion que des membres du même groupe. Pour discuter, ajoutez-le comme ami.", "rq_ok": "Accepter", "rq_no": "Refuser", "rq_ok_t": "C'est fait : vous pouvez discuter.", "rq_no_t": "Demande refusée.", "rq_fail": "Impossible d'envoyer la demande.", "rq_list": "Demandes de discussion", "rq_sent_s": "Demande envoyée", "s_dmq": "Qui peut me demander à discuter", "s_dmq_h": "Pour les personnes qui ne sont pas vos amis. Les amis et les joueurs du même match peuvent toujours discuter avec vous.", "s_dmq_all": "Tout le monde", "s_dmq_grp": "Mes groupes", "s_dmq_none": "Personne"}, "de": {"rq_send": "Anfrage senden", "rq_ph": "Schreib deine Anfrage (nur Text)...", "rq_h_req": "Ihr seid noch keine Freunde. Schick eine Chatanfrage: eine einzige Nachricht, nur Text. Wenn {0} annimmt, könnt ihr normal chatten.", "rq_h_sent": "Anfrage gesendet. Wenn {0} annimmt, könnt ihr normal chatten.", "rq_h_again": "{0} hat deine Anfrage noch nicht angenommen. 30 Tage sind vergangen: Du kannst eine neue schicken.", "rq_h_in": "{0} möchte mit dir chatten und ist noch nicht dein Freund. Wenn du annimmst, könnt ihr normal chatten; wenn du ablehnst, erfährt {0} es nicht. Zum Blockieren oder Melden tippe auf ⋯.", "rq_h_none": "{0} nimmt keine Chatanfragen an. Um zu chatten, füge die Person als Freund hinzu.", "rq_h_grp": "{0} nimmt Chatanfragen nur von Leuten aus derselben Gruppe an. Um zu chatten, füge die Person als Freund hinzu.", "rq_ok": "Annehmen", "rq_no": "Ablehnen", "rq_ok_t": "Fertig: Ihr könnt jetzt chatten.", "rq_no_t": "Anfrage abgelehnt.", "rq_fail": "Anfrage konnte nicht gesendet werden.", "rq_list": "Chatanfragen", "rq_sent_s": "Anfrage gesendet", "s_dmq": "Wer mich um einen Chat bitten darf", "s_dmq_h": "Gilt für Leute, die nicht deine Freunde sind. Freunde und Spieler aus demselben Spiel können immer mit dir chatten.", "s_dmq_all": "Alle", "s_dmq_grp": "Meine Gruppen", "s_dmq_none": "Niemand"}};
+  Object.keys(KJ24).forEach(function (l) { if (D[l]) Object.assign(D[l], KJ24[l]); });
   var KJ21 = {"pt-BR": {"ff_n": "{0} de {1} jogos", "f_state": "Estado", "f_hood": "Bairro", "ff_st": "Estado", "ff_city": "Cidade", "ff_hood": "Bairro", "ff_lvl": "Nível", "ff_lv_all": "Todos os níveis", "ff_lv_me": "Para o meu nível", "ff_lv_free": "Sem restrição de nível", "ff_clr": "Limpar filtros"}, "pt-PT": {"ff_n": "{0} de {1} jogos", "f_state": "Distrito / estado", "f_hood": "Bairro", "ff_st": "Distrito / estado", "ff_city": "Cidade", "ff_hood": "Bairro", "ff_lvl": "Nível", "ff_lv_all": "Todos os níveis", "ff_lv_me": "Para o meu nível", "ff_lv_free": "Sem restrição de nível", "ff_clr": "Limpar filtros"}, "en": {"ff_n": "{0} of {1} games", "f_state": "State", "f_hood": "Neighborhood", "ff_st": "State", "ff_city": "City", "ff_hood": "Neighborhood", "ff_lvl": "Level", "ff_lv_all": "All levels", "ff_lv_me": "For my level", "ff_lv_free": "No level limit", "ff_clr": "Clear filters"}, "es": {"ff_n": "{0} de {1} partidos", "f_state": "Estado / provincia", "f_hood": "Barrio", "ff_st": "Estado / provincia", "ff_city": "Ciudad", "ff_hood": "Barrio", "ff_lvl": "Nivel", "ff_lv_all": "Todos los niveles", "ff_lv_me": "Para mi nivel", "ff_lv_free": "Sin límite de nivel", "ff_clr": "Borrar filtros"}, "fr": {"ff_n": "{0} sur {1} matchs", "f_state": "Région", "f_hood": "Quartier", "ff_st": "Région", "ff_city": "Ville", "ff_hood": "Quartier", "ff_lvl": "Niveau", "ff_lv_all": "Tous les niveaux", "ff_lv_me": "Pour mon niveau", "ff_lv_free": "Sans limite de niveau", "ff_clr": "Effacer les filtres"}, "de": {"ff_n": "{0} von {1} Spielen", "f_state": "Bundesland", "f_hood": "Stadtteil", "ff_st": "Bundesland", "ff_city": "Stadt", "ff_hood": "Stadtteil", "ff_lvl": "Niveau", "ff_lv_all": "Alle Niveaus", "ff_lv_me": "Für mein Niveau", "ff_lv_free": "Ohne Niveaugrenze", "ff_clr": "Filter löschen"}};   // 7.67: filtros de Entrar num jogo (estado, cidade, bairro, nível) e estado/bairro no jogo
   Object.keys(KJ21).forEach(function (l) { if (D[l]) Object.assign(D[l], KJ21[l]); });
   var KJ20 = {"pt-BR": {"ex_t": "Sair do BoxScore?", "ex_d": "Toque em Sair para fechar o app.", "ex_go": "Sair", "ex_stay": "Continuar no app"}, "pt-PT": {"ex_t": "Sair do BoxScore?", "ex_d": "Toque em Sair para fechar a app.", "ex_go": "Sair", "ex_stay": "Continuar na app"}, "en": {"ex_t": "Exit BoxScore?", "ex_d": "Tap Exit to close the app.", "ex_go": "Exit", "ex_stay": "Stay in the app"}, "es": {"ex_t": "¿Salir de BoxScore?", "ex_d": "Toca Salir para cerrar la app.", "ex_go": "Salir", "ex_stay": "Seguir en la app"}, "fr": {"ex_t": "Quitter BoxScore ?", "ex_d": "Touchez Quitter pour fermer l'app.", "ex_go": "Quitter", "ex_stay": "Rester dans l'app"}, "de": {"ex_t": "BoxScore beenden?", "ex_d": "Tippe auf Beenden, um die App zu schließen.", "ex_go": "Beenden", "ex_stay": "In der App bleiben"}};   // 7.66: voltar do Android pede confirmação
@@ -733,7 +736,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     return host;
   }
   function myWhere() { var pl = placar(), mp = pl.players && pl.meId ? pl.players[pl.meId] || {} : {}; return { state: mp.state || '', hood: mp.hood || '', city: mp.city || '' }; }
-  function myCity() { return P.city || lsGet('boxscore.profile.city') || lsGet('boxscore.rede.city'); }
+  function myCity() { return lsGet('boxscore.profile.city') || lsGet('boxscore.rede.city'); }   // 7.80: sem "Cidade padrão" nos Ajustes — vale a cidade do perfil
   function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
 
   var S = { wg: {}, wgBad: {}, dq: { n: '', c: '', k: '' }, groups: {}, disc: {}, gReqs: {}, sentReq: {}, gid: '', gtab: 'sum', ranks: {}, rkBusy: {}, rkTry: {}, gf: 'mine', dcity: true, discAt: 0, discLoading: false, gLoaded: false, user: null, db: null, auth: null, posts: {}, pub: {}, follows: {}, fmode: 'friends', pubAt: 0, pubLoading: false, blocks: {}, chats: [], friends: [], friendsLoaded: false, games: {}, jt: 'play', jf: { p: 'all', o: '', r: '', l: '' }, ff: { s: '', c: '', b: '', l: '' }, jx: {}, tab: 'feed', loading: false, err: false, form: null, armed: '' };
@@ -820,7 +823,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     return loadFB().then(function () {
       firebase.initializeApp(FB_CFG);
       S.auth = firebase.auth(); S.db = firebase.firestore();
-      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.79', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
+      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.81', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
       try { S.db.settings({ experimentalAutoDetectLongPolling: true, merge: true }); } catch (e) {}
       try { S.auth.getRedirectResult().catch(function () {}); } catch (e) {}
       S.auth.onAuthStateChanged(function (u) { if (!u || (RT.uid && RT.uid !== u.uid)) rtStop(); S.user = u || null; paintGate(); if (u) { loadFriends(); loadFollows(); loadBlocks().then(reload); ensureProfile(); } });
@@ -1062,10 +1065,15 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
   function pairId(a, b) { return [a, b].sort().join('_'); }
   function showProfile(uid, name, who) {
     var me0 = S.user.uid, fr = S.friends.map(function (x) { return x.uid; });
-    function open(state) {
+    function open(state0) {
+      // 7.81: botão Mensagem / Pedir conversa no perfil
+      (uid === me0 ? Promise.resolve('') : chatModeFor(uid)).then(function (mm) { open2(state0, mm); }, function () { open2(state0, ''); });
+    }
+    function open2(state, mm) {
       var f = S.form;
       BXProfile.show({
         db: S.db, uid: uid, name: name, me: me0, friends: fr, friendState: state, toast: toast,
+        msg: mm, onMsg: function () { openChat(uid, name, null); },
         onInvite: who && f ? function (on) { var has = f.invited.some(function (y) { return y.uid === uid; }); if (on && !has) f.invited.push(who); if (!on) f.invited = f.invited.filter(function (y) { return y.uid !== uid; }); if (S.tab === 'neu') paintForm(); } : null,
         invited: !!(who && f && f.invited.some(function (y) { return y.uid === uid; })),
         onFriend: function (st) {
@@ -1523,7 +1531,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
   // ---------- conversas diretas (Beta 5.7) ----------
   var CH = { unsub: null, root: null, id: '' };
   function pairOther(c) { var me0 = S.user.uid; return (c.members || []).filter(function (u) { return u !== me0; })[0] || ''; }
-  function isUnread(c) { var me0 = S.user.uid; return !!c.lastFrom && c.lastFrom !== me0 && (c.lastAt || 0) > ((c.reads || {})[me0] || 0); }
+  function isUnread(c) { var me0 = S.user.uid; if (c.rq && c.rq.no && c.rq.by !== me0) return false; return !!c.lastFrom && c.lastFrom !== me0 && (c.lastAt || 0) > ((c.reads || {})[me0] || 0); }
   function unreadN() { return S.chats.filter(isUnread).length; }
   function clock(ms) { try { return new Date(ms).toLocaleTimeString(LG, { hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; } }
   // 0.34.1: tempo desde a publicação ("há 5 min") nas primeiras 24 h; depois, a data da publicação
@@ -1581,6 +1589,26 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     box.refresh = function () { cur = emoRecent().length ? 'rec' : 'face'; draw(); };   // abre sempre nos Recentes, quando houver
     draw(); return box;
   }
+  // ---------- 7.81: pedido de conversa para quem não é amigo ----------
+  // chats/{par}.rq = { by (quem pediu), at, gid? (grupo em comum), no? (recusado: só quem recebeu deixa de ver) }; a mensagem do pedido é msgs/rq.
+  // dmq/{uid}.who = quem pode me pedir: 'all', 'grp' (padrão: quem está num grupo comigo) ou 'none'. As regras conferem tudo.
+  var DMQ = {}, RQ_AGAIN = 30 * 864e5;
+  function dmqOf(u) {
+    var c = DMQ[u]; if (c && Date.now() - c.at < 10 * 60e3) return Promise.resolve(c.who);
+    return S.db.collection('dmq').doc(u).get().then(function (d) { var w = (d.exists && d.data().who) || 'grp'; DMQ[u] = { who: w, at: Date.now() }; return w; }).catch(function () { return 'grp'; });
+  }
+  function sharedGid(u) { var g = myGroups().filter(function (x) { return (x.members || []).indexOf(u) >= 0; })[0]; return g ? g.id : ''; }
+  function rqIn(c) { return !!(c && c.rq && c.rq.by && c.rq.by !== S.user.uid); }      // pedido que recebi (pendente)
+  function rqOut(c) { return !!(c && c.rq && c.rq.by === S.user.uid); }                // pedido que mandei (pendente)
+  function Tn(k, n) { return T(k).split('{0}').join(n || '?'); }
+  // modo da conversa com alguém, para o botão do perfil: 'chat', 'req', 'sent' ou '' (não dá)
+  function chatModeFor(u) {
+    if (S.blocks[u]) return Promise.resolve('');
+    if (S.friends.some(function (x) { return x.uid === u; })) return Promise.resolve('chat');
+    var c = S.chats.filter(function (x) { return x.id === pairId(S.user.uid, u); })[0];
+    if (c) return Promise.resolve(rqOut(c) ? 'sent' : 'chat');
+    return dmqOf(u).then(function (w) { return w === 'all' || (w === 'grp' && sharedGid(u)) ? 'req' : ''; });
+  }
   function openChat(uid, name, g) {
     if (CH.root) closeChat();
     var mine = S.user.uid, id = pairId(mine, uid), cref = S.db.collection('chats').doc(id), seen = 0, marked = 0;
@@ -1602,6 +1630,31 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     var form = h('div', { cls: 'cf' }, [emoB, inp, sendB]);
     // 7.63: responder uma mensagem (como no WhatsApp): segurar, arrastar para a direita ou Enter na mensagem
     var REP = null, otherRead = 0, lastMsgs = [];
+    // 7.81: MODE = 'open' (conversa normal), 'wait' (conferindo), 'req' (posso pedir), 'sent' (pedi), 'again' (pedi há 30+ dias), 'inbox' (recebi pedido), 'no' (não aceita pedidos)
+    var MODE = (g || S.friends.some(function (x) { return x.uid === uid; })) ? 'open' : 'wait', RQ = null, RQGID = '', WHO = 'grp';
+    var bar = h('div', { cls: 'cf rqbar', hidden: true }, [ibtn('x', T('rq_no'), '', declineRq), ibtn('check', T('rq_ok'), 'pri', acceptRq)]);
+    function modeOf(rq) { if (!rq) return 'open'; if (rq.by === mine) return rq.at < Date.now() - RQ_AGAIN ? 'again' : 'sent'; return 'inbox'; }
+    function setMode(m) {
+      MODE = m; var rq = m === 'req' || m === 'again';
+      form.hidden = !(m === 'open' || rq); bar.hidden = m !== 'inbox';
+      sendB.textContent = T(rq ? 'rq_send' : 'ch_send'); inp.maxLength = rq ? 300 : 500; inp.placeholder = T(rq ? 'rq_ph' : 'ch_ph'); inp.setAttribute('aria-label', inp.placeholder);
+      emoB.hidden = rq; if (rq) { emoP.hidden = true; setRep(null); }
+      draw(lastMsgs);
+    }
+    function rqHint() {
+      var k = { req: 'rq_h_req', sent: 'rq_h_sent', again: 'rq_h_again', inbox: 'rq_h_in', no: WHO === 'none' ? 'rq_h_none' : 'rq_h_grp' }[MODE];
+      return k ? h('div', { cls: 'repn', id: 'rqHint', 'data-mode': MODE }, [ic(MODE === 'no' ? 'lock' : MODE === 'sent' ? 'check' : 'chat'), h('span', { text: Tn(k, name) })]) : null;
+    }
+    function chatRow() { return S.chats.filter(function (x) { return x.id === id; })[0]; }
+    function acceptRq() {
+      var u = { rq: null }; u['reads.' + mine] = Date.now();
+      cref.update(u).then(function () { tel('r_dmrq_ok'); RQ = null; var c = chatRow(); if (c) { c.rq = null; c.reads = c.reads || {}; c.reads[mine] = Date.now(); } setMode('open'); toast(T('rq_ok_t')); try { inp.focus(); } catch (x) {} })
+        .catch(function () { toast(T('fail')); });
+    }
+    function declineRq() {
+      if (!RQ) return; var n = { by: RQ.by, at: RQ.at, no: true }; if (RQ.gid) n.gid = RQ.gid;
+      cref.update({ rq: n }).then(function () { RQ = n; var c = chatRow(); if (c) c.rq = n; closeChat(); toast(T('rq_no_t')); }).catch(function () { toast(T('fail')); });
+    }
     var repX = h('button', { type: 'button', cls: 'btn icb', 'aria-label': T('ch_rep_x'), title: T('ch_rep_x') }, [ic('x')]);
     var repBar = h('div', { cls: 'rbar', hidden: true }, [h('div', { cls: 'bq' }, [h('b', { cls: 'bqn' }), h('span', { cls: 'bqt' })]), repX]);
     repX.addEventListener('click', function () { setRep(null); });
@@ -1609,13 +1662,14 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
       REP = m ? { id: m.id, from: m.from, text: String(m.text || '').slice(0, 120) } : null; repBar.hidden = !REP;
       if (REP) { repBar.querySelector('.bqn').textContent = REP.from === mine ? T('ch_you') : (name || '?'); repBar.querySelector('.bqt').textContent = REP.text; try { inp.focus(); } catch (x) {} }
     }
-    var root = h('div', { cls: 'chat', role: 'dialog', 'aria-label': name || '' }, [h('div', { cls: 'w' }, [top, ctxEl, list, emoP, repBar, form])]);
+    var root = h('div', { cls: 'chat', role: 'dialog', 'aria-label': name || '' }, [h('div', { cls: 'w' }, [top, ctxEl, list, emoP, repBar, form, bar])]);
+    if (MODE === 'wait') form.hidden = true;
     document.body.appendChild(root); CH.root = root;
     function draw(msgs) {
-      list.textContent = '';
-      if (!msgs.length) { list.appendChild(h('div', { cls: 'empty', text: T('ch_empty') })); return; }
+      list.textContent = ''; lastMsgs = msgs;
+      var hint = rqHint();
+      if (!msgs.length) { if (hint) list.appendChild(hint); else if (MODE !== 'wait') list.appendChild(h('div', { cls: 'empty', text: T('ch_empty') })); return; }
       var lastDay = '';
-      lastMsgs = msgs;
       msgs.forEach(function (m) {
         var d = dayL(m.at); if (d !== lastDay) { lastDay = d; list.appendChild(h('div', { cls: 'day', text: d })); }
         var isMe = m.from === mine, rd = isMe && otherRead >= m.at;
@@ -1626,8 +1680,9 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
         if (m.rep && m.rep.text) kids.push(h('button', { type: 'button', cls: 'bq', 'aria-label': T('ch_goto'), on: { click: function (e) { e.stopPropagation(); var t = list.querySelector('[data-mid="' + m.rep.id + '"]'); if (t) { t.scrollIntoView({ block: 'center' }); t.classList.add('hl'); setTimeout(function () { t.classList.remove('hl'); }, 1200); } } } }, [h('b', { cls: 'bqn', text: m.rep.from === mine ? T('ch_you') : (name || '?') }), h('span', { cls: 'bqt', text: m.rep.text })]));
         kids.push(h('span', { cls: 'bt', text: m.text })); kids.push(tm);
         var b = h('div', { cls: 'bub' + (isMe ? ' me' : '') + (onlyEmoji(m.text) && !m.rep ? ' big' : ''), 'data-mid': m.id || '', tabindex: '0', 'aria-label': (isMe ? T('ch_you') : (name || '?')) + ': ' + m.text + ' · ' + T('ch_rep_hint') }, kids);   // 7.30: só emoji = grande
-        bubReply(b, m); list.appendChild(b);
+        if (MODE === 'open') bubReply(b, m); list.appendChild(b);
       });
+      if (hint) list.appendChild(hint);   // 7.81: aviso do pedido depois da mensagem
       list.scrollTop = list.scrollHeight;
     }
     function bubReply(b, m) {
@@ -1640,7 +1695,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
       b.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); setRep(m); } });
     }
     function markRead(msgs) {
-      var last = msgs[msgs.length - 1]; if (!last || last.from === mine || last.at <= marked) return;
+      var last = msgs[msgs.length - 1]; if (!last || last.from === mine || last.at <= marked || MODE === 'inbox') return;   // 7.81: pedido visto não vira lida
       marked = last.at; var u = {}; u['reads.' + mine] = Date.now(); cref.update(u).then(function () { var c = S.chats.filter(function (x) { return x.id === id; })[0]; if (c) { c.reads = c.reads || {}; c.reads[mine] = Date.now(); } }).catch(function () {});
     }
     function listen() {
@@ -1649,12 +1704,39 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
         var msgs = sn.docs.map(function (d) { var x = d.data(); x.id = d.id; return x; }); seen = msgs.length; draw(msgs); markRead(msgs);
       }, function () { list.textContent = ''; list.appendChild(h('div', { cls: 'empty', text: T('err') })); });
       // 7.63: quando o outro lê (reads[outro]), as minhas mensagens viram ✓✓
-      CH.unsub2 = cref.onSnapshot(function (d) { var r = d.exists ? ((d.data().reads || {})[uid] || 0) : 0; if (r !== otherRead) { otherRead = r; if (lastMsgs.length) draw(lastMsgs); } }, function () {});
+      CH.unsub2 = cref.onSnapshot(function (d) {
+        var x = d.exists ? d.data() : {}, r = (x.reads || {})[uid] || 0, nrq = x.rq || null;
+        // 7.81: pedido aceito (ou recebido) enquanto a conversa está aberta
+        if (d.exists && JSON.stringify(nrq) !== JSON.stringify(RQ)) { RQ = nrq; var c = chatRow(); if (c) c.rq = nrq; if (modeOf(RQ) !== MODE) setMode(modeOf(RQ)); }
+        if (r !== otherRead) { otherRead = r; if (lastMsgs.length) draw(lastMsgs); } }, function () {});
     }
     draw([]);
-    cref.get().then(function (d) { if (d.exists) listen(); }).catch(function () {});
+    cref.get().then(function (d) {
+      if (d.exists) { RQ = d.data().rq || null; if (RQ || MODE === 'wait') setMode(modeOf(RQ)); listen(); return; }
+      if (MODE !== 'wait') return;
+      // 7.81: não é amigo e ainda não há conversa: pode pedir? (ajuste de quem recebe)
+      RQGID = sharedGid(uid);
+      return dmqOf(uid).then(function (w) { WHO = w; if (CH.root === root) setMode(w === 'all' || (w === 'grp' && RQGID) ? 'req' : 'no'); });
+    }).catch(function () { if (MODE === 'wait') setMode('open'); });
+    function sendRq(text) {
+      var now = Date.now(), nm = {}, rd = {}, rq = { by: mine, at: now }, again = MODE === 'again'; nm[mine] = S.user.displayName || S.user.email || '?'; nm[uid] = name || '?'; rd[mine] = now;
+      if (!again) RQGID = RQGID || sharedGid(uid); else RQGID = sharedGid(uid);
+      if (RQGID) rq.gid = RQGID;
+      var meta = { members: [mine, uid].sort(), names: nm, last: text.slice(0, 80), lastAt: now, lastFrom: mine, reads: rd, rq: rq }, msgs = cref.collection('msgs');
+      sendB.disabled = true;
+      (again ? cref.update({ rq: rq, last: meta.last, lastAt: now, lastFrom: mine }).then(function () { return msgs.doc('rq').delete().catch(function () {}); }) : cref.set(meta))
+        .then(function () { return msgs.doc('rq').set({ from: mine, text: text, at: now }); })
+        .then(function () {
+          tel('r_dmrq'); RQ = rq; inp.value = '';
+          var c = chatRow(); if (!c) { c = { id: id, members: meta.members }; S.chats.push(c); } c.names = nm; c.last = meta.last; c.lastAt = now; c.lastFrom = mine; c.rq = rq; c.reads = c.reads || rd;
+          setMode('sent'); listen();
+        }).catch(function () { toast(T('rq_fail')); }).then(function () { sendB.disabled = false; });
+    }
     function send() {
-      var text = inp.value.trim().slice(0, 500); if (!text || sendB.disabled || Date.now() - (CH.lastSend || 0) < 1200) return; CH.lastSend = Date.now(); tel('r_msg');
+      var text = inp.value.trim().slice(0, 500); if (!text || sendB.disabled || Date.now() - (CH.lastSend || 0) < 1200) return; CH.lastSend = Date.now();
+      if (MODE === 'req' || MODE === 'again') return sendRq(text.slice(0, 300));
+      if (MODE !== 'open') return;
+      tel('r_msg');
       sendB.disabled = true; var now = Date.now(), nm = {}; nm[mine] = S.user.displayName || S.user.email || '?'; nm[uid] = name || '?';
       var rd = {}; rd[mine] = now;
       var meta = { members: [mine, uid].sort(), names: nm, last: text.slice(0, 80), lastAt: now, lastFrom: mine, reads: rd };
@@ -1670,20 +1752,26 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     setTimeout(function () { try { inp.focus(); } catch (e) {} }, 50);
   }
   function paintChats(host) {
-    var chats = S.chats.slice().sort(function (a, b) { return (b.lastAt || 0) - (a.lastAt || 0); }), me0 = S.user.uid, withChat = {};
-    chats.forEach(function (c) {
-      var o = pairOther(c); withChat[o] = 1;
+    var me0 = S.user.uid, withChat = {}, all = S.chats.slice().sort(function (a, b) { return (b.lastAt || 0) - (a.lastAt || 0); });
+    // 7.81: pedidos recebidos ficam numa seção própria, no topo; recusados somem (só para quem recusou)
+    all.forEach(function (c) { withChat[pairOther(c)] = 1; });
+    var reqs = all.filter(function (c) { return rqIn(c) && !c.rq.no; }), chats = all.filter(function (c) { return !rqIn(c); });
+    function row(c) {
+      var o = pairOther(c);
       var fr = S.friends.filter(function (x) { return x.uid === o; })[0], nm = (fr && fr.name !== '?' && fr.name) || (c.names || {})[o] || '?';
-      var row = h('article', { cls: 'card crow', role: 'button', tabindex: '0', on: { click: function () { openChat(o, nm, null); } } }, [
+      var r = h('article', { cls: 'card crow' + (rqIn(c) ? ' rqrow' : ''), role: 'button', tabindex: '0', on: { click: function () { openChat(o, nm, null); } } }, [
         memAv(o, nm),   // 7.30: foto, como nas outras telas
-        h('div', { cls: 'cn' }, [h('b', { text: nm }), h('span', { text: (c.lastFrom === me0 ? '↪ ' : '') + (c.last || '') })]),
+        h('div', { cls: 'cn' }, [h('b', { text: nm }), h('span', { text: (rqOut(c) ? T('rq_sent_s') + ' · ' : c.lastFrom === me0 ? '↪ ' : '') + (c.last || '') })]),
         c.lastAt ? h('time', { title: fmtWhen(c.lastAt), text: whenShort(c.lastAt) }) : null,
         isUnread(c) ? h('span', { cls: 'ub', 'aria-label': '•', text: '' }) : null]);
-      row.addEventListener('keydown', function (e) { if (e.key === 'Enter') openChat(o, nm, null); });
-      host.appendChild(row);
-    });
+      r.addEventListener('keydown', function (e) { if (e.key === 'Enter') openChat(o, nm, null); });
+      host.appendChild(r);
+    }
+    if (reqs.length) { host.appendChild(h('div', { cls: 'sub', id: 'rqHead', text: T('rq_list') + ' · ' + reqs.length, style: 'margin-top:6px;font-weight:700' })); reqs.forEach(row);
+      if (chats.length) host.appendChild(h('div', { cls: 'sub', text: T('chat'), style: 'margin-top:6px;font-weight:700' })); }
+    chats.forEach(row);
     var rest = S.friends.filter(function (x) { return !withChat[x.uid] && !S.blocks[x.uid]; });
-    if (!chats.length) { var fr0 = S.friends.filter(function (x) { return !S.blocks[x.uid]; }).length;
+    if (!chats.length && !reqs.length) { var fr0 = S.friends.filter(function (x) { return !S.blocks[x.uid]; }).length;
       empty(host, 'chat', T('ev_chat_t'), fr0 ? T('ev_chat_d') + ' ' + T('ev_chat_d2') : T('ev_chat_d'), fr0 ? '' : T('ev_go_find'), function () { S.tab = 'find'; paint(); }); }
     if (rest.length) {
       host.appendChild(h('div', { cls: 'sub', text: T('ch_friends'), style: 'margin-top:6px;font-weight:700' }));
@@ -4226,8 +4314,6 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
       try { var st = JSON.parse(localStorage.getItem('boxscore.placar.v1') || 'null'); if (st && st.settings) { st.settings.lang = l; st.settings.langAuto = false; localStorage.setItem('boxscore.placar.v1', JSON.stringify(st)); } } catch (e) {}
       location.reload();
     });
-    var city = h('input', { type: 'text', maxlength: '60', value: P.city || '', placeholder: lsGet('boxscore.profile.city') || '', autocapitalize: 'words', 'aria-label': T('s_city') });
-    city.addEventListener('change', function () { savePref('city', city.value.trim().slice(0, 60)); });
     // Perfil (no topo, com a foto)
     var prof = link('user', T('s_prof_go'), T('s_prof_h'), null, function () { try { sessionStorage.setItem('bx.ret', JSON.stringify({ m: 'rede', snap: navSnap(), y: window.scrollY, at: Date.now() })); } catch (e) {} BXMods.mark('placar'); location.href = '../placar/#perfil-rede'; }, 'st-prof', 'stProf');
     prof.replaceChild(h('span', { cls: 'st-ic st-av' }, [memAv(S.user.uid, S.user.displayName || '?')]), prof.firstChild);
@@ -4242,7 +4328,6 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     host.appendChild(sec(T('s_games')));
     host.appendChild(box([
       item('coin', T('s_cur'), null, (function (g) { g.classList.add('st-w1'); return g; })(seg('cur', [['', T('s_auto')], ['BRL', 'R$'], ['USD', 'US$'], ['EUR', '€'], ['GBP', '£']], function () { S.form = null; }))),
-      item('pin', T('s_city'), T('s_city_h'), city),
       item('mine', T('s_days'), T('s_days_h'), seg('days', [[0, T('s_all')], [7, Tf('s_nd', 7)], [14, Tf('s_nd', 14)], [30, Tf('s_nd', 30)]]))]));
     // Avisos
     host.appendChild(sec(T('s_notif')));
@@ -4259,7 +4344,13 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     var blk = Object.keys(S.blocks), bl = h('div', { cls: 'st-blk' });
     if (!blk.length) bl.appendChild(h('div', { cls: 'sub', text: T('s_noblk') }));
     blk.forEach(function (u) { bl.appendChild(h('div', { cls: 'who' }, [memAv(u, S.blocks[u].name || '?'), h('span', { text: S.blocks[u].name || '?', style: 'flex:1;min-width:0;font:700 15px var(--ui);overflow-wrap:anywhere' }), twoTap('ub' + u, T('unblock'), '', function () { S.db.collection('users').doc(S.user.uid).collection('blocks').doc(u).delete().then(function () { delete S.blocks[u]; toast(T('unblocked_ok')); reload(); paint(); }).catch(function () { toast(T('fail')); }); })])); });
+    // 7.81: quem pode me pedir conversa (dmq/{uid}; sem documento = 'grp')
+    if (S.dmqMe === undefined) { S.dmqMe = null; S.db.collection('dmq').doc(S.user.uid).get().then(function (d) { S.dmqMe = (d.exists && d.data().who) || 'grp'; if (S.tab === 'set') paint(); }).catch(function () { S.dmqMe = 'grp'; }); }
+    var dmqSeg = seg(null, [['all', T('s_dmq_all')], ['grp', T('s_dmq_grp')], ['none', T('s_dmq_none')]], function (v) {
+      S.dmqMe = v; S.db.collection('dmq').doc(S.user.uid).set({ who: v }).catch(function () { toast(T('fail')); }); }, S.dmqMe || 'grp');
+    dmqSeg.id = 'dmqSeg';
     host.appendChild(box([
+      item('chat', T('s_dmq'), T('s_dmq_h'), dmqSeg),
       item('block', T('s_blk') + (blk.length ? ' · ' + blk.length : ''), null, bl),
       window.BXTel ? item('chart', T('s_tel'), T('s_tel_h'), seg(null, [[1, T('s_on')], [0, T('s_off')]], function (v) { BXTel.setOn(!!v); }, BXTel.isOn() ? 1 : 0)) : null,
       link('shield', T('sx_policy'), null, '../legal/privacidade.html'),
@@ -4444,7 +4535,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
   })();
   initFB();
   var bxDbg = false; try { bxDbg = !!navigator.webdriver || localStorage.getItem("bxDebug") === "1"; } catch (x) {}
-  if (bxDbg) window.__rede = { RT: RT, untag: untag, openResult: openResult, openComposer: openComposer, userMenu: userMenu, S: S, reload: reload, create: create, paint: paint, openChat: openChat, createGroup: createGroup, loadGroups: loadGroups, joinCode: typeof joinByCode === "function" ? joinByCode : null };
+  if (bxDbg) window.__rede = { RT: RT, untag: untag, openResult: openResult, openComposer: openComposer, userMenu: userMenu, S: S, reload: reload, create: create, paint: paint, openChat: openChat, showProfile: showProfile, createGroup: createGroup, loadGroups: loadGroups, joinCode: typeof joinByCode === "function" ? joinByCode : null };
   if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('../sw.js').catch(function () {});
 })();
 </script></body></html>

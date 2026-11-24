@@ -19,7 +19,9 @@
     'r_game_new', 'r_game_accept', 'r_post', 'r_post_photo', 'r_like', 'r_comment', 'r_msg', 'r_follow',
     'r_group_new', 'r_group_join', 'r_result', 'r_tour_new', 'r_tour_join', 'r_live_open', 'r_suggest', 'r_tor_hdr', 'p_tour', 'p_stream', 'v_overlay', 'r_settings',
     // Página pública do ao vivo (7.52): quem abriu o link, sem conta
-    'v_live_open', 'v_live_tv'
+    'v_live_open', 'v_live_tv',
+    // 7.81: pedido de conversa
+    'r_dmrq', 'r_dmrq_ok'
   ];
   var OK = {}; KEYS.forEach(function (k) { OK[k] = 1; });
   var cfg = { module: '', build: '', lang: '', getDb: null, getUid: null }, timer = null, started = false;
