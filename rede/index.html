@@ -258,7 +258,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
 (function () {
   'use strict';
   BXMods.mark('rede');
-  var VERSION = '0.64.0';
+  var VERSION = '0.65.0';
   var FB_CFG = { apiKey: 'AIzaSyD_L90YxJAVRuTfPqwNbETJlbV9BYdnuYI', authDomain: 'boxsocore.firebaseapp.com', projectId: 'boxsocore', storageBucket: 'boxsocore.firebasestorage.app', messagingSenderId: '639383913161', appId: '1:639383913161:web:a9bb75fcf99f4b03378318' };
   var FB_VER = '10.12.2', FB_LIBS = ['app', 'auth', 'firestore'];
   var HOUR = 3600000;
@@ -805,10 +805,10 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     return loadFB().then(function () {
       firebase.initializeApp(FB_CFG);
       S.auth = firebase.auth(); S.db = firebase.firestore();
-      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.74', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
+      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.75', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
       try { S.db.settings({ experimentalAutoDetectLongPolling: true, merge: true }); } catch (e) {}
       try { S.auth.getRedirectResult().catch(function () {}); } catch (e) {}
-      S.auth.onAuthStateChanged(function (u) { S.user = u || null; paintGate(); if (u) { loadFriends(); loadFollows(); loadBlocks().then(reload); ensureProfile(); } });
+      S.auth.onAuthStateChanged(function (u) { if (!u || (RT.uid && RT.uid !== u.uid)) rtStop(); S.user = u || null; paintGate(); if (u) { loadFriends(); loadFollows(); loadBlocks().then(reload); ensureProfile(); } });
     }).catch(function () { $('gate').hidden = false; $('app').hidden = true; $('gateT').textContent = T('err'); $('login').hidden = true; });
   }
   // quem usa só a Comunidade também precisa de perfil público e código de 6 letras (antes só o Placar criava)
@@ -869,9 +869,49 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
       S.chats = cs.docs.map(function (d) { var c = d.data(); c.id = d.id; return c; }).filter(function (c) { return !S.blocks[pairOther(c)]; });
       rs.forEach(function (s) { s.docs.forEach(function (d) { var x = d.data(); x.id = d.id; m[d.id] = x; }); });
       Object.keys(m).forEach(function (k) { if (m[k].hostUid !== uid && S.blocks[m[k].hostUid]) delete m[k]; });
-      S.games = m; S.loading = false; paint(); showInvite(); loadGroups(); loadTinv(true); autoGames(); openHashCode(); openDraft(); prefsCloud(); reconcileResults();
+      S.games = m; S.loading = false; paint(); showInvite(); rtStart(); loadGroups(); loadTinv(true); autoGames(); openHashCode(); openDraft(); prefsCloud(); reconcileResults();
     }).catch(function () { S.loading = false; S.err = true; paint(); });
   }
+  // 7.75: tempo real para o que é pessoal e urgente — conversas e os meus jogos (convites, pedidos, respostas).
+  // O resto (feed, jogos abertos de todos, grupos) continua sendo buscado ao abrir e ao trocar de tela, para gastar poucas leituras.
+  // Pausa quando o app vai para segundo plano ou a tela bloqueia; ao voltar, busca tudo e volta a escutar.
+  var RT = { un: [], uid: '', on: false, ids: {}, pt: 0 };
+  function rtPaint(kind) {
+    clearTimeout(RT.pt);
+    RT.pt = setTimeout(function () {
+      if (!S.user) return;
+      // formulário aberto (Marcar um jogo, Ajustes): só os números das abas, para não atrapalhar quem está digitando
+      if (S.tab === 'neu' || S.tab === 'set') { paintTabs(); return; }
+      paint(); if (kind === 'games') showInvite();
+    }, 250);
+  }
+  function rtStart() {
+    if (!S.user || !S.db || RT.on) return;
+    var uid = S.user.uid, gc = S.db.collection('games'); RT.on = true; RT.uid = uid; RT.ids = {};
+    function watch(field, src) {
+      return gc.where(field, 'array-contains', uid).onSnapshot(function (sn) {
+        var now = {}, ch = false, old = RT.ids[src] || {};
+        sn.docs.forEach(function (d) {
+          var x = d.data(); x.id = d.id; now[d.id] = 1;
+          if (x.hostUid !== uid && S.blocks[x.hostUid]) return;
+          if (JSON.stringify(S.games[d.id]) !== JSON.stringify(x)) { S.games[d.id] = x; ch = true; }
+        });
+        // saiu desta lista (ex.: o organizador recusou meu pedido): busca o jogo de novo, 1 leitura
+        Object.keys(old).forEach(function (id) {
+          if (now[id]) return;
+          gc.doc(id).get().then(function (d) { if (d.exists) { var x = d.data(); x.id = d.id; S.games[id] = x; } else delete S.games[id]; rtPaint('games'); }, function () { delete S.games[id]; rtPaint('games'); });
+        });
+        RT.ids[src] = now;
+        if (ch) rtPaint('games');
+      }, function () {});
+    }
+    RT.un = [watch('invited', 'inv'), watch('accepted', 'acc'), watch('asked', 'ask'), watch('audience', 'aud'),
+      S.db.collection('chats').where('members', 'array-contains', uid).onSnapshot(function (sn) {
+        var l = sn.docs.map(function (d) { var c = d.data(); c.id = d.id; return c; }).filter(function (c) { return !S.blocks[pairOther(c)]; });
+        if (JSON.stringify(l) !== JSON.stringify(S.chats)) { S.chats = l; rtPaint('chat'); }
+      }, function () {})];
+  }
+  function rtStop() { RT.un.forEach(function (u) { try { u(); } catch (e) {} }); RT.un = []; RT.on = false; RT.ids = {}; }
   function run(p, okMsg) { return p.then(function () { if (okMsg) toast(okMsg); return reload(); }).catch(function () { toast(T('fail')); }); }
   function ref(id) { return S.db.collection('games').doc(id); }
   function isInv(g, u) { return (g.invited || []).indexOf(u) >= 0 || (g.visibility === 'group' && g.hostUid !== u && (g.audience || []).indexOf(u) >= 0); }
@@ -4328,7 +4368,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
   $('login').textContent = T('login'); $('login').addEventListener('click', login);
 
   $('gateT').textContent = T('loading'); $('gate').hidden = false;
-  document.addEventListener('visibilitychange', function () { if (!document.hidden && S.user && !CH.root) reload(); });
+  document.addEventListener('visibilitychange', function () { if (document.hidden) { rtStop(); return; } if (S.user && !CH.root) reload(); else if (S.user) rtStart(); });
   // Beta 5.12.1: teclado do celular — telas sobrepostas acompanham a área visível (visualViewport) para a caixa de texto não ficar escondida
   (function () {
     var v = window.visualViewport, r = document.documentElement;
@@ -4343,7 +4383,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
   })();
   initFB();
   var bxDbg = false; try { bxDbg = !!navigator.webdriver || localStorage.getItem("bxDebug") === "1"; } catch (x) {}
-  if (bxDbg) window.__rede = { untag: untag, openResult: openResult, openComposer: openComposer, userMenu: userMenu, S: S, reload: reload, create: create, paint: paint, openChat: openChat, createGroup: createGroup, loadGroups: loadGroups, joinCode: typeof joinByCode === "function" ? joinByCode : null };
+  if (bxDbg) window.__rede = { RT: RT, untag: untag, openResult: openResult, openComposer: openComposer, userMenu: userMenu, S: S, reload: reload, create: create, paint: paint, openChat: openChat, createGroup: createGroup, loadGroups: loadGroups, joinCode: typeof joinByCode === "function" ? joinByCode : null };
   if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('../sw.js').catch(function () {});
 })();
 </script></body></html>
