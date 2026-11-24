@@ -17,7 +17,7 @@
     // Comunidade
     'r_open', 'r_tab_feed', 'r_tab_find', 'r_tab_neu', 'r_tab_groups', 'r_tab_notif',
     'r_game_new', 'r_game_accept', 'r_post', 'r_post_photo', 'r_like', 'r_comment', 'r_msg', 'r_follow',
-    'r_group_new', 'r_group_join', 'r_result', 'r_tour_new', 'r_tour_join', 'r_live_open', 'r_suggest', 'r_tor_hdr', 'p_tour', 'r_settings',
+    'r_group_new', 'r_group_join', 'r_result', 'r_tour_new', 'r_tour_join', 'r_live_open', 'r_suggest', 'r_tor_hdr', 'p_tour', 'p_stream', 'v_overlay', 'r_settings',
     // Página pública do ao vivo (7.52): quem abriu o link, sem conta
     'v_live_open', 'v_live_tv'
   ];

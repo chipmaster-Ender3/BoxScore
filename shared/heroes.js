@@ -258,6 +258,21 @@
       arc(c, 700, 262, 700, 140, 700, 86, 'rgba(255,255,255,.7)'); ball(c, 700, 58, 22, true); rk(c, 820, 190, .36, 0.75, 'a'); target(c, 450, 230, 56); arc(c, 682, 66, 520, 70, 462, 214, 'rgba(228,255,79,.75)'); },
     rest_troca: function (c, r) { surface(c, 'dusk', r); lines(c, [[120, 120, W, 120], [120, 120, 120, H]], 7, 'rgba(255,255,255,.55)');
       bench(c, 760, 200, 300); towel(c, 820, 178, 90); bottle(c, 560, 210, .62); swap(c, 640, 62, 70); },
+    // 7.76: placar na transmissão (celular no tripé filmando, com o placar por cima da imagem)
+    stream: function (c, r) {
+      surface(c, 'grass', r); lines(c, [[120, 250, W, 250], [420, 0, 420, 250]]);
+      c.save(); c.strokeStyle = '#1D2328'; c.lineWidth = 10; c.lineCap = 'round'; c.beginPath(); c.moveTo(760, 200); c.lineTo(690, 310); c.moveTo(760, 200); c.lineTo(830, 310); c.moveTo(760, 200); c.lineTo(760, 310); c.stroke();
+      c.fillStyle = '#1D2328'; rr(c, 744, 186, 32, 22, 6); c.fill();
+      c.shadowColor = 'rgba(0,0,0,.5)'; c.shadowBlur = 22; c.shadowOffsetY = 8; c.fillStyle = '#14191D'; rr(c, 600, 36, 320, 160, 24); c.fill(); c.shadowColor = 'transparent';
+      var g = c.createLinearGradient(0, 50, 0, 182); g.addColorStop(0, '#62A05A'); g.addColorStop(1, '#2F6131'); c.fillStyle = g; rr(c, 616, 50, 288, 132, 12); c.fill();
+      c.strokeStyle = 'rgba(255,255,255,.7)'; c.lineWidth = 2; c.beginPath(); c.moveTo(616, 120); c.lineTo(904, 120); c.moveTo(760, 50); c.lineTo(760, 120); c.stroke();
+      c.fillStyle = 'rgba(9,17,22,.94)'; rr(c, 628, 140, 168, 34, 6); c.fill();
+      c.fillStyle = '#C4502A'; c.fillRect(628, 140, 5, 17); c.fillStyle = '#2C6A86'; c.fillRect(628, 157, 5, 17);
+      c.fillStyle = '#D7F24A'; rr(c, 770, 140, 26, 34, 4); c.fill();
+      c.fillStyle = 'rgba(255,255,255,.88)'; c.fillRect(640, 145, 62, 6); c.fillRect(640, 162, 52, 6); [718, 738].forEach(function (x) { c.fillRect(x, 144, 9, 9); c.fillRect(x, 161, 9, 9); });
+      c.fillStyle = '#D92D20'; rr(c, 628, 60, 62, 22, 6); c.fill(); c.fillStyle = '#fff'; c.beginPath(); c.arc(640, 71, 4, 0, 7); c.fill(); c.font = '800 13px sans-serif'; c.fillText('LIVE', 650, 76);
+      c.restore(); ball(c, 520, 236, 20); ball(c, 900, 262, 18);
+    },
     // 7.66: janela "Sair do BoxScore?" (fim do treino: raquete no banco, garrafa e a bola parada)
     sair: function (c, r) { surface(c, 'dusk', r); lines(c, [[120, 120, W, 120], [120, 120, 120, H]], 7, 'rgba(255,255,255,.55)'); bench(c, 740, 210, 320); rk(c, 760, 168, .3, 1.5, 'b'); bottle(c, 560, 215, .55); ball(c, 900, 262, 20); },
     rest_set: function (c, r) { surface(c, 'night', r); board(c, 600, 40, 320, 160, [[6, 3], [4, 6]]); bottle(c, 520, 200, .66); rk(c, 790, 262, .28, 1.45, 'b'); ball(c, 900, 250, 20); },
