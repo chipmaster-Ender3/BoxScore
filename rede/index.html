@@ -131,8 +131,8 @@ header.hero #navBack{align-self:flex-start;flex:none;width:44px;height:44px;min-
 <style id="v727">
 /* 7.27: padrão visual, etapa 1 (botões, cantos, abas, rótulos, status, cartão, feed) */
 :root{--segbg:rgba(14,26,34,.07);--s-open-bg:#DDF3E4;--s-open:#13612E;--s-full-bg:#DCEBFA;--s-full:#0D4F86;--s-start-bg:#EEF8C9;--s-start:#3F5A00;--s-done-bg:rgba(14,26,34,.08);--s-can-bg:#FBE1DE;--s-can:#9B1C14}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--segbg:rgba(255,255,255,.09);--s-open-bg:#123B22;--s-open:#9BE3B2;--s-full-bg:#0F2C47;--s-full:#9CCBF5;--s-start-bg:#2C3A08;--s-start:#D7F37A;--s-done-bg:rgba(255,255,255,.09);--s-can-bg:#4A1712;--s-can:#FFB4A8}}
-:root[data-theme="dark"]{--segbg:rgba(255,255,255,.09);--s-open-bg:#123B22;--s-open:#9BE3B2;--s-full-bg:#0F2C47;--s-full:#9CCBF5;--s-start-bg:#2C3A08;--s-start:#D7F37A;--s-done-bg:rgba(255,255,255,.09);--s-can-bg:#4A1712;--s-can:#FFB4A8}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--segbg:rgba(255,255,255,.09);--s-open-bg:#123B22;--s-open:#9BE3B2;--s-full-bg:#0F2C47;--s-full:#9CCBF5;--s-start-bg:#2C3A08;--s-start:#D7F37A;--s-done-bg:rgba(255,255,255,.09);--s-can-bg:#4A1712;--s-can:#FFB4A8;--s-warn-bg:#3D2E08;--s-warn:#F6D27A}}
+:root[data-theme="dark"]{--s-warn-bg:#3D2E08;--s-warn:#F6D27A;--segbg:rgba(255,255,255,.09);--s-open-bg:#123B22;--s-open:#9BE3B2;--s-full-bg:#0F2C47;--s-full:#9CCBF5;--s-start-bg:#2C3A08;--s-start:#D7F37A;--s-done-bg:rgba(255,255,255,.09);--s-can-bg:#4A1712;--s-can:#FFB4A8}
 main .btn,.chat .btn,.um .btn{border-radius:14px}
 main .btn.pri,.um .btn.pri,.chat .cf .btn.pri{min-height:48px}
 main .btn.opt,.chat .btn.opt,.um .btn.opt{border-radius:999px}
@@ -168,7 +168,9 @@ main .pact.on{color:#E0245E}main .pact.on .ic svg{fill:currentColor}main .pact.p
 .orow .oi{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--segbg);flex:none}.orow .oi .ic{width:22px;height:22px}
 .orow .ox{display:grid;gap:2px;flex:1;min-width:0}.orow .ox b{font:800 16px/1.25 var(--ui)}.orow .ox small{font:500 13px/1.3 var(--ui);color:var(--muted)}
 .orow .och{color:var(--muted);flex:none}.orow .och .ic{width:20px;height:20px}
-main .orow.arow{min-height:64px;margin:0 0 10px}main .orow.arow .oi{background:var(--s-can-bg);color:var(--s-can)}main .orow.arow .ox b{font-size:16px}
+main .tpk{gap:10px!important;padding:14px 12px!important}.orow.tpr{border-left:5px solid var(--tc,var(--line));align-items:center}.orow.tpr .ox{gap:4px}.orow.tpr .ox .chip{justify-self:start;margin-top:4px;white-space:normal;font:800 12px/1.25 var(--ui);padding:5px 10px;border-radius:999px;border:0;background:var(--tb);color:var(--tc)}.orow.tpr .oi{background:var(--tb,var(--segbg));color:var(--tc,var(--ink))}
+.tpr[data-st=warn]{--tc:var(--s-warn,#8A5A00);--tb:var(--s-warn-bg,#FFF4D6)}.tpr[data-st=full]{--tc:var(--s-full);--tb:var(--s-full-bg)}.tpr[data-st=started]{--tc:var(--s-start);--tb:var(--s-start-bg)}.tpr[data-st=open]{--tc:var(--s-open);--tb:var(--s-open-bg)}
+.orow.arow{min-height:64px;margin:0 0 10px}main .orow.arow .oi{background:var(--s-can-bg);color:var(--s-can)}main .orow.arow .ox b{font-size:16px}
 main .emp{display:grid;justify-items:center;text-align:center;gap:10px;padding:36px 16px}main .emp .ei{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;background:var(--segbg);color:var(--ink)}main .emp .ei .ic{width:32px;height:32px}
 main .emp b{font:800 18px/1.25 var(--ui)}main .emp p{margin:0;max-width:320px;color:var(--muted);font:500 15px/1.45 var(--ui)}main .emp .btn{margin-top:6px;min-width:220px}
 </style>
@@ -258,7 +260,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
 (function () {
   'use strict';
   BXMods.mark('rede');
-  var VERSION = '0.65.0';
+  var VERSION = '0.66.0';
   var FB_CFG = { apiKey: 'AIzaSyD_L90YxJAVRuTfPqwNbETJlbV9BYdnuYI', authDomain: 'boxsocore.firebaseapp.com', projectId: 'boxsocore', storageBucket: 'boxsocore.firebasestorage.app', messagingSenderId: '639383913161', appId: '1:639383913161:web:a9bb75fcf99f4b03378318' };
   var FB_VER = '10.12.2', FB_LIBS = ['app', 'auth', 'firestore'];
   var HOUR = 3600000;
@@ -805,7 +807,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     return loadFB().then(function () {
       firebase.initializeApp(FB_CFG);
       S.auth = firebase.auth(); S.db = firebase.firestore();
-      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.76', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
+      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.77', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
       try { S.db.settings({ experimentalAutoDetectLongPolling: true, merge: true }); } catch (e) {}
       try { S.auth.getRedirectResult().catch(function () {}); } catch (e) {}
       S.auth.onAuthStateChanged(function (u) { if (!u || (RT.uid && RT.uid !== u.uid)) rtStop(); S.user = u || null; paintGate(); if (u) { loadFriends(); loadFollows(); loadBlocks().then(reload); ensureProfile(); } });
@@ -3524,10 +3526,18 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
   function torPick() {
     var l = torAct(); if (!l.length) return; if (l.length === 1) { torOpen(l[0]); return; }
     tel('r_tor_hdr');
-    sheet(function (close) { return [h('b', { text: T('tor_pick') })].concat(l.map(function (a) {
-      return h('div', { cls: 'tm' }, [h('b', { text: a.t.name }), h('div', { cls: 'sub', text: (a.g.name || '') }), h('div', { cls: 'row' }, [h('span', { cls: 'chip' + (a.conf || a.inv ? ' bad' : ''), text: torLine(a) })]),
-        ibtn('eye', T('tn_open'), 'pri', function () { close(); torOpen(a); })]);
-    })); });
+    // 7.77: janela no padrão (imagem no topo, linhas coloridas pelo estado do torneio)
+    var root, list = h('div', { cls: 'cl tpk' });
+    function close() { if (root) root.remove(); }
+    l.forEach(function (a) {
+      var st = a.conf || a.inv ? 'warn' : a.t.status !== 'run' ? 'full' : a.next ? 'started' : 'open';
+      list.appendChild(h('button', { type: 'button', cls: 'orow tpr', 'data-st': st, on: { click: function () { close(); torOpen(a); } } }, [
+        h('span', { cls: 'oi' }, [ic('trophy')]),
+        h('span', { cls: 'ox' }, [h('b', { text: a.t.name }), a.g.name ? h('small', { text: a.g.name }) : null, h('span', { cls: 'chip', 'data-st': st, text: torLine(a) })]),
+        h('span', { cls: 'och' }, [ic('chev')])]));
+    });
+    root = h('div', { cls: 'chat', role: 'dialog' }, [h('div', { cls: 'w' }, [heroCt(h('div', { cls: 'ct' }, [h('button', { type: 'button', cls: 'btn', text: '←', 'aria-label': T('close'), on: { click: close } }), h('b', { text: T('tor_pick') })]), 'torneios'), list])]);
+    document.body.appendChild(root);
   }
   function myTorCard(host) {
     var l = loadMyTor(); if (!l || !l.length) return false;

@@ -241,6 +241,14 @@
     conversas: function (c, r) { SCENES.contact(c, r); },
     publicar: function (c, r) { surface(c, 'clay', r); lines(c, [[0, 250, W, 250]]); photo(c, 720, 150, 220, 250, -0.08, function (k, w, h) { k.fillStyle = '#5DA043'; k.fillRect(0, 0, w, h); k.strokeStyle = '#fff'; k.lineWidth = 4; k.strokeRect(14, 14, w - 28, h - 28); k.beginPath(); k.moveTo(14, h / 2); k.lineTo(w - 14, h / 2); k.stroke(); ball(k, w * .65, h * .35, 16); }); ball(c, 880, 70, 24); },
     jogador: function (c, r) { surface(c, 'hard', r); lines(c, [[120, 40, W, 40], [520, 40, 520, H], [120, 200, W, 200]]); rk(c, 880, 200, .5, 0.45, 'c'); avatar(c, 720, 150, 92); ball(c, 610, 240, 22); },
+    // 7.77: lista dos meus torneios (chave de 8 levando ao troféu)
+    torneios: function (c, r) { surface(c, 'hard', r);
+      var col = 'rgba(255,255,255,.88)', s = [], ys = [52, 92, 132, 172, 212, 252];
+      [[56, 96], [136, 176], [216, 256]].forEach(function (p) { s.push([360, p[0], 440, p[0]], [360, p[1], 440, p[1]], [440, p[0], 440, p[1]], [440, (p[0] + p[1]) / 2, 520, (p[0] + p[1]) / 2]); });
+      s.push([520, 76, 520, 156], [520, 116, 600, 116], [520, 236, 600, 236], [600, 116, 600, 236], [600, 176, 660, 176]);
+      lines(c, s, 6, col);
+      [[400, 56], [400, 96], [400, 136], [400, 176], [400, 216], [400, 256]].forEach(function (q) { c.fillStyle = 'rgba(228,255,79,.95)'; c.beginPath(); c.arc(q[0] - 40, q[1], 7, 0, Math.PI * 2); c.fill(); });
+      trophy(c, 770, 150, .95); ball(c, 892, 226, 22, true); },
     trofeu: function (c, r) { surface(c, 'night', r); trophy(c, 740, 150, 1.0); ball(c, 870, 240, 22, true); },
     // 7.50: página do placar ao vivo, uma por piso (quadra com linhas, rede, raquete e bola)
 
