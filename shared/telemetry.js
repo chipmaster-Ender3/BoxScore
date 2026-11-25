@@ -21,7 +21,9 @@
     // Página pública do ao vivo (7.52): quem abriu o link, sem conta
     'v_live_open', 'v_live_tv',
     // 7.81: pedido de conversa
-    'r_dmrq', 'r_dmrq_ok'
+    'r_dmrq', 'r_dmrq_ok',
+    // 7.82: vídeo da transmissão na página ao vivo
+    'p_live_vid', 'v_live_vid'
   ];
   var OK = {}; KEYS.forEach(function (k) { OK[k] = 1; });
   var cfg = { module: '', build: '', lang: '', getDb: null, getUid: null }, timer = null, started = false;

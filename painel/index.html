@@ -138,7 +138,7 @@ ol.steps { text-align: left; color: var(--ink2); }
 <script>
 /* 7.45: ao abrir, confere se a versão publicada é outra; se for, apaga a cópia guardada e recarrega uma vez (o painel não passa pela atualização de módulos do Placar). */
 (function () {
-  var CUR = '1.0.12', base = location.pathname.replace(/[^\/]*$/, '');
+  var CUR = '1.0.13', base = location.pathname.replace(/[^\/]*$/, '');
   if (!window.fetch || !window.caches) return;
   fetch(base + 'index.html?v=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (t) {
     var m = /painel (\d+\.\d+\.\d+)/.exec(t); if (!m || m[1] === CUR) return;
@@ -167,7 +167,7 @@ ol.steps { text-align: left; color: var(--ink2); }
     r_open: 'Abriu a Comunidade', r_tab_feed: 'Aba Feed', r_tab_find: 'Aba Buscar', r_tab_neu: 'Botão +', r_tab_groups: 'Aba Grupos',
     r_tab_notif: 'Aba Início/Avisos', r_game_new: 'Criou jogo', r_game_accept: 'Aceitou jogo', r_post: 'Publicou', r_post_photo: 'Publicou com foto',
     r_like: 'Curtiu', r_comment: 'Comentou', r_msg: 'Enviou mensagem', r_follow: 'Seguiu alguém', r_suggest: 'Viu jogadores sugeridos', r_tor_hdr: 'Abriu torneio pelo troféu', p_tour: 'Abriu o torneio pelo Placar', p_stream: 'Configurou o placar para transmissão', v_overlay: 'Placar aberto num app de transmissão', r_live_open: 'Abriu um ao vivo pela Comunidade', v_live_open: 'Abriu o link do ao vivo', v_live_tv: 'Usou o modo TV', r_group_new: 'Criou grupo',
-    r_group_join: 'Entrou em grupo', r_result: 'Lançou resultado', r_tour_new: 'Criou torneio (chaves)', r_tour_join: 'Entrou em torneio', r_settings: 'Abriu Ajustes da Comunidade', r_dmrq: 'Pediu conversa (não amigo)', r_dmrq_ok: 'Aceitou pedido de conversa'
+    r_group_join: 'Entrou em grupo', r_result: 'Lançou resultado', r_tour_new: 'Criou torneio (chaves)', r_tour_join: 'Entrou em torneio', r_settings: 'Abriu Ajustes da Comunidade', r_dmrq: 'Pediu conversa (não amigo)', r_dmrq_ok: 'Aceitou pedido de conversa', p_live_vid: 'Ao vivo: pôs o vídeo da transmissão', v_live_vid: 'Ao vivo: assistiu com vídeo'
   };
   var PLAT = { android: 'App Android', ios: 'App iPhone', pwa: 'Instalado (PWA)', web: 'Navegador', '': 'Não informado' };
   var $ = function (id) { return document.getElementById(id); };
@@ -302,6 +302,7 @@ ol.steps { text-align: left; color: var(--ink2); }
     $('tbRede').innerHTML = feat('r_', N);
     var lv = n(S.agg.users.v_live_open), lt = S.agg.tot.v_live_open || 0;   // 7.52
     var tvr = [[esc(LBL.v_live_open), fmt(lt), fmt(lv)]]; if (S.agg.tot.v_live_tv) tvr.push([esc(LBL.v_live_tv), fmt(S.agg.tot.v_live_tv), fmt(n(S.agg.users.v_live_tv))]);   // 7.53
+    if (S.agg.tot.v_live_vid) tvr.push([esc(LBL.v_live_vid), fmt(S.agg.tot.v_live_vid), fmt(n(S.agg.users.v_live_vid))]);   // 7.82
     $('tbLive').innerHTML = lt ? table(['Página pública', 'Vezes', 'Aparelhos'], tvr, [0, 1, 1]) + '<p class="sub">Conta uma vez por transmissão por dia em cada aparelho. Sem conta e sem dados pessoais; não entra em "Pessoas ativas".</p>' : '<p class="sub">Ninguém abriu um link do ao vivo no período.</p>';
     $('tbPlat').innerHTML = dist('plat', 'Plataforma', function (v) { return PLAT[v] || v; });
     $('tbBuild').innerHTML = dist('build', 'Versão', function (v) { return v || 'Não informada'; });

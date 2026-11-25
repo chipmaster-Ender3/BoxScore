@@ -9,7 +9,7 @@
 <link rel="icon" href="../icons/icon-192.png">
 <link rel="stylesheet" href="../fonts/fonts.css">
 <style>
-/* BoxScore — Placar ao vivo (aovivo 1.3.0, Beta 7.56). Página pública: abre pelo link, sem login, e acompanha live/{id}. */
+/* BoxScore — Placar ao vivo (aovivo 1.5.0, Beta 7.82; 7.82: vídeo da transmissão do jogador com o placar atrasado junto). Página pública: abre pelo link, sem login, e acompanha live/{id}. */
 :root { --bg: #0E1A21; --card: #14252E; --ink: #F4F7F5; --ink2: #B9C6CC; --muted: #8FA3AC; --line: #24404D; --live: #D92D20; --ball: #D7F24A; --win: #D7F24A;
   --dsp: 'Big Shoulders Display', 'Arial Narrow', system-ui, sans-serif; --ui: 'Public Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
 @media (prefers-color-scheme: light) { :root { --bg: #F3F5F4; --card: #FFFFFF; --ink: #0B1418; --ink2: #3D4B52; --muted: #5E6E75; --line: #DCE3E2; --win: #2E6B00; } }
@@ -119,6 +119,24 @@ body.tv .tvc { display: flex; gap: 10px; position: fixed; top: 14px; left: 50%; 
 body.tv .tvc.show { opacity: 1; pointer-events: auto; }
 .tvc button { padding: 10px 16px; border-radius: 999px; border: 0; background: rgba(255,255,255,.92); color: #0B1418; font: 700 15px/1 var(--ui); cursor: pointer; }
 @media (prefers-reduced-motion: reduce) { body.tv .tvc { transition: none; } }
+/* 7.82: vídeo da transmissão (YouTube, Twitch, Kick). Em pé: vídeo em cima, placar embaixo; deitado ou tela larga: lado a lado. */
+.vidc { margin-bottom: clamp(12px, 2.5vw, 20px); }
+.vid { position: relative; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; background: #000; }
+.vid iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.dly { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-top: 12px; color: var(--ink2); font: 600 14px/1.3 var(--ui); }
+.dly .dv { font: 800 20px/1 var(--dsp); color: var(--ink); min-width: 3.2em; text-align: center; }
+.dly button { min-height: 44px; min-width: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: 700 15px/1 var(--ui); cursor: pointer; }
+.dly button.pri { background: var(--ball); border-color: var(--ball); color: #0B1418; }
+.dly button:focus-visible { outline: 3px solid var(--ball); outline-offset: 2px; }
+.dly .sp { flex: 1 1 auto; }
+.vh { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
+.vh a { color: var(--ink2); }
+@media (min-width: 900px), (min-width: 700px) and (orientation: landscape) {
+  body.hasVid .lay { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr); gap: clamp(14px, 2vw, 24px); align-items: start; }
+  body.hasVid .vidc { margin-bottom: 0; position: sticky; top: 12px; }
+  body.hasVid .nm { font-size: clamp(22px, 2.6vw, 40px); } body.hasVid .c { font-size: clamp(22px, 2.6vw, 38px); } body.hasVid .c.pt { font-size: clamp(30px, 3.6vw, 54px); min-width: clamp(56px, 6vw, 96px); }
+}
+body.tv .lay { display: contents; } body.tv .vidc { display: none; }
 </style>
 </head>
 <body>
@@ -127,7 +145,12 @@ body.tv .tvc.show { opacity: 1; pointer-events: auto; }
     <div class="top"><a class="brand" href="../" id="brand">BoxScore</a><span class="topR"><button type="button" class="tvb" id="tvBtn" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg><span id="tvBtnT"></span></button><span class="pill" id="pill" hidden><i aria-hidden="true"></i><span id="pillT"></span></span></span></div>
     <div><div class="ht" id="ht"></div><div class="hs" id="hs"></div></div>
   </header>
-  <main id="main" aria-live="polite"><div class="card msg" id="loading"></div></main>
+  <div class="lay" id="lay">
+    <section class="card vidc" id="vidc" hidden aria-label="Vídeo"><div class="vid" id="vid"></div>
+      <div class="dly" id="dly"><span id="dlyL"></span><button type="button" id="dlyM" aria-label="−">−</button><span class="dv" id="dlyV"></span><button type="button" id="dlyP" aria-label="+">+</button><span class="sp"></span><button type="button" class="pri" id="dlyS"></button></div>
+      <p class="vh" id="vh"></p></section>
+    <main id="main" aria-live="polite"><div class="card msg" id="loading"></div></main>
+  </div>
   <div class="tvBot" id="tvBot"><div class="tvf" id="tvf"></div><div class="tvq" id="tvq"></div></div>
   <p class="foot" id="foot"></p>
 </div>
@@ -192,6 +215,16 @@ body.tv .tvc.show { opacity: 1; pointer-events: auto; }
     de: { k_mp: 'Matchball', k_sp: 'Satzball', k_bp: 'Breakball' }
   };
   Object.keys(D4).forEach(function (l) { for (var k in D4[l]) D[l][k] = D4[l][k]; });
+  // 7.82: vídeo da transmissão
+  var D5 = {
+    'pt-BR': { vid: 'Vídeo', dly: 'Placar com atraso de', sync: 'Sincronizar', vh: 'O vídeo chega alguns segundos atrasado. Se o placar estiver adiantado ou atrasado, toque em Sincronizar assim que um ponto terminar no vídeo.', synced: 'Placar sincronizado com o vídeo.', open: 'Vídeo não aparece? Abrir no {0}', sec: '{0} s', minus: 'Menos atraso', plus: 'Mais atraso' },
+    'pt-PT': { vid: 'Vídeo', dly: 'Marcador com atraso de', sync: 'Sincronizar', vh: 'O vídeo chega alguns segundos atrasado. Se o marcador estiver adiantado ou atrasado, toque em Sincronizar assim que um ponto terminar no vídeo.', synced: 'Marcador sincronizado com o vídeo.', open: 'O vídeo não aparece? Abrir no {0}', sec: '{0} s', minus: 'Menos atraso', plus: 'Mais atraso' },
+    en: { vid: 'Video', dly: 'Score delayed by', sync: 'Sync', vh: 'The video arrives a few seconds late. If the score is ahead or behind, tap Sync as soon as a point ends in the video.', synced: 'Score synced with the video.', open: 'Video not showing? Open on {0}', sec: '{0} s', minus: 'Less delay', plus: 'More delay' },
+    es: { vid: 'Video', dly: 'Marcador con retraso de', sync: 'Sincronizar', vh: 'El video llega unos segundos tarde. Si el marcador va adelantado o atrasado, toca Sincronizar en cuanto termine un punto en el video.', synced: 'Marcador sincronizado con el video.', open: '¿No se ve el video? Abrir en {0}', sec: '{0} s', minus: 'Menos retraso', plus: 'Más retraso' },
+    fr: { vid: 'Vidéo', dly: 'Score décalé de', sync: 'Synchroniser', vh: 'La vidéo arrive avec quelques secondes de retard. Si le score est en avance ou en retard, touchez Synchroniser dès qu\'un point se termine dans la vidéo.', synced: 'Score synchronisé avec la vidéo.', open: 'La vidéo ne s\'affiche pas ? Ouvrir sur {0}', sec: '{0} s', minus: 'Moins de retard', plus: 'Plus de retard' },
+    de: { vid: 'Video', dly: 'Spielstand verzögert um', sync: 'Synchronisieren', vh: 'Das Video kommt ein paar Sekunden später an. Wenn der Spielstand vor- oder nachgeht, tippe auf Synchronisieren, sobald im Video ein Punkt endet.', synced: 'Spielstand mit dem Video synchronisiert.', open: 'Video wird nicht angezeigt? Auf {0} öffnen', sec: '{0} s', minus: 'Weniger Verzögerung', plus: 'Mehr Verzögerung' }
+  };
+  Object.keys(D5).forEach(function (l) { for (var k in D5[l]) D[l][k] = D5[l][k]; });
   var nl = String((navigator.languages && navigator.languages[0]) || navigator.language || 'pt-BR').toLowerCase();
   var LG = nl === 'pt-pt' ? 'pt-PT' : nl.indexOf('pt') === 0 ? 'pt-BR' : D[nl.slice(0, 2)] ? nl.slice(0, 2) : 'en';
   document.documentElement.lang = LG;
@@ -337,7 +370,7 @@ body.tv .tvc.show { opacity: 1; pointer-events: auto; }
   // 7.52: contagem anônima de quem abriu o link (uma vez por transmissão por dia neste aparelho; sem conta, sem nomes nem placar)
   try {
     if (window.BXTel) {
-      BXTel.init({ module: 'aovivo', build: '7.56', lang: LG, getDb: function () { return db; }, getUid: function () { return null; } });
+      BXTel.init({ module: 'aovivo', build: '7.82', lang: LG, getDb: function () { return db; }, getUid: function () { return null; } });
       var sk = 'boxscore.live.seen', seen = {}; try { seen = JSON.parse(localStorage.getItem(sk) || '{}') || {}; } catch (e) {}
       var dd = new Date().toISOString().slice(0, 10);
       if (seen[id] !== dd) { seen[id] = dd; Object.keys(seen).forEach(function (k) { if (seen[k] !== dd) delete seen[k]; }); try { localStorage.setItem(sk, JSON.stringify(seen)); } catch (e) {} BXTel.count('v_live_open'); }
@@ -348,17 +381,65 @@ body.tv .tvc.show { opacity: 1; pointer-events: auto; }
     unsub = db.collection('live').doc(id).onSnapshot(function (snap) {
       net = true;
       if (!snap.exists) { if (!last) msg(T('gone_t'), T('gone')); else { last.on = false; render(); } return; }
-      last = snap.data(); lastAt = Date.now(); render(); $('tvBtn').hidden = false;
+      // 7.82: com vídeo, o placar espera o atraso do vídeo (fila Q); sem vídeo, entra na hora
+      Q.push({ at: Date.now(), d: snap.data() }); if (Q.length > 400) Q.splice(0, Q.length - 400);
+      if (!last) { last = snap.data(); lastAt = Date.now(); render(); } else tick();
+      $('tvBtn').hidden = false;
     }, function (err) {
       var c = err && err.code;
       if (c === 'permission-denied' || c === 'not-found') { if (last && last.sc && (last.sc.w === 0 || last.sc.w === 1)) { last.expAt = 0; render(); } else msg(T('gone_t'), T('gone')); return; }
       net = false; render(); setTimeout(watch, 5000);
     });
   }
-  window.addEventListener('online', function () { net = true; watch(); });
+  // ---------- 7.82: vídeo da transmissão (livevid/{id}) e atraso do placar ----------
+  var Q = [], DL = 0, VID = null, VKEY = '', DLK = 'boxscore.live.dl', vidCounted = false;
+  function dlSaved() { try { var o = JSON.parse(localStorage.getItem(DLK) || '{}') || {}; return o[id]; } catch (e) { return undefined; } }
+  function dlSave(v) { try { var o = JSON.parse(localStorage.getItem(DLK) || '{}') || {}; o[id] = v; var ks = Object.keys(o); if (ks.length > 20) delete o[ks[0]]; localStorage.setItem(DLK, JSON.stringify(o)); } catch (e) {} }
+  function tick() {   // mostra o estado mais novo que já "aconteceu" no vídeo (chegou há pelo menos DL segundos)
+    if (!Q.length) return;
+    var lim = Date.now() - DL * 1000, pick = -1;
+    for (var i = Q.length - 1; i >= 0; i--) if (Q[i].at <= lim) { pick = i; break; }
+    if (pick < 0) return;
+    var e = Q[pick]; Q.splice(0, pick);   // o escolhido fica como Q[0]
+    if (e.d !== last) { last = e.d; lastAt = e.at; render(); }
+  }
+  setInterval(tick, 250);
+  function dlShow() { $('dlyV').textContent = Tf('sec', DL); $('dlyM').disabled = DL <= 0; $('dlyP').disabled = DL >= 90; }
+  function dlSet(v, save) { DL = Math.max(0, Math.min(90, Math.round(v))); if (save) dlSave(DL); dlShow(); tick(); }
+  $('dlyL').textContent = T('dly'); $('dlyS').textContent = T('sync'); $('dlyM').setAttribute('aria-label', T('minus')); $('dlyP').setAttribute('aria-label', T('plus')); $('vidc').setAttribute('aria-label', T('vid'));
+  $('dlyM').addEventListener('click', function () { dlSet(DL - 1, true); });
+  $('dlyP').addEventListener('click', function () { dlSet(DL + 1, true); });
+  // Sincronizar: a pessoa toca quando vê o ponto terminar no vídeo; o atraso é o tempo desde que esse ponto chegou aqui
+  $('dlyS').addEventListener('click', function () {
+    var e = Q[Q.length - 1]; if (!e) return;
+    dlSet((Date.now() - e.at) / 1000, true);
+    var h = $('vh'), old = h.innerHTML; h.textContent = T('synced'); setTimeout(function () { h.innerHTML = old; }, 3000);
+  });
+  function vidHint(x) {
+    var h = $('vh'); h.textContent = T('vh') + ' ';
+    var a = el('a', '', Tf('open', BXLive.VID_NAME[x.p])); a.href = BXLive.vidPage(x); a.target = '_blank'; a.rel = 'noopener'; h.appendChild(a);
+  }
+  function vidShow(x) {
+    var ok = x && window.BXLive && BXLive.vidOk(x), key = ok ? x.p + ':' + x.v : '';
+    if (key === VKEY) { if (ok && dlSaved() === undefined && x.dl !== DL) dlSet(x.dl, false); return; }
+    VKEY = key; VID = ok ? x : null;
+    var box = $('vid'); box.textContent = ''; $('vidc').hidden = !ok; document.body.classList.toggle('hasVid', !!ok);
+    if (!ok) { dlSet(0, false); return; }
+    var f = document.createElement('iframe'); f.src = BXLive.vidSrc(x, location.hostname); f.title = T('vid') + ' · ' + BXLive.VID_NAME[x.p];
+    f.setAttribute('allow', 'autoplay; fullscreen; encrypted-media; picture-in-picture'); f.setAttribute('allowfullscreen', ''); f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+    box.appendChild(f); vidHint(x);
+    var sv = dlSaved(); dlSet(sv !== undefined ? sv : (x.dl != null ? x.dl : BXLive.VID_DL[x.p]), false);
+    if (!vidCounted && window.BXTel) { vidCounted = true; try { BXTel.count('v_live_vid'); } catch (e) {} }
+  }
+  var unsubV = null;
+  function watchVid() {
+    if (unsubV) try { unsubV(); } catch (e) {}
+    unsubV = db.collection('livevid').doc(id).onSnapshot(function (snap) { vidShow(snap.exists ? snap.data() : null); }, function () {});
+  }
+  window.addEventListener('online', function () { net = true; watch(); watchVid(); });
   window.addEventListener('offline', function () { net = false; render(); });
   if (/[?&]tv=1/.test(location.search)) tvSet(true, false);
-  watch();
+  watch(); watchVid();
 })();
 </script>
 </body>

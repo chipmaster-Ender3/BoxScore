@@ -30,5 +30,56 @@
   }
   function active(d, now) { now = now || Date.now(); return !!(d && d.on && !d.endedAt && d.expAt > now); }
   function waText(name0, name1, u) { return name0 + ' x ' + name1 + ' · ' + u; }
-  root.BXLive = { SITE: SITE, LIVE_MS: LIVE_MS, AFTER_MS: AFTER_MS, base: base, url: url, newId: newId, line: line, active: active, waText: waText };
+  /* 7.82: vídeo da transmissão do jogador dentro da página ao vivo. livevid/{id do ao vivo} = { owner, p, v, dl, at }.
+     p: 'yt' (vídeo do YouTube), 'ytc' (canal do YouTube: mostra a live que estiver no ar), 'tw' (Twitch), 'kk' (Kick); v: id do vídeo ou do canal;
+     dl: atraso do vídeo em segundos (a página ao vivo segura o placar esse tempo). Nunca guardamos o endereço colado: só p + v, e o
+     endereço do player é montado aqui, sempre num destes três sites. */
+  var VID_DL = { yt: 15, ytc: 15, tw: 10, kk: 10 }, VID_NAME = { yt: 'YouTube', ytc: 'YouTube', tw: 'Twitch', kk: 'Kick' };
+  var TW_RES = /^(directory|videos|settings|search|downloads|p|subscriptions|inventory|wallet|drops|turbo|jobs|login|signup)$/i;
+  var KK_RES = /^(categories|category|following|search|video|videos|clips|dashboard|login|signup|terms-of-service|privacy-policy)$/i;
+  // devolve { p, v } ou { err: 'handle' | 'site' | 'bad' }
+  function parseVid(s) {
+    s = String(s || '').trim(); if (!s) return null;
+    if (!/^[a-z]+:\/\//i.test(s)) s = 'https://' + s;
+    var u; try { u = new URL(s); } catch (e) { return { err: 'bad' }; }
+    var h = u.hostname.toLowerCase().replace(/^(www|m|music)\./, ''), parts = u.pathname.split('/').filter(Boolean), id;
+    var YT = /^[A-Za-z0-9_-]{11}$/;
+    if (h === 'youtu.be') { id = parts[0] || ''; return YT.test(id) ? { p: 'yt', v: id } : { err: 'bad' }; }
+    if (h === 'youtube.com' || h === 'youtube-nocookie.com') {
+      id = u.searchParams.get('v');
+      if (id && YT.test(id)) return { p: 'yt', v: id };
+      if (/^(live|embed|shorts|v)$/.test(parts[0] || '') && YT.test(parts[1] || '')) return { p: 'yt', v: parts[1] };
+      if (parts[0] === 'channel' && /^UC[A-Za-z0-9_-]{22}$/.test(parts[1] || '')) return { p: 'ytc', v: parts[1] };
+      if (parts[0] === 'embed' && parts[1] === 'live_stream' && /^UC[A-Za-z0-9_-]{22}$/.test(u.searchParams.get('channel') || '')) return { p: 'ytc', v: u.searchParams.get('channel') };
+      if ((parts[0] || '').charAt(0) === '@' || parts[0] === 'c' || parts[0] === 'user') return { err: 'handle' };
+      return { err: 'bad' };
+    }
+    if (h === 'twitch.tv' || h === 'player.twitch.tv') {
+      id = h === 'player.twitch.tv' ? (u.searchParams.get('channel') || '') : (parts[0] || '');
+      return /^[A-Za-z0-9_]{3,25}$/.test(id) && !TW_RES.test(id) ? { p: 'tw', v: id.toLowerCase() } : { err: 'bad' };
+    }
+    if (h === 'kick.com' || h === 'player.kick.com') {
+      id = parts[0] || '';
+      return /^[A-Za-z0-9_-]{3,25}$/.test(id) && !KK_RES.test(id) ? { p: 'kk', v: id.toLowerCase() } : { err: 'bad' };
+    }
+    return { err: 'site' };
+  }
+  function vidOk(x) { return !!(x && VID_DL[x.p] && /^[A-Za-z0-9_-]{2,30}$/.test(String(x.v || ''))); }
+  // endereço do player (iframe). host = domínio da página (o Twitch exige)
+  function vidSrc(x, host) {
+    if (!vidOk(x)) return '';
+    var v = encodeURIComponent(x.v);
+    if (x.p === 'yt') return 'https://www.youtube.com/embed/' + v + '?autoplay=1&mute=1&playsinline=1&rel=0';
+    if (x.p === 'ytc') return 'https://www.youtube.com/embed/live_stream?channel=' + v + '&autoplay=1&mute=1&playsinline=1';
+    if (x.p === 'tw') return 'https://player.twitch.tv/?channel=' + v + '&parent=' + encodeURIComponent(host || 'localhost') + '&muted=true&autoplay=true';
+    return 'https://player.kick.com/' + v + '?muted=true&autoplay=true';
+  }
+  // endereço para abrir no site/app da plataforma (quando o vídeo não pode ser incorporado)
+  function vidPage(x) {
+    if (!vidOk(x)) return '';
+    var v = encodeURIComponent(x.v);
+    return x.p === 'yt' ? 'https://www.youtube.com/watch?v=' + v : x.p === 'ytc' ? 'https://www.youtube.com/channel/' + v + '/live' : x.p === 'tw' ? 'https://www.twitch.tv/' + v : 'https://kick.com/' + v;
+  }
+  root.BXLive = { SITE: SITE, LIVE_MS: LIVE_MS, AFTER_MS: AFTER_MS, base: base, url: url, newId: newId, line: line, active: active, waText: waText,
+    VID_DL: VID_DL, VID_NAME: VID_NAME, parseVid: parseVid, vidOk: vidOk, vidSrc: vidSrc, vidPage: vidPage };
 })(typeof self !== 'undefined' ? self : this);
