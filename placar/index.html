@@ -1152,7 +1152,7 @@ html.nfy .bar { padding-right: max(230px, env(safe-area-inset-right, 0px)); }
       <div class="actions"><button class="btn" type="button" id="sManage">Gerenciar dados salvos</button></div>
       <label class="check srow"><span class="sic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><input type="checkbox" id="sTel"> Enviar estatísticas de uso</label>
       <span class="hint" id="sTelHint">Só contagens anônimas de uso dos recursos (ex.: quantas partidas, se usou a pulseira), para melhorar o app. Nunca nomes, placares, mensagens, fotos ou local.</span>
-      <p class="note" id="verNote">BoxScore Beta 7.84 · Placar 4.67.0</p>
+      <p class="note" id="verNote">BoxScore Beta 7.86 · Placar 4.67.1</p>
     </div>
     <div class="actions"><button class="btn primary" type="button" data-close>Pronto</button></div>
   </div>
@@ -1852,7 +1852,7 @@ try { I18N.applyDom(); } catch (e) {}
       .sort(function (a, b) { return a[0] - b[0]; });
     var hh = function (t) { var d = new Date(t), z = function (n) { return (n < 10 ? '0' : '') + n; }; return z(d.getDate()) + '/' + z(d.getMonth() + 1) + ' ' + z(d.getHours()) + ':' + z(d.getMinutes()) + ':' + z(d.getSeconds()); };
     var ua = (navigator.userAgent || '').replace(/^.*?\(([^)]*)\).*$/, '$1');
-    return ['BoxScore 7.84 · ' + ua].concat(rows.map(function (r) {
+    return ['BoxScore 7.86 · ' + ua].concat(rows.map(function (r) {
       return hh(r[0]) + ' ' + r[1] + (r[1] === 'tick' ? ' x' + r[2] + ' até ' + hh(r[3]).slice(6) : (r[2] ? ' ' + r[2] : ''));
     })).join('\n');
   }
@@ -4868,7 +4868,10 @@ try { I18N.applyDom(); } catch (e) {}
     var h = (P.history || []).filter(function (x) { return x.tour && x.tour.gid && x.tour.tid && (x.endedAt || 0) > Date.now() - 30 * 864e5; })[0];
     return h ? h.tour : null;
   }
-  $('bTour').addEventListener('click', function () { tel('p_tour'); closeSheets(); if (window.BXMods) BXMods.mark('rede'); try { sessionStorage.setItem('bx.comp', String(Date.now())); } catch (e) {} location.href = '../rede/#comp'; });
+  // 7.86: não fecha o Mais antes de sair: fechar dispara o history.back() do voltar do Android e, no Chrome, isso cancelava a ida à Comunidade.
+  // Com o Mais armado no histórico, troca essa entrada pela Comunidade (location.replace): o voltar de lá cai no Placar, sem o Mais.
+  $('bTour').addEventListener('click', function () { tel('p_tour'); if (window.BXMods) BXMods.mark('rede'); try { sessionStorage.setItem('bx.comp', String(Date.now())); } catch (e) {}
+    var u = '../rede/#comp'; if (SHNAV.armed) { SHNAV.armed = false; location.replace(u); } else location.href = u; });
   $('bMore').addEventListener('click', function () { $('bTour').hidden = !myComp() && !myTour(); moreDot(); Array.prototype.forEach.call(document.querySelectorAll('#shMore .moreG'), function (g) { g.hidden = !Array.prototype.some.call(g.querySelectorAll('.btn'), function (b) { return !b.hidden; }); }); openSheet('shMore'); });
   $('shMore').addEventListener('click', function (e) { var b = e.target.closest ? e.target.closest('.moreGrid .btn') : null; if (b) setTimeout(function () { var o = $('shMore'); if (o && !o.hidden && b.id !== 'bSet' && b.id !== 'bHist' && b.id !== 'bProf') o.hidden = true; }, 0); });
   function moreDot() { var warn = $('bBand') && $('bBand').classList.contains('bwarn'); $('bMore').classList.toggle('bnote', !!warn); }
@@ -5363,7 +5366,7 @@ try { I18N.applyDom(); } catch (e) {}
     b.disabled = true; err.textContent = '';
     var doc = { topic: $('ctTopic').value, msg: msg.slice(0, 2000), email: em.slice(0, 120), uid: sy.user ? sy.user.uid : null,
       name: String((P.sync.acct && P.sync.acct.name) || '').slice(0, 80), lang: String(P.settings.lang || 'pt-BR').slice(0, 8),
-      build: '7.84', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
+      build: '7.86', plat: String(window.BX_NATIVE || 'web').slice(0, 12), at: firebase.firestore.FieldValue.serverTimestamp() };
     sy.db.collection('contact').add(doc).then(function () {
       b.disabled = false; $('ctMsg').value = ''; closeSheets(); showToast(T("Mensagem enviada. Obrigado! Responderemos pelo e-mail informado."));
     }, function (e) { b.disabled = false; err.textContent = Tf("Não foi possível enviar ({0}). Tente de novo.", (e && e.code) || T("erro")); });
@@ -6194,7 +6197,7 @@ try { I18N.applyDom(); } catch (e) {}
   // Beta 7.8: telemetria de uso (shared/telemetry.js) e versão da ponte do app nativo na linha de versão
   try {
     if (window.BXTel) {
-      BXTel.init({ module: 'placar', build: '7.84', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
+      BXTel.init({ module: 'placar', build: '7.86', lang: P.settings.lang || 'pt-BR', getDb: function () { return sy.ready ? sy.db : null; }, getUid: function () { return P.sync.signedIn && sy.user ? sy.user.uid : null; } });
       tel('p_open');
       $('sTel').checked = BXTel.isOn();
       $('sTel').addEventListener('change', function () { BXTel.setOn(this.checked); showToast(this.checked ? T("Estatísticas de uso ligadas. Obrigado!") : T("Estatísticas de uso desligadas.")); });

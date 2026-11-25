@@ -265,7 +265,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
 (function () {
   'use strict';
   BXMods.mark('rede');
-  var VERSION = '0.69.0';
+  var VERSION = '0.70.0';
   var FB_CFG = { apiKey: 'AIzaSyD_L90YxJAVRuTfPqwNbETJlbV9BYdnuYI', authDomain: 'boxsocore.firebaseapp.com', projectId: 'boxsocore', storageBucket: 'boxsocore.firebasestorage.app', messagingSenderId: '639383913161', appId: '1:639383913161:web:a9bb75fcf99f4b03378318' };
   var FB_VER = '10.12.2', FB_LIBS = ['app', 'auth', 'firestore'];
   var HOUR = 3600000;
@@ -823,7 +823,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     return loadFB().then(function () {
       firebase.initializeApp(FB_CFG);
       S.auth = firebase.auth(); S.db = firebase.firestore();
-      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.84', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
+      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.86', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
       try { S.db.settings({ experimentalAutoDetectLongPolling: true, merge: true }); } catch (e) {}
       try { S.auth.getRedirectResult().catch(function () {}); } catch (e) {}
       S.auth.onAuthStateChanged(function (u) { if (!u || (RT.uid && RT.uid !== u.uid)) rtStop(); S.user = u || null; paintGate(); if (u) { loadFriends(); loadFollows(); loadBlocks().then(reload); ensureProfile(); } });
@@ -2346,7 +2346,17 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
   // 7.63: sugestão de parceiros. Sem servidor, a lista sai de quem já está perto de você no app (amigos, membros dos seus grupos,
   // quem você segue ou te segue, quem já jogou com você). Pontua: nível (calculado; sem ele, o declarado) 35%, proximidade
   // (bairro > cidade > estado) 25%, atividade nos últimos 30 dias 20% e equilíbrio de vitórias, sets e games 20%.
+  // 7.85: + desconhecidos que podem ser encontrados na busca, do mesmo bairro (e, se faltar, da mesma cidade), escolhidos no
+  // servidor (functions/src/suggest.ts: suggestPlayers). Ordem final: bairro, depois cidade, depois o resto; dentro de cada um, a nota.
   var SUG = { at: 0, list: null, busy: false };
+  var SUG_URL = 'https://southamerica-east1-boxsocore.cloudfunctions.net/suggestPlayers';
+  function srvSug() {
+    if (!S.user || typeof S.user.getIdToken !== 'function' || typeof fetch !== 'function') return Promise.resolve([]);
+    return S.user.getIdToken().then(function (tk) {
+      return fetch(SUG_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tk }, body: JSON.stringify({ data: {} }) });
+    }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { var l = j && j.result && j.result.list; return Array.isArray(l) ? l : []; })
+      .catch(function () { return []; });
+  }
   function loadSug() {
     if (SUG.busy || (SUG.list && Date.now() - SUG.at < 600000)) return SUG;
     SUG.busy = true; SUG.list = null; var me0 = S.user.uid, pool = {};
@@ -2361,9 +2371,14 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
       var b = (frs[u] || u === me0) ? S.db.collection('profFriends').doc(u).get().then(function (d) { return d.exists ? d.data() : null; }, function () { return null; }) : Promise.resolve(null);
       return Promise.all([a, b]).then(function (r) { return r[0] || r[1] ? Object.assign({}, r[0] || {}, r[1] || {}) : null; });
     }
+    var srv = {};
     S.db.collection('follows').where('to', '==', me0).limit(60).get().then(function (r) { r.docs.forEach(function (d) { add(d.data().from, ''); }); }, function () {})
       .then(function () {
-        var ids = Object.keys(pool).slice(0, 80);
+        var net = Object.keys(pool).slice(0, 80);
+        return srvSug().then(function (l) { l.forEach(function (x) { if (x && typeof x.uid === 'string' && !pool[x.uid]) { add(x.uid, x.name); if (pool[x.uid] !== undefined) srv[x.uid] = x.near; } }); return net; });
+      })
+      .then(function (net) {
+        var ids = net.concat(Object.keys(srv).filter(function (u) { return net.indexOf(u) < 0; }));
         return Promise.all([prof(me0)].concat(ids.map(prof))).then(function (rs) {
           var me = rs[0] || {}, out = [];
           function rate(p) { return typeof p.lvR === 'number' ? p.lvR : (typeof p.lvD === 'number' ? p.lvD : null); }
@@ -2379,9 +2394,12 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
             var a = Math.min(8, +p.act30 || 0) / 8; sc += 0.2 * a; if ((+p.act30 || 0) >= 3) why.push(Tf('sg_act', p.act30));
             var ps = st(p); if (ms && ps) { var bal = 1 - (Math.abs(ms.w - ps.w) + Math.abs(ms.s - ps.s) + Math.abs(ms.g - ps.g)) / 3; sc += 0.2 * bal; if (bal > 0.85) why.push(T('sg_bal')); } else sc += 0.2 * 0.4;
             if (!why.length) why.push(frs[u] ? T('sg_friend') : T('sg_near'));
-            out.push({ uid: u, name: p.name, code: p.code || '', score: sc, why: why });
+            // 7.85: faixa de proximidade (bairro 0, cidade 1, resto 2); o servidor já conferiu o bairro/cidade de quem veio dele
+            var tier = px === 1 || srv[u] === 'hood' ? 0 : px >= 0.6 || srv[u] === 'city' ? 1 : 2;
+            if (srv[u] && !why.some(function (w) { return w === T('sg_hood') || w === T('sg_city'); })) why.unshift(T(srv[u] === 'hood' ? 'sg_hood' : 'sg_city'));
+            out.push({ uid: u, name: p.name, code: p.code || '', score: sc, why: why, tier: tier, srv: !!srv[u] });
           });
-          out.sort(function (a, b) { return b.score - a.score; });
+          out.sort(function (a, b) { return a.tier - b.tier || b.score - a.score; });
           SUG.list = out.slice(0, 12); SUG.at = Date.now();
         });
       }).catch(function () { SUG.list = []; }).then(function () { SUG.busy = false; tel('r_suggest'); paint(); });
