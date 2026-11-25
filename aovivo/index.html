@@ -9,7 +9,7 @@
 <link rel="icon" href="../icons/icon-192.png">
 <link rel="stylesheet" href="../fonts/fonts.css">
 <style>
-/* BoxScore — Placar ao vivo (aovivo 1.5.0, Beta 7.82; 7.82: vídeo da transmissão do jogador com o placar atrasado junto). Página pública: abre pelo link, sem login, e acompanha live/{id}. */
+/* BoxScore — Placar ao vivo (aovivo 1.5.1, Beta 7.83; 7.82: vídeo da transmissão do jogador com o placar atrasado junto). Página pública: abre pelo link, sem login, e acompanha live/{id}. */
 :root { --bg: #0E1A21; --card: #14252E; --ink: #F4F7F5; --ink2: #B9C6CC; --muted: #8FA3AC; --line: #24404D; --live: #D92D20; --ball: #D7F24A; --win: #D7F24A;
   --dsp: 'Big Shoulders Display', 'Arial Narrow', system-ui, sans-serif; --ui: 'Public Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
 @media (prefers-color-scheme: light) { :root { --bg: #F3F5F4; --card: #FFFFFF; --ink: #0B1418; --ink2: #3D4B52; --muted: #5E6E75; --line: #DCE3E2; --win: #2E6B00; } }
@@ -132,11 +132,22 @@ body.tv .tvc.show { opacity: 1; pointer-events: auto; }
 .vh { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
 .vh a { color: var(--ink2); }
 @media (min-width: 900px), (min-width: 700px) and (orientation: landscape) {
-  body.hasVid .lay { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr); gap: clamp(14px, 2vw, 24px); align-items: start; }
-  body.hasVid .vidc { margin-bottom: 0; position: sticky; top: 12px; }
-  body.hasVid .nm { font-size: clamp(22px, 2.6vw, 40px); } body.hasVid .c { font-size: clamp(22px, 2.6vw, 38px); } body.hasVid .c.pt { font-size: clamp(30px, 3.6vw, 54px); min-width: clamp(56px, 6vw, 96px); }
+  body.hasVid:not(.tv) .lay { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(360px, 1fr); gap: clamp(14px, 2vw, 24px); align-items: start; }
+  body.hasVid:not(.tv) .vidc { margin-bottom: 0; position: sticky; top: 12px; }
+  /* 7.82.1: coluna do placar estreita — nome quebra só entre palavras, selos (ace, break point) descem para baixo do nome, números menores */
+  body.hasVid:not(.tv) .who { flex-wrap: wrap; row-gap: 6px; }
+  body.hasVid:not(.tv) .nm { font-size: clamp(18px, 1.8vw, 30px); }
+  body.hasVid:not(.tv) .who .srv { align-self: center; }
+  body.hasVid:not(.tv) .aceF, body.hasVid:not(.tv) .stkF { margin-left: 0; font-size: clamp(12px, 1.2vw, 16px); }
+  body.hasVid:not(.tv) .cells { gap: clamp(6px, 1vw, 12px); padding-left: 8px; }
+  body.hasVid:not(.tv) .c { font-size: clamp(20px, 2.2vw, 34px); min-width: clamp(20px, 2.4vw, 34px); }
+  body.hasVid:not(.tv) .c.pt { font-size: clamp(28px, 3vw, 48px); min-width: clamp(52px, 5vw, 84px); padding: 4px 6px; }
 }
 body.tv .lay { display: contents; } body.tv .vidc { display: none; }
+/* 7.82.1: em qualquer largura, nome não quebra no meio da palavra; o selo (ace, break point) desce para baixo do nome se não couber */
+.who { flex-wrap: wrap; row-gap: 6px; } .nm { overflow-wrap: break-word; flex: 1 1 0; }   /* base 0: o nome fica na linha da bolinha do saque; não encolhe abaixo da maior palavra */
+.who .aceF, .who .stkF { margin-left: 0; }
+body.tv .who { flex-wrap: nowrap; } body.tv .nm { flex: 0 1 auto; } body.tv .aceF, body.tv .stkF { margin-left: 1.4vw; }
 </style>
 </head>
 <body>
@@ -370,7 +381,7 @@ body.tv .lay { display: contents; } body.tv .vidc { display: none; }
   // 7.52: contagem anônima de quem abriu o link (uma vez por transmissão por dia neste aparelho; sem conta, sem nomes nem placar)
   try {
     if (window.BXTel) {
-      BXTel.init({ module: 'aovivo', build: '7.82', lang: LG, getDb: function () { return db; }, getUid: function () { return null; } });
+      BXTel.init({ module: 'aovivo', build: '7.83', lang: LG, getDb: function () { return db; }, getUid: function () { return null; } });
       var sk = 'boxscore.live.seen', seen = {}; try { seen = JSON.parse(localStorage.getItem(sk) || '{}') || {}; } catch (e) {}
       var dd = new Date().toISOString().slice(0, 10);
       if (seen[id] !== dd) { seen[id] = dd; Object.keys(seen).forEach(function (k) { if (seen[k] !== dd) delete seen[k]; }); try { localStorage.setItem(sk, JSON.stringify(seen)); } catch (e) {} BXTel.count('v_live_open'); }
