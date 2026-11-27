@@ -227,9 +227,9 @@
   function sessionTake() { if (!S) return JSON.stringify({ ok: false }); var o = { ok: true, changed: S.changed, points: S.n, G: S.G }; return JSON.stringify(o); }
 
   /* 7.87: pronúncia só no texto que vai para a voz (a tela continua "ACE"). Cada voz lê do seu jeito:
-     a grafia fonética por idioma faz o "ace" soar como em inglês ("êis"). Para ajustar outra palavra, acrescente aqui. */
+     a grafia fonética por idioma faz o "ace" soar como em inglês ("eis", que se lê "êis"). Para ajustar outra palavra, acrescente aqui. */
   var SAY = {
-    'pt-BR': [[/\bace\b/gi, 'êis']],
+    'pt-BR': [[/\bace\b/gi, 'eis']],   // 7.92: sem acento (a voz Luciana, da Apple, lia o "circunflexo"); "eis" já soa "êis"
     es: [[/\bace\b/gi, 'eis']],
     fr: [[/\bace\b/gi, 'esse']]
   };
