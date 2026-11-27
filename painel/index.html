@@ -8,7 +8,7 @@
 <link rel="icon" href="../icons/icon-192.png">
 <link rel="stylesheet" href="../fonts/fonts.css">
 <style>
-/* BoxScore — Painel "Uso do app" (painel 1.0.9, Beta 7.63). Só para a equipe: lê a coleção telemetry. */
+/* BoxScore — Painel "Uso do app" (painel 1.1.0, Beta 7.88). Só para a equipe: lê a coleção telemetry e (7.88) as mensagens do Fale conosco. */
 :root { --bg: #f4f6f7; --card: #fcfcfb; --ink: #0b0b0b; --ink2: #52514e; --muted: #6b6a66; --line: #e2e1dc; --grid: #ecebe6;
   --s1: #2a78d6; --s2: #eb6834; --chip: #0a1014; --chipInk: #fff; color-scheme: light dark; }
 @media (prefers-color-scheme: dark) { :root { --bg: #0f0f0e; --card: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --muted: #9a998f; --line: #2e2e2b; --grid: #262624;
@@ -64,6 +64,13 @@ tr.zero td { color: var(--muted); }
 ol.steps { text-align: left; color: var(--ink2); }
 .foot { color: var(--muted); font-size: 12px; margin-top: 18px; }
 .err { color: #d03b3b; }
+/* 7.88: mensagens do Fale conosco */
+.msgi { border-top: 1px solid var(--grid); padding: 12px 0; }
+.msgi:first-child { border-top: 0; }
+.msgi .h { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; font-size: 13px; color: var(--ink2); }
+.msgi .h b { color: var(--ink); font-size: 15px; }
+.msgi .t { white-space: pre-wrap; margin: 6px 0; overflow-wrap: anywhere; }
+.msgi .att { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0; }
 [hidden] { display: none !important; }
 </style>
 </head>
@@ -132,13 +139,17 @@ ol.steps { text-align: left; color: var(--ink2); }
       <div class="card"><h2>Versão e idioma</h2><div id="tbBuild"></div><div id="tbLang" style="margin-top:12px"></div></div>
     </div>
 
+    <div class="card" id="msgs" style="margin-top:14px"><h2>Mensagens do Fale conosco</h2>
+      <p class="sub">As 30 mais recentes. Os anexos (PDF, JPG ou PNG) abrem numa aba nova. Apagar remove a mensagem e os anexos.</p>
+      <div class="bar"><button id="msgLoad">Carregar mensagens</button></div><p class="err" id="msgErr"></p><div id="msgList"></div></div>
+
     <p class="foot" id="foot"></p>
   </section>
 </main>
 <script>
 /* 7.45: ao abrir, confere se a versão publicada é outra; se for, apaga a cópia guardada e recarrega uma vez (o painel não passa pela atualização de módulos do Placar). */
 (function () {
-  var CUR = '1.0.13', base = location.pathname.replace(/[^\/]*$/, '');
+  var CUR = '1.1.0', base = location.pathname.replace(/[^\/]*$/, '');
   if (!window.fetch || !window.caches) return;
   fetch(base + 'index.html?v=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (t) {
     var m = /painel (\d+\.\d+\.\d+)/.exec(t); if (!m || m[1] === CUR) return;
@@ -167,7 +178,7 @@ ol.steps { text-align: left; color: var(--ink2); }
     r_open: 'Abriu a Comunidade', r_tab_feed: 'Aba Feed', r_tab_find: 'Aba Buscar', r_tab_neu: 'Botão +', r_tab_groups: 'Aba Grupos',
     r_tab_notif: 'Aba Início/Avisos', r_game_new: 'Criou jogo', r_game_accept: 'Aceitou jogo', r_post: 'Publicou', r_post_photo: 'Publicou com foto',
     r_like: 'Curtiu', r_comment: 'Comentou', r_msg: 'Enviou mensagem', r_follow: 'Seguiu alguém', r_suggest: 'Viu jogadores sugeridos', r_tor_hdr: 'Abriu torneio pelo troféu', p_tour: 'Abriu o torneio pelo Placar', p_stream: 'Configurou o placar para transmissão', v_overlay: 'Placar aberto num app de transmissão', r_live_open: 'Abriu um ao vivo pela Comunidade', v_live_open: 'Abriu o link do ao vivo', v_live_tv: 'Usou o modo TV', r_group_new: 'Criou grupo',
-    r_group_join: 'Entrou em grupo', r_result: 'Lançou resultado', r_tour_new: 'Criou torneio (chaves)', r_tour_join: 'Entrou em torneio', r_settings: 'Abriu Ajustes da Comunidade', r_dmrq: 'Pediu conversa (não amigo)', r_dmrq_ok: 'Aceitou pedido de conversa', p_live_vid: 'Ao vivo: pôs o vídeo da transmissão', v_live_vid: 'Ao vivo: assistiu com vídeo'
+    r_group_join: 'Entrou em grupo', r_result: 'Lançou resultado', r_tour_new: 'Criou torneio (chaves)', r_tour_join: 'Entrou em torneio', r_settings: 'Abriu Ajustes da Comunidade', r_dmrq: 'Pediu conversa (não amigo)', p_acct_pause: 'Pausou a conta', p_acct_del: 'Pediu exclusão da conta', p_acct_back: 'Reativou a conta / desistiu da exclusão', r_dmrq_ok: 'Aceitou pedido de conversa', p_live_vid: 'Ao vivo: pôs o vídeo da transmissão', v_live_vid: 'Ao vivo: assistiu com vídeo'
   };
   var PLAT = { android: 'App Android', ios: 'App iPhone', pwa: 'Instalado (PWA)', web: 'Navegador', '': 'Não informado' };
   var $ = function (id) { return document.getElementById(id); };
@@ -222,6 +233,50 @@ ol.steps { text-align: left; color: var(--ink2); }
   });
   $('reload').addEventListener('click', function () { load(); });
   $('csv').addEventListener('click', exportCsv);
+  // 7.88: mensagens do Fale conosco (contact) com anexos (contact/{id}/files: partes em base64)
+  var TOPIC = { duvida: 'Dúvida', problema: 'Problema no app', sugestao: 'Sugestão', privacidade: 'Privacidade e dados (LGPD)', excluir: 'Excluir conta', denuncia: 'Denúncia', outro: 'Outro' };
+  $('msgLoad').addEventListener('click', loadMsgs);
+  function loadMsgs() {
+    var b = $('msgLoad'); b.disabled = true; b.textContent = 'Carregando…'; $('msgErr').textContent = '';
+    S.db.collection('contact').orderBy('at', 'desc').limit(30).get().then(function (snap) {
+      var host = $('msgList'); host.innerHTML = '';
+      if (!snap.docs.length) host.innerHTML = '<p class="unused">Nenhuma mensagem.</p>';
+      snap.docs.forEach(function (d) { host.appendChild(msgItem(d)); });
+    }, function (e) { $('msgErr').textContent = 'Não foi possível carregar (' + ((e && e.code) || 'erro') + '). Confira se as regras da 7.88 foram publicadas.'; })
+      .then(function () { b.disabled = false; b.textContent = 'Atualizar mensagens'; });
+  }
+  function msgItem(d) {
+    var x = d.data() || {}, at = x.at && x.at.toDate ? x.at.toDate() : (x.at ? new Date(x.at) : null), el = document.createElement('div'); el.className = 'msgi';
+    el.innerHTML = '<div class="h"><b>' + esc(TOPIC[x.topic] || x.topic) + '</b><span>' + esc(at ? at.toLocaleString('pt-BR') : '') + '</span><span>' + esc(x.name || '') + ' &lt;' + esc(x.email || '') + '&gt;</span><span>' + esc(x.uid ? 'conta ' + x.uid : 'sem login') + '</span><span>' + esc([x.build, x.plat, x.lang].filter(Boolean).join(' · ')) + '</span></div>' +
+      '<div class="t">' + esc(x.msg || '') + '</div>';
+    var att = document.createElement('div'); att.className = 'att';
+    (x.files || []).forEach(function (f, fi) {
+      var bt = document.createElement('button'); bt.type = 'button'; bt.textContent = '📎 ' + (f.n || ('anexo ' + (fi + 1))) + ' (' + Math.max(1, Math.round((f.s || 0) / 1024)) + ' kB)';
+      bt.addEventListener('click', function () { openFile(d.ref, fi, f, bt); }); att.appendChild(bt);
+    });
+    var del = document.createElement('button'); del.type = 'button'; del.textContent = 'Apagar'; var armed = false;
+    del.addEventListener('click', function () {
+      if (!armed) { armed = true; del.textContent = 'Toque de novo para apagar'; setTimeout(function () { armed = false; del.textContent = 'Apagar'; }, 3000); return; }
+      del.disabled = true;
+      d.ref.collection('files').get().then(function (fs) { return Promise.all(fs.docs.map(function (z) { return z.ref.delete(); })); }).then(function () { return d.ref.delete(); })
+        .then(function () { el.remove(); }, function (e) { del.disabled = false; $('msgErr').textContent = 'Não foi possível apagar (' + ((e && e.code) || 'erro') + ').'; });
+    });
+    att.appendChild(del); el.appendChild(att);
+    return el;
+  }
+  function openFile(ref, fi, f, bt) {
+    var w = window.open('', '_blank'); bt.disabled = true;
+    ref.collection('files').get().then(function (fs) {
+      var parts = fs.docs.map(function (z) { return z.data(); }).filter(function (z) { return z.f === fi; }).sort(function (a, b) { return a.i - b.i; });
+      if (!parts.length) throw { code: 'sem-partes' };
+      var bin = atob(parts.map(function (z) { return z.d; }).join('')), u8 = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+      var type = /^(application\/pdf|image\/jpeg|image\/png)$/.test(f.t) ? f.t : 'application/octet-stream';
+      var url = URL.createObjectURL(new Blob([u8], { type: type }));
+      if (w) w.location.href = url; else location.href = url;
+    }).catch(function (e) { if (w) w.close(); $('msgErr').textContent = 'Não foi possível abrir o anexo (' + ((e && e.code) || 'erro') + ').'; })
+      .then(function () { bt.disabled = false; });
+  }
 
   function load() {
     if (S.busy) return; S.busy = true; $('dataErr').textContent = ''; $('reload').disabled = true; $('reload').textContent = 'Carregando…';

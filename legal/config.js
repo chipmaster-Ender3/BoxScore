@@ -8,9 +8,9 @@ window.BX_LEGAL = {
   docId: '[CPF OU CNPJ]',                       // opcional para pessoa física; obrigatório para empresa
   city: '[CIDADE/UF]',                          // cidade/estado do responsável (foro)
   email: '',                                    // e-mail oficial; vazio = só o formulário do app (mensagens ficam no Firestore, coleção "contact")
-  updated: '18 de novembro de 2026',            // data por extenso (usada se updatedISO estiver vazio)
-  updatedISO: '2026-11-18',                     // data da versão (AAAA-MM-DD); cada idioma mostra no seu formato
-  version: '1.0',
+  updated: '27 de novembro de 2026',            // data por extenso (usada se updatedISO estiver vazio)
+  updatedISO: '2026-11-27',                     // data da versão (AAAA-MM-DD); cada idioma mostra no seu formato
+  version: '1.1',                               // 7.88: mudou → o app pede o aceite de novo
   minAgeNetwork: 18,                            // idade mínima para a Comunidade (recursos sociais)
-  deleteDays: 15                                // prazo para concluir pedidos de exclusão
+  deleteDays: 30                                // 7.88: prazo para desistir da exclusão (depois, o servidor apaga tudo)
 };

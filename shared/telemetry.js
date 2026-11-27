@@ -23,7 +23,9 @@
     // 7.81: pedido de conversa
     'r_dmrq', 'r_dmrq_ok',
     // 7.82: vídeo da transmissão na página ao vivo
-    'p_live_vid', 'v_live_vid'
+    'p_live_vid', 'v_live_vid',
+    // 7.88: pausar, excluir com prazo e voltar
+    'p_acct_pause', 'p_acct_del', 'p_acct_back'
   ];
   var OK = {}; KEYS.forEach(function (k) { OK[k] = 1; });
   var cfg = { module: '', build: '', lang: '', getDb: null, getUid: null }, timer = null, started = false;

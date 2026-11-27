@@ -21,6 +21,7 @@
     tiebreakPoints: 7,
     finalSet: 'same',         // 'same' | 'super' | 'advantage' (set decisivo; em 1 set vale para o 6-6: tie-break, super tie-break ou sem tie-break)
     stb: false,               // 7.59: a partida é só um super tie-break
+    stbPts: 0,                // 7.87: pontos desse tie-break único (0 = superTiebreakPoints; 7 = partida "Tie-break")
     superTiebreakPoints: 10,
     noAd: false,              // ponto decisivo no 40 iguais
     firstServer: 0
@@ -28,6 +29,8 @@
 
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
   function setsToWin(cfg) { return Math.ceil(cfg.bestOf / 2); }
+  // 7.87: partida "Tie-break" (um único tie-break de 7 pontos; o super TB é de 10)
+  function tb7(s) { return !!(s && s.cfg && s.cfg.stb && s.cfg.stbPts && s.cfg.stbPts < 10); }
 
   function isDeciding(s) {
     var n = setsToWin(s.cfg);
@@ -89,7 +92,7 @@
       winner: null,
       pointsPlayed: 0
     };
-    if (cfg.stb) { cfg.bestOf = 1; startTb(s, 'super', cfg.superTiebreakPoints, cfg.firstServer); }   // 7.59: só um super tie-break
+    if (cfg.stb) { cfg.bestOf = 1; startTb(s, 'super', cfg.stbPts || cfg.superTiebreakPoints, cfg.firstServer); }   // 7.59: só um super tie-break; 7.87: ou um tie-break de 7
     else startGame(s, cfg.firstServer);
     return s;
   }
@@ -276,7 +279,7 @@
       // lado do saque: direita (quadra de iguais) nos pontos pares, esquerda nos ímpares
       serveSide: (s.points[0] + s.points[1]) % 2 === 0 ? 'right' : 'left',
       tiebreak: !!s.tb,
-      tbKind: s.tb ? (s.tb.kind === 'normal' && s.tb.target >= 10 ? 'super' : s.tb.kind) : null, deuce: false, advantage: null, deciding: false,
+      tbKind: s.tb ? (s.tb.kind === 'normal' && s.tb.target >= 10 ? 'super' : s.tb.kind === 'super' && s.tb.target < 10 ? 'normal' : s.tb.kind) : null, deuce: false, advantage: null, deciding: false,
       winner: s.winner, matchPoint: null, setPoint: null
     };
     if (s.winner !== null) { out.points = ['', '']; return out; }
@@ -330,14 +333,14 @@
       out.push(Tf("Fim de jogo. Vitória de {0}.", nm(w)));
       out.push(s.sets.map(function (r) {
         return r.kind === 'super'
-          ? Tf("super tie-break {0} a {1}", num(r.tb[w]), num(r.tb[1 - w]))
+          ? Tf(tb7(s) ? "tie-break {0} a {1}" : "super tie-break {0} a {1}", num(r.tb[w]), num(r.tb[1 - w]))
           : num(r.games[w]) + ' a ' + num(r.games[1 - w]);
       }).join(', ') + '.');
       return out;
     }
     if (st) {
       var sw = st.winner;
-      if (st.kind === 'super') out.push(Tf("Super tie-break para {0}, {1} a {2}.", nm(sw), num(st.tb[sw]), num(st.tb[1 - sw])));
+      if (st.kind === 'super') out.push(Tf(tb7(s) ? "Tie-break para {0}, {1} a {2}." : "Super tie-break para {0}, {1} a {2}.", nm(sw), num(st.tb[sw]), num(st.tb[1 - sw])));
       else out.push(Tf("Set para {0}, {1} a {2}.", nm(sw), num(st.games[sw]), num(st.games[1 - sw])));
     } else if (g) {
       var gw = g.winner;
@@ -408,7 +411,8 @@
     endMatch: endMatch,
     undo: undo,
     display: display,
-    announce: announce
+    announce: announce,
+    isTb7: tb7
   };
 });
 

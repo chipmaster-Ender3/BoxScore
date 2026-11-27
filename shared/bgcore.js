@@ -156,6 +156,7 @@
     S.changed = true; S.n++;
     out.ok = true; out.changed = true; out.over = S.G.state.winner !== null; out.info = info(S.G);
     if (S.settings.voice === false) out.parts = [];
+    out.parts = out.parts.map(say);
     return out;
   }
   function sessionGesture(id, code, now) {
@@ -225,7 +226,21 @@
   }
   function sessionTake() { if (!S) return JSON.stringify({ ok: false }); var o = { ok: true, changed: S.changed, points: S.n, G: S.G }; return JSON.stringify(o); }
 
+  /* 7.87: pronúncia só no texto que vai para a voz (a tela continua "ACE"). Cada voz lê do seu jeito:
+     a grafia fonética por idioma faz o "ace" soar como em inglês ("êis"). Para ajustar outra palavra, acrescente aqui. */
+  var SAY = {
+    'pt-BR': [[/\bace\b/gi, 'êis']],
+    es: [[/\bace\b/gi, 'eis']],
+    fr: [[/\bace\b/gi, 'esse']]
+  };
+  function say(t, lang) {
+    var l = lang || (typeof I18N !== 'undefined' && I18N.lang ? I18N.lang() : 'pt-BR'), r = SAY[l], out = String(t == null ? '' : t);
+    if (r) r.forEach(function (x) { out = out.replace(x[0], function (m) { return m.charAt(0) === m.charAt(0).toUpperCase() ? x[1].charAt(0).toUpperCase() + x[1].slice(1) : x[1]; }); });   // mantém a maiúscula
+    return out;
+  }
+
   return {
+    say: say, SAY: SAY,
     LOCK_MS: LOCK_MS, MODES: MODES, GN: GN,
     spokenDur: spokenDur, restLine: restLine, speakNames: speakNames, alertInfo: alertInfo, alertText: alertText, serveLine: serveLine, setText: setText,
     applyPoint: applyPoint, applyUndo: applyUndo, info: info,

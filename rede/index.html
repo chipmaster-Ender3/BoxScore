@@ -120,6 +120,7 @@ header.hero #navBack{align-self:flex-start;flex:none;width:44px;height:44px;min-
 /* 7.68: País › Estado › Cidade › Bairro (shared/geo.js) */
 .geobox .geo{display:grid;gap:10px}.geobox .geo-sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.geobox .geo-sug:empty{display:none}.geobox .geo-sug .btn{min-height:38px;padding:0 14px;font-size:14px;font-weight:600}.geobox .geo-add{border-style:dashed}.geobox .geo-none{color:var(--muted);font:600 13px var(--ui);align-self:center}.geobox .geo-msg{color:var(--muted);font:500 12px var(--ui)}.geobox .geo-msg:empty{display:none}.geobox select,.geobox input{min-width:0}
 </style>
+<script src="../legal/config.js"></script>
 <script src="../shared/modules.js"></script>
 <script src="../shared/profile-view.js"></script>
 <script src="../shared/telemetry.js"></script>
@@ -246,7 +247,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
 </head><body>
 <main>
 <header id="hdr" class="hero"><button class="btn" id="navBack" type="button" hidden>←</button><div class="htx"><small id="kick">BoxScore</small><h1 id="ttl"></h1></div><small id="ver"></small><button class="btn" id="torB" type="button" hidden></button><button class="btn" id="chatB" type="button" hidden></button><button class="btn" id="setB" type="button" hidden></button><button class="btn" id="back" type="button"></button></header>
-<div id="gate" class="card" hidden><div class="sub" id="gateT"></div><button class="btn pri" id="login" type="button"></button><div class="msg" id="gateE" hidden></div></div>
+<div id="gate" class="card" hidden><div class="sub" id="gateT"></div><label class="sub" id="gateTerms" style="display:flex;gap:10px;align-items:center;margin:10px 0"><input type="checkbox" id="gateChk" style="width:22px;height:22px;flex:none"><span id="gateTermsT"></span></label><button class="btn pri" id="login" type="button" disabled></button><div class="msg" id="gateE" hidden></div></div>
 <div id="app" hidden>
 <nav class="tabs" id="tabs"></nav>
 <div class="seg" id="jSeg" hidden></div>
@@ -265,7 +266,7 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
 (function () {
   'use strict';
   BXMods.mark('rede');
-  var VERSION = '0.70.0';
+  var VERSION = '0.72.0';
   var FB_CFG = { apiKey: 'AIzaSyD_L90YxJAVRuTfPqwNbETJlbV9BYdnuYI', authDomain: 'boxsocore.firebaseapp.com', projectId: 'boxsocore', storageBucket: 'boxsocore.firebasestorage.app', messagingSenderId: '639383913161', appId: '1:639383913161:web:a9bb75fcf99f4b03378318' };
   var FB_VER = '10.12.2', FB_LIBS = ['app', 'auth', 'firestore'];
   var HOUR = 3600000;
@@ -662,9 +663,15 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     "fr": {"cp_none": "Aucun tournoi actif ni classement pour le moment.", "tor_hb": "Tournois et classements", "cp_t": "Tournois et classements", "cp_tor": "Tournois", "cp_rk": "Classements", "cp_na": "Pas encore de points", "cp_lead": "En tête"},
     "de": {"cp_none": "Noch kein aktives Turnier und keine Rangliste.", "tor_hb": "Turniere und Ranglisten", "cp_t": "Turniere und Ranglisten", "cp_tor": "Turniere", "cp_rk": "Ranglisten", "cp_na": "Noch keine Punkte", "cp_lead": "Spitze"}};
   Object.keys(KJ23).forEach(function (l) { if (D[l]) Object.assign(D[l], KJ23[l]); });
+  // 7.87: dicionário novo
+  var KJ25 = {"pt-BR": {"tf_tb7": "Só TB", "tf_stb7": "só tie-break de 7", "tf_h_tb7": "A partida é um único tie-break de 7 pontos (vence quem fizer 7 com 2 de vantagem)."}, "pt-PT": {"tf_tb7": "Só TB", "tf_stb7": "só tie-break de 7", "tf_h_tb7": "A partida é um único tie-break de 7 pontos (ganha quem fizer 7 com 2 de vantagem)."}, "en": {"tf_tb7": "TB only", "tf_stb7": "7-point tie-break only", "tf_h_tb7": "The match is a single 7-point tie-break (first to 7, winning by 2)."}, "es": {"tf_tb7": "Solo TB", "tf_stb7": "solo tie-break a 7", "tf_h_tb7": "El partido es un único tie-break a 7 puntos (gana quien llegue a 7 con 2 de ventaja)."}, "fr": {"tf_tb7": "TB seul", "tf_stb7": "tie-break en 7 seul", "tf_h_tb7": "Le match se joue en un seul tie-break en 7 points (le premier à 7 avec 2 points d'écart)."}, "de": {"tf_tb7": "Nur TB", "tf_stb7": "nur Tie-Break bis 7", "tf_h_tb7": "Das Match ist ein einziger Tie-Break bis 7 (wer zuerst 7 Punkte mit 2 Vorsprung hat)."}};
+  Object.keys(KJ25).forEach(function (l) { if (D[l]) Object.assign(D[l], KJ25[l]); });
   // 7.81: pedido de conversa para quem não é amigo
   var KJ24 = {"pt-BR": {"rq_send": "Enviar pedido", "rq_ph": "Escreva o pedido (só texto)...", "rq_h_req": "Vocês ainda não são amigos. Mande um pedido de conversa: uma mensagem só, de texto. Se {0} aceitar, vocês conversam normalmente.", "rq_h_sent": "Pedido enviado. Quando {0} aceitar, vocês conversam normalmente.", "rq_h_again": "{0} ainda não aceitou o seu pedido. Já se passaram 30 dias: você pode mandar outro.", "rq_h_in": "{0} quer conversar com você e ainda não é seu amigo. Se aceitar, vocês conversam normalmente; se recusar, {0} não fica sabendo. Para bloquear ou denunciar, toque em ⋯.", "rq_h_none": "{0} não recebe pedidos de conversa. Para conversar, adicione como amigo.", "rq_h_grp": "{0} só recebe pedidos de conversa de quem está no mesmo grupo. Para conversar, adicione como amigo.", "rq_ok": "Aceitar", "rq_no": "Recusar", "rq_ok_t": "Pronto: agora vocês podem conversar.", "rq_no_t": "Pedido recusado.", "rq_fail": "Não deu para enviar o pedido.", "rq_list": "Pedidos de conversa", "rq_sent_s": "Pedido enviado", "s_dmq": "Quem pode me pedir conversa", "s_dmq_h": "Vale para quem não é seu amigo. Amigos e jogadores do mesmo jogo sempre podem conversar com você.", "s_dmq_all": "Todos", "s_dmq_grp": "Meus grupos", "s_dmq_none": "Ninguém"}, "pt-PT": {"rq_send": "Enviar pedido", "rq_ph": "Escreva o pedido (só texto)...", "rq_h_req": "Ainda não são amigos. Envie um pedido de conversa: uma única mensagem, só de texto. Se {0} aceitar, podem conversar normalmente.", "rq_h_sent": "Pedido enviado. Quando {0} aceitar, podem conversar normalmente.", "rq_h_again": "{0} ainda não aceitou o seu pedido. Já passaram 30 dias: pode enviar outro.", "rq_h_in": "{0} quer conversar consigo e ainda não é seu amigo. Se aceitar, podem conversar normalmente; se recusar, {0} não fica a saber. Para bloquear ou denunciar, toque em ⋯.", "rq_h_none": "{0} não recebe pedidos de conversa. Para conversar, adicione como amigo.", "rq_h_grp": "{0} só recebe pedidos de conversa de quem está no mesmo grupo. Para conversar, adicione como amigo.", "rq_ok": "Aceitar", "rq_no": "Recusar", "rq_ok_t": "Pronto: agora podem conversar.", "rq_no_t": "Pedido recusado.", "rq_fail": "Não foi possível enviar o pedido.", "rq_list": "Pedidos de conversa", "rq_sent_s": "Pedido enviado", "s_dmq": "Quem me pode pedir conversa", "s_dmq_h": "Vale para quem não é seu amigo. Amigos e jogadores do mesmo jogo podem sempre conversar consigo.", "s_dmq_all": "Todos", "s_dmq_grp": "Os meus grupos", "s_dmq_none": "Ninguém"}, "en": {"rq_send": "Send request", "rq_ph": "Write your request (text only)...", "rq_h_req": "You're not friends yet. Send a chat request: a single text-only message. If {0} accepts, you can chat normally.", "rq_h_sent": "Request sent. When {0} accepts, you can chat normally.", "rq_h_again": "{0} hasn't accepted your request yet. It's been 30 days: you can send another one.", "rq_h_in": "{0} wants to chat with you and isn't your friend yet. If you accept, you can chat normally; if you decline, {0} won't be told. To block or report, tap ⋯.", "rq_h_none": "{0} doesn't accept chat requests. To chat, add them as a friend.", "rq_h_grp": "{0} only accepts chat requests from people in the same group. To chat, add them as a friend.", "rq_ok": "Accept", "rq_no": "Decline", "rq_ok_t": "Done: you can chat now.", "rq_no_t": "Request declined.", "rq_fail": "Couldn't send the request.", "rq_list": "Chat requests", "rq_sent_s": "Request sent", "s_dmq": "Who can request to chat with me", "s_dmq_h": "Applies to people who aren't your friends. Friends and players in the same game can always chat with you.", "s_dmq_all": "Everyone", "s_dmq_grp": "My groups", "s_dmq_none": "Nobody"}, "es": {"rq_send": "Enviar solicitud", "rq_ph": "Escribe la solicitud (solo texto)...", "rq_h_req": "Todavía no son amigos. Envía una solicitud de conversación: un solo mensaje, solo de texto. Si {0} acepta, podrán conversar con normalidad.", "rq_h_sent": "Solicitud enviada. Cuando {0} acepte, podrán conversar con normalidad.", "rq_h_again": "{0} aún no aceptó tu solicitud. Ya pasaron 30 días: puedes enviar otra.", "rq_h_in": "{0} quiere conversar contigo y aún no es tu amigo. Si aceptas, podrán conversar con normalidad; si rechazas, {0} no se entera. Para bloquear o denunciar, toca ⋯.", "rq_h_none": "{0} no recibe solicitudes de conversación. Para conversar, agrégalo como amigo.", "rq_h_grp": "{0} solo recibe solicitudes de conversación de quien está en el mismo grupo. Para conversar, agrégalo como amigo.", "rq_ok": "Aceptar", "rq_no": "Rechazar", "rq_ok_t": "Listo: ya pueden conversar.", "rq_no_t": "Solicitud rechazada.", "rq_fail": "No se pudo enviar la solicitud.", "rq_list": "Solicitudes de conversación", "rq_sent_s": "Solicitud enviada", "s_dmq": "Quién puede pedirme conversación", "s_dmq_h": "Vale para quien no es tu amigo. Los amigos y los jugadores del mismo partido siempre pueden conversar contigo.", "s_dmq_all": "Todos", "s_dmq_grp": "Mis grupos", "s_dmq_none": "Nadie"}, "fr": {"rq_send": "Envoyer la demande", "rq_ph": "Écrivez la demande (texte seulement)...", "rq_h_req": "Vous n'êtes pas encore amis. Envoyez une demande de discussion : un seul message, texte uniquement. Si {0} accepte, vous pourrez discuter normalement.", "rq_h_sent": "Demande envoyée. Quand {0} acceptera, vous pourrez discuter normalement.", "rq_h_again": "{0} n'a pas encore accepté votre demande. 30 jours sont passés : vous pouvez en envoyer une autre.", "rq_h_in": "{0} veut discuter avec vous et n'est pas encore votre ami. Si vous acceptez, vous pourrez discuter normalement ; si vous refusez, {0} n'en saura rien. Pour bloquer ou signaler, touchez ⋯.", "rq_h_none": "{0} ne reçoit pas de demandes de discussion. Pour discuter, ajoutez-le comme ami.", "rq_h_grp": "{0} ne reçoit des demandes de discussion que des membres du même groupe. Pour discuter, ajoutez-le comme ami.", "rq_ok": "Accepter", "rq_no": "Refuser", "rq_ok_t": "C'est fait : vous pouvez discuter.", "rq_no_t": "Demande refusée.", "rq_fail": "Impossible d'envoyer la demande.", "rq_list": "Demandes de discussion", "rq_sent_s": "Demande envoyée", "s_dmq": "Qui peut me demander à discuter", "s_dmq_h": "Pour les personnes qui ne sont pas vos amis. Les amis et les joueurs du même match peuvent toujours discuter avec vous.", "s_dmq_all": "Tout le monde", "s_dmq_grp": "Mes groupes", "s_dmq_none": "Personne"}, "de": {"rq_send": "Anfrage senden", "rq_ph": "Schreib deine Anfrage (nur Text)...", "rq_h_req": "Ihr seid noch keine Freunde. Schick eine Chatanfrage: eine einzige Nachricht, nur Text. Wenn {0} annimmt, könnt ihr normal chatten.", "rq_h_sent": "Anfrage gesendet. Wenn {0} annimmt, könnt ihr normal chatten.", "rq_h_again": "{0} hat deine Anfrage noch nicht angenommen. 30 Tage sind vergangen: Du kannst eine neue schicken.", "rq_h_in": "{0} möchte mit dir chatten und ist noch nicht dein Freund. Wenn du annimmst, könnt ihr normal chatten; wenn du ablehnst, erfährt {0} es nicht. Zum Blockieren oder Melden tippe auf ⋯.", "rq_h_none": "{0} nimmt keine Chatanfragen an. Um zu chatten, füge die Person als Freund hinzu.", "rq_h_grp": "{0} nimmt Chatanfragen nur von Leuten aus derselben Gruppe an. Um zu chatten, füge die Person als Freund hinzu.", "rq_ok": "Annehmen", "rq_no": "Ablehnen", "rq_ok_t": "Fertig: Ihr könnt jetzt chatten.", "rq_no_t": "Anfrage abgelehnt.", "rq_fail": "Anfrage konnte nicht gesendet werden.", "rq_list": "Chatanfragen", "rq_sent_s": "Anfrage gesendet", "s_dmq": "Wer mich um einen Chat bitten darf", "s_dmq_h": "Gilt für Leute, die nicht deine Freunde sind. Freunde und Spieler aus demselben Spiel können immer mit dir chatten.", "s_dmq_all": "Alle", "s_dmq_grp": "Meine Gruppen", "s_dmq_none": "Niemand"}};
   Object.keys(KJ24).forEach(function (l) { if (D[l]) Object.assign(D[l], KJ24[l]); });
+  // 7.88: termos e conta pausada
+  var KJ26 = {"pt-BR": {"tr_a": "Li e aceito os", "tr_terms": "Termos de uso", "tr_and": "e a", "tr_priv": "Política de privacidade", "tr_t": "Termos de uso e privacidade", "tr_need": "Para continuar usando a sua conta, leia e aceite os Termos de uso e a Política de privacidade.", "tr_new": "Os Termos de uso e a Política de privacidade mudaram. Para continuar usando a sua conta, leia e aceite a nova versão.", "tr_ok": "Continuar", "tr_out": "Sair da conta", "as_t": "Sua conta", "as_pause": "Sua conta está pausada: seu perfil não aparece na Comunidade nem na busca. Quer reativar?", "as_del": "Sua conta está marcada para ser excluída em {0}. Quer desistir da exclusão e continuar usando?", "as_back": "Reativar minha conta", "as_back_del": "Desistir da exclusão", "as_out": "Continuar pausada e sair", "as_out_del": "Manter a exclusão e sair", "as_ok": "Pronto: a sua conta voltou ao normal.", "pv_paused": "Esta conta está pausada."}, "pt-PT": {"tr_a": "Li e aceito os", "tr_terms": "Termos de utilização", "tr_and": "e a", "tr_priv": "Política de privacidade", "tr_t": "Termos de utilização e privacidade", "tr_need": "Para continuar a usar a sua conta, leia e aceite os Termos de utilização e a Política de privacidade.", "tr_new": "Os Termos de utilização e a Política de privacidade mudaram. Para continuar a usar a sua conta, leia e aceite a nova versão.", "tr_ok": "Continuar", "tr_out": "Terminar sessão", "as_t": "A sua conta", "as_pause": "A sua conta está pausada: o seu perfil não aparece na Comunidade nem na pesquisa. Quer reativá-la?", "as_del": "A sua conta está marcada para ser eliminada em {0}. Quer desistir da eliminação e continuar a usá-la?", "as_back": "Reativar a minha conta", "as_back_del": "Desistir da eliminação", "as_out": "Continuar pausada e sair", "as_out_del": "Manter a eliminação e sair", "as_ok": "Pronto: a sua conta voltou ao normal.", "pv_paused": "Esta conta está pausada."}, "en": {"tr_a": "I have read and accept the", "tr_terms": "Terms of use", "tr_and": "and the", "tr_priv": "Privacy policy", "tr_t": "Terms of use and privacy", "tr_need": "To keep using your account, please read and accept the Terms of use and the Privacy policy.", "tr_new": "The Terms of use and the Privacy policy have changed. To keep using your account, please read and accept the new version.", "tr_ok": "Continue", "tr_out": "Sign out", "as_t": "Your account", "as_pause": "Your account is paused: your profile doesn't appear in the Community or in search. Do you want to reactivate it?", "as_del": "Your account is scheduled to be deleted on {0}. Do you want to cancel the deletion and keep using it?", "as_back": "Reactivate my account", "as_back_del": "Cancel the deletion", "as_out": "Stay paused and sign out", "as_out_del": "Keep the deletion and sign out", "as_ok": "Done: your account is back to normal.", "pv_paused": "This account is paused."}, "es": {"tr_a": "He leído y acepto los", "tr_terms": "Términos de uso", "tr_and": "y la", "tr_priv": "Política de privacidad", "tr_t": "Términos de uso y privacidad", "tr_need": "Para seguir usando tu cuenta, lee y acepta los Términos de uso y la Política de privacidad.", "tr_new": "Los Términos de uso y la Política de privacidad cambiaron. Para seguir usando tu cuenta, lee y acepta la nueva versión.", "tr_ok": "Continuar", "tr_out": "Cerrar sesión", "as_t": "Tu cuenta", "as_pause": "Tu cuenta está pausada: tu perfil no aparece en la Comunidad ni en la búsqueda. ¿Quieres reactivarla?", "as_del": "Tu cuenta está programada para eliminarse el {0}. ¿Quieres cancelar la eliminación y seguir usándola?", "as_back": "Reactivar mi cuenta", "as_back_del": "Cancelar la eliminación", "as_out": "Seguir pausada y salir", "as_out_del": "Mantener la eliminación y salir", "as_ok": "Listo: tu cuenta volvió a la normalidad.", "pv_paused": "Esta cuenta está pausada."}, "fr": {"tr_a": "J'ai lu et j'accepte les", "tr_terms": "Conditions d'utilisation", "tr_and": "et la", "tr_priv": "Politique de confidentialité", "tr_t": "Conditions d'utilisation et confidentialité", "tr_need": "Pour continuer à utiliser votre compte, lisez et acceptez les Conditions d'utilisation et la Politique de confidentialité.", "tr_new": "Les Conditions d'utilisation et la Politique de confidentialité ont changé. Pour continuer à utiliser votre compte, lisez et acceptez la nouvelle version.", "tr_ok": "Continuer", "tr_out": "Se déconnecter", "as_t": "Votre compte", "as_pause": "Votre compte est en pause : votre profil n'apparaît ni dans la Communauté ni dans la recherche. Voulez-vous le réactiver ?", "as_del": "Votre compte doit être supprimé le {0}. Voulez-vous annuler la suppression et continuer à l'utiliser ?", "as_back": "Réactiver mon compte", "as_back_del": "Annuler la suppression", "as_out": "Rester en pause et se déconnecter", "as_out_del": "Maintenir la suppression et se déconnecter", "as_ok": "C'est fait : votre compte est revenu à la normale.", "pv_paused": "Ce compte est en pause."}, "de": {"tr_a": "Ich habe gelesen und akzeptiere die", "tr_terms": "Nutzungsbedingungen", "tr_and": "und die", "tr_priv": "Datenschutzerklärung", "tr_t": "Nutzungsbedingungen und Datenschutz", "tr_need": "Um dein Konto weiter zu nutzen, lies und akzeptiere die Nutzungsbedingungen und die Datenschutzerklärung.", "tr_new": "Die Nutzungsbedingungen und die Datenschutzerklärung wurden geändert. Um dein Konto weiter zu nutzen, lies und akzeptiere die neue Version.", "tr_ok": "Weiter", "tr_out": "Abmelden", "as_t": "Dein Konto", "as_pause": "Dein Konto ist pausiert: Dein Profil erscheint weder in der Community noch in der Suche. Möchtest du es reaktivieren?", "as_del": "Dein Konto wird am {0} gelöscht. Möchtest du das Löschen abbrechen und es weiter nutzen?", "as_back": "Mein Konto reaktivieren", "as_back_del": "Löschen abbrechen", "as_out": "Pausiert lassen und abmelden", "as_out_del": "Löschen beibehalten und abmelden", "as_ok": "Erledigt: Dein Konto ist wieder normal.", "pv_paused": "Dieses Konto ist pausiert."}};
+  Object.keys(KJ26).forEach(function (l) { if (D[l]) Object.assign(D[l], KJ26[l]); });
   var KJ21 = {"pt-BR": {"ff_n": "{0} de {1} jogos", "f_state": "Estado", "f_hood": "Bairro", "ff_st": "Estado", "ff_city": "Cidade", "ff_hood": "Bairro", "ff_lvl": "Nível", "ff_lv_all": "Todos os níveis", "ff_lv_me": "Para o meu nível", "ff_lv_free": "Sem restrição de nível", "ff_clr": "Limpar filtros"}, "pt-PT": {"ff_n": "{0} de {1} jogos", "f_state": "Distrito / estado", "f_hood": "Bairro", "ff_st": "Distrito / estado", "ff_city": "Cidade", "ff_hood": "Bairro", "ff_lvl": "Nível", "ff_lv_all": "Todos os níveis", "ff_lv_me": "Para o meu nível", "ff_lv_free": "Sem restrição de nível", "ff_clr": "Limpar filtros"}, "en": {"ff_n": "{0} of {1} games", "f_state": "State", "f_hood": "Neighborhood", "ff_st": "State", "ff_city": "City", "ff_hood": "Neighborhood", "ff_lvl": "Level", "ff_lv_all": "All levels", "ff_lv_me": "For my level", "ff_lv_free": "No level limit", "ff_clr": "Clear filters"}, "es": {"ff_n": "{0} de {1} partidos", "f_state": "Estado / provincia", "f_hood": "Barrio", "ff_st": "Estado / provincia", "ff_city": "Ciudad", "ff_hood": "Barrio", "ff_lvl": "Nivel", "ff_lv_all": "Todos los niveles", "ff_lv_me": "Para mi nivel", "ff_lv_free": "Sin límite de nivel", "ff_clr": "Borrar filtros"}, "fr": {"ff_n": "{0} sur {1} matchs", "f_state": "Région", "f_hood": "Quartier", "ff_st": "Région", "ff_city": "Ville", "ff_hood": "Quartier", "ff_lvl": "Niveau", "ff_lv_all": "Tous les niveaux", "ff_lv_me": "Pour mon niveau", "ff_lv_free": "Sans limite de niveau", "ff_clr": "Effacer les filtres"}, "de": {"ff_n": "{0} von {1} Spielen", "f_state": "Bundesland", "f_hood": "Stadtteil", "ff_st": "Bundesland", "ff_city": "Stadt", "ff_hood": "Stadtteil", "ff_lvl": "Niveau", "ff_lv_all": "Alle Niveaus", "ff_lv_me": "Für mein Niveau", "ff_lv_free": "Ohne Niveaugrenze", "ff_clr": "Filter löschen"}};   // 7.67: filtros de Entrar num jogo (estado, cidade, bairro, nível) e estado/bairro no jogo
   Object.keys(KJ21).forEach(function (l) { if (D[l]) Object.assign(D[l], KJ21[l]); });
   var KJ20 = {"pt-BR": {"ex_t": "Sair do BoxScore?", "ex_d": "Toque em Sair para fechar o app.", "ex_go": "Sair", "ex_stay": "Continuar no app"}, "pt-PT": {"ex_t": "Sair do BoxScore?", "ex_d": "Toque em Sair para fechar a app.", "ex_go": "Sair", "ex_stay": "Continuar na app"}, "en": {"ex_t": "Exit BoxScore?", "ex_d": "Tap Exit to close the app.", "ex_go": "Exit", "ex_stay": "Stay in the app"}, "es": {"ex_t": "¿Salir de BoxScore?", "ex_d": "Toca Salir para cerrar la app.", "ex_go": "Salir", "ex_stay": "Seguir en la app"}, "fr": {"ex_t": "Quitter BoxScore ?", "ex_d": "Touchez Quitter pour fermer l'app.", "ex_go": "Quitter", "ex_stay": "Rester dans l'app"}, "de": {"ex_t": "BoxScore beenden?", "ex_d": "Tippe auf Beenden, um die App zu schließen.", "ex_go": "Beenden", "ex_stay": "In der App bleiben"}};   // 7.66: voltar do Android pede confirmação
@@ -823,10 +830,10 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     return loadFB().then(function () {
       firebase.initializeApp(FB_CFG);
       S.auth = firebase.auth(); S.db = firebase.firestore();
-      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.86', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
+      try { if (window.BXTel) { BXTel.init({ module: 'rede', build: '7.89', lang: LG, getDb: function () { return S.db; }, getUid: function () { return S.user ? S.user.uid : null; } }); tel('r_open'); } } catch (x) {}
       try { S.db.settings({ experimentalAutoDetectLongPolling: true, merge: true }); } catch (e) {}
       try { S.auth.getRedirectResult().catch(function () {}); } catch (e) {}
-      S.auth.onAuthStateChanged(function (u) { if (!u || (RT.uid && RT.uid !== u.uid)) rtStop(); S.user = u || null; paintGate(); if (u) { loadFriends(); loadFollows(); loadBlocks().then(reload); ensureProfile(); } });
+      S.auth.onAuthStateChanged(function (u) { if (!u || (RT.uid && RT.uid !== u.uid)) rtStop(); S.user = u || null; paintGate(); if (u) { loadFriends(); loadFollows(); loadBlocks().then(reload); ensureProfile(); acctCheck(u); } });
     }).catch(function () { $('gate').hidden = false; $('app').hidden = true; $('gateT').textContent = T('err'); $('login').hidden = true; });
   }
   // quem usa só a Comunidade também precisa de perfil público e código de 6 letras (antes só o Placar criava)
@@ -854,12 +861,71 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
   }
   function login() {
     $('gateE').hidden = true;
+    if (!$('gateChk').checked) return;
+    try { localStorage.setItem('bx.termsPend', JSON.stringify({ tv: legalV(), at: Date.now() })); } catch (e) {}
     var prov = new firebase.auth.GoogleAuthProvider();
     S.auth.signInWithPopup(prov).catch(function (e) {
       var c = (e && e.code) || '';
       if (/popup-blocked|operation-not-supported/.test(c)) { try { return S.auth.signInWithRedirect(prov); } catch (x) {} }
       if (/popup-closed|cancelled/.test(c)) return;
       $('gateE').hidden = false; $('gateE').textContent = T('fail');
+    });
+  }
+  /* ---------- 7.88: termos aceitos e conta pausada / exclusão marcada ---------- */
+  function legalV() { return String((window.BX_LEGAL && window.BX_LEGAL.version) || '1'); }
+  function legalUrl(pg) { return '../legal/' + pg + '.html'; }
+  function termsLine(host) {
+    host.innerHTML = '';
+    host.appendChild(document.createTextNode(T('tr_a') + ' '));
+    host.appendChild(h('a', { href: legalUrl('termos'), text: T('tr_terms') }));
+    host.appendChild(document.createTextNode(' ' + T('tr_and') + ' '));
+    host.appendChild(h('a', { href: legalUrl('privacidade'), text: T('tr_priv') }));
+  }
+  // janela que não fecha tocando fora (decisão obrigatória)
+  function hardSheet(kids) { var root = h('div', { cls: 'um', role: 'dialog' }, [h('div', { cls: 'umb' }, kids(function () { root.remove(); }))]); document.body.appendChild(root); return root; }
+  var ACK = '';
+  function acctCheck(u) {
+    if (!u || ACK === u.uid || !S.db) return; ACK = u.uid;
+    var db = S.db, uid = u.uid, get = function (c) { return db.collection(c).doc(uid).get().then(function (d) { return d.exists ? d.data() : null; }, function () { return null; }); };
+    Promise.all([get('deletions'), get('profiles'), get('consents')]).then(function (r) {
+      var del = r[0] && r[0].state === 'scheduled' ? r[0] : null, paused = !!(r[1] && r[1].paused) || !!del;
+      var next = function () { consentCheck(r[2]); };
+      if (paused) stateAsk(del, next); else next();
+    });
+  }
+  function stateAsk(del, next) {
+    var due = del && del.due && del.due.toMillis ? del.due.toMillis() : (del && del.due) || 0;
+    hardSheet(function (close) {
+      return [h('b', { text: T('as_t') }), h('div', { cls: 'sub', text: del ? T('as_del').replace('{0}', new Date(due).toLocaleDateString(LG)) : T('as_pause') }),
+        h('button', { cls: 'btn pri', type: 'button', text: del ? T('as_back_del') : T('as_back'), on: { click: function () {
+          var uid = S.user.uid, b = S.db.batch(), now = Date.now();
+          if (del) b.set(S.db.collection('deletions').doc(uid), { uid: uid, email: String(del.email || '').slice(0, 120), at: fv().serverTimestamp(), state: 'canceled', due: del.due, ok: false, manual: [], errs: [] });
+          b.set(S.db.collection('profiles').doc(uid), { paused: false, searchable: true, updatedAt: now }, { merge: true });
+          b.commit().then(function () { close(); toast(T('as_ok')); ensureDir(); next(); }, function () { toast(T('fail')); });
+        } } }),
+        h('button', { cls: 'btn', type: 'button', text: del ? T('as_out_del') : T('as_out'), on: { click: function () { close(); try { S.auth.signOut(); } catch (e) {} } } })];
+    });
+  }
+  function ensureDir() {   // volta para a busca (o Placar publica o perfil completo na próxima abertura)
+    var uid = S.user.uid;
+    S.db.collection('profiles').doc(uid).get().then(function (d) { var x = d.exists ? d.data() : {}; if (!x.code) return; var nm = x.name || ''; return S.db.collection('directory').doc(uid).set({ uid: uid, name: nm, nameLower: String(nm).trim().toLowerCase(), code: x.code, updatedAt: Date.now() }); }).catch(function () {});
+  }
+  function consentWrite(prev) {
+    var F = fv(), now = F.serverTimestamp(), d = prev || {};
+    return S.db.collection('consents').doc(S.user.uid).set({ tv: legalV(), ta: now, mk: d.mk !== false, mkAt: d.mkAt || now, wa: !!d.wa, waAt: d.waAt || now, at: now });
+  }
+  function consentCheck(c) {
+    if (c && c.tv === legalV()) return;
+    var pend = null; try { pend = JSON.parse(localStorage.getItem('bx.termsPend') || 'null'); } catch (e) {}
+    if (pend && pend.tv === legalV() && Date.now() - pend.at < 3600e3) { consentWrite(c).then(function () { try { localStorage.removeItem('bx.termsPend'); } catch (e) {} }, function () {}); return; }
+    hardSheet(function (close) {
+      var chk = h('input', { type: 'checkbox', style: 'width:22px;height:22px;flex:none' }), line = h('span'), ok = h('button', { cls: 'btn pri', type: 'button', text: T('tr_ok'), disabled: 'disabled', on: { click: function () {
+        ok.disabled = true; consentWrite(c).then(close, function () { ok.disabled = false; toast(T('fail')); });
+      } } });
+      termsLine(line);
+      chk.addEventListener('change', function () { ok.disabled = !chk.checked; });
+      return [h('b', { text: T('tr_t') }), h('div', { cls: 'sub', text: c ? T('tr_new') : T('tr_need') }), h('label', { cls: 'sub', style: 'display:flex;gap:10px;align-items:center' }, [chk, line]), ok,
+        h('button', { cls: 'btn', type: 'button', text: T('tr_out'), on: { click: function () { close(); ACK = ''; try { S.auth.signOut(); } catch (e) {} } } })];
     });
   }
   function paintGate() { $('gate').hidden = !!S.user; $('app').hidden = !S.user; $('login').hidden = false; if (!S.user) $('gateT').textContent = T('login_t'); }
@@ -4152,19 +4218,19 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
     }
     return h('article', { cls: 'card' }, kids);
   }
-  // 7.57: regras de jogo do torneio. fmt = { bo: 1|3, fs: 'same'|'super'|'advantage', tb, na, lk } (lk: travadas no Placar)
+  // 7.57: regras de jogo do torneio (7.87: bo -1 = só um tie-break de 7). fmt = { bo: 1|3, fs: 'same'|'super'|'advantage', tb, na, lk } (lk: travadas no Placar)
   function fmtDef() { return { bo: 3, fs: 'super', tb: true, na: false, lk: false }; }
-  function fmtOf(t) { var f = Object.assign(fmtDef(), (t && t.fmt) || {}); if (f.bo !== 1 && f.bo !== 0) f.bo = 3; if (['same', 'super', 'advantage'].indexOf(f.fs) < 0) f.fs = 'same'; f.tb = f.tb !== false; f.na = !!f.na; f.lk = !!f.lk; return f; }
+  function fmtOf(t) { var f = Object.assign(fmtDef(), (t && t.fmt) || {}); if (f.bo !== 1 && f.bo !== 0 && f.bo !== -1) f.bo = 3; if (['same', 'super', 'advantage'].indexOf(f.fs) < 0) f.fs = 'same'; f.tb = f.tb !== false; f.na = !!f.na; f.lk = !!f.lk; return f; }
   function fmtTxt(f, withLk) {
-    if (f.bo === 0) return [T('tf_sstb'), withLk && f.lk ? T('tf_slk') : ''].filter(Boolean).join(' · ');
+    if (f.bo <= 0) return [T(f.bo === -1 ? 'tf_stb7' : 'tf_sstb'), withLk && f.lk ? T('tf_slk') : ''].filter(Boolean).join(' · ');
     return [f.bo === 1 ? T('tf_s1') : T('tf_s3'), f.bo === 3 && f.fs === 'super' ? T('tf_ssuper') : '', f.bo === 3 && f.fs === 'advantage' ? T('tf_sadv') : '',
       f.bo === 1 && f.fs === 'super' ? T('tf_s1super') : '', f.bo === 1 && f.fs === 'advantage' ? T('tf_s1adv') : '',
       f.tb || f.bo === 1 && f.fs !== 'same' ? '' : T('tf_snotb'), f.na ? T('tf_sna') : '', withLk && f.lk ? T('tf_slk') : ''].filter(Boolean).join(' · ');
   }
   function fmtEditor(f, redraw) {
     function lb(k, el) { return h('div', { cls: 'f' }, [T(k), el]); }
-    var out = [lb('tf_bo', tseg([[1, T('tf_1')], [3, T('tf_3')], [0, T('tf_stb')]], f.bo, function (v) { f.bo = v; redraw(); }))];
-    if (f.bo === 0) out.push(h('div', { cls: 'sub', text: T('tf_h_stb') }));
+    var out = [lb('tf_bo', tseg([[1, T('tf_1')], [3, T('tf_3')], [0, T('tf_stb')], [-1, T('tf_tb7')]], f.bo, function (v) { f.bo = v; redraw(); }))];
+    if (f.bo <= 0) out.push(h('div', { cls: 'sub', text: T(f.bo === -1 ? 'tf_h_tb7' : 'tf_h_stb') }));
     else {
       var fsg = tseg([['same', T('tf_same')], ['super', T('tf_super').replace('-', '\u2011')], ['advantage', T('tf_adv').replace('-', '\u2011')]], f.fs, function (v) { f.fs = v; redraw(); }); fsg.classList.add('wrap');
       out.push(lb(f.bo === 1 ? 'tf_fs1' : 'tf_fs', fsg));
@@ -4536,6 +4602,9 @@ main .pc .mnt{display:inline;border:0;background:transparent;padding:0;margin:0;
   $('chatB').addEventListener('click', function () { S.tab = 'chat'; paint(); reload(); });
   $('setB').addEventListener('click', function () { if (S.tab !== 'set') tel('r_settings'); S.tab = S.tab === 'set' ? 'home' : 'set'; paint(); });
   $('login').textContent = T('login'); $('login').addEventListener('click', login);
+  // 7.88: aceite dos Termos e da Política antes de entrar (e, depois de entrar, consents/{uid})
+  termsLine($('gateTermsT'));
+  $('gateChk').addEventListener('change', function () { $('login').disabled = !this.checked; });
 
   $('gateT').textContent = T('loading'); $('gate').hidden = false;
   document.addEventListener('visibilitychange', function () { if (document.hidden) { rtStop(); return; } if (S.user && !CH.root) reload(); else if (S.user) rtStart(); });
