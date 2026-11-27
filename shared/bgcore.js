@@ -136,7 +136,10 @@
     S = { G: o.G, settings: o.settings || {}, bands: o.bands || [], mode: MODES[o.mode] ? o.mode : 'fast', lock: 0, changed: false, n: 0, live: o.live || null };
     return JSON.stringify({ ok: true, info: info(S.G) });
   }
-  function teamOf(id) { for (var i = 0; i < S.bands.length; i++) if (S.bands[i].id === id) return S.bands[i].team; return -1; }
+  function teamOf(id) {
+    if (id === 'side:0' || id === 'side:1') return +id.charAt(5);   // 7.93: relógio (Wear OS): o lado vem do próprio relógio
+    for (var i = 0; i < S.bands.length; i++) if (S.bands[i].id === id) return S.bands[i].team; return -1;
+  }
   function run(team, act, now) {
     var G = S.G, out = { ok: false, parts: [], over: G.state.winner !== null, changed: false };
     if (act === 'undo') {
