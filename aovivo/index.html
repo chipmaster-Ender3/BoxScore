@@ -381,7 +381,7 @@ body.tv .who { flex-wrap: nowrap; } body.tv .nm { flex: 0 1 auto; } body.tv .ace
   // 7.52: contagem anônima de quem abriu o link (uma vez por transmissão por dia neste aparelho; sem conta, sem nomes nem placar)
   try {
     if (window.BXTel) {
-      BXTel.init({ module: 'aovivo', build: '7.94', lang: LG, getDb: function () { return db; }, getUid: function () { return null; } });
+      BXTel.init({ module: 'aovivo', build: '7.95', lang: LG, getDb: function () { return db; }, getUid: function () { return null; } });
       var sk = 'boxscore.live.seen', seen = {}; try { seen = JSON.parse(localStorage.getItem(sk) || '{}') || {}; } catch (e) {}
       var dd = new Date().toISOString().slice(0, 10);
       if (seen[id] !== dd) { seen[id] = dd; Object.keys(seen).forEach(function (k) { if (seen[k] !== dd) delete seen[k]; }); try { localStorage.setItem(sk, JSON.stringify(seen)); } catch (e) {} BXTel.count('v_live_open'); }
