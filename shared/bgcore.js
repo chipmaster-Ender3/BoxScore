@@ -133,7 +133,8 @@
   var S = null;
   function sessionStart(json) {
     var o = typeof json === 'string' ? JSON.parse(json) : json;
-    S = { G: o.G, settings: o.settings || {}, bands: o.bands || [], mode: MODES[o.mode] ? o.mode : 'fast', lock: 0, changed: false, n: 0, live: o.live || null };
+    S = { G: o.G, settings: o.settings || {}, bands: o.bands || [], mode: MODES[o.mode] ? o.mode : 'fast', lock: 0, changed: false, n: 0, live: o.live || null,
+      wid: String((o.wear && o.wear.id) || ''), wq: +((o.wear && o.wear.q) || 0) };   // 7.94: placar do relógio (id e contador continuam da página)
     return JSON.stringify({ ok: true, info: info(S.G) });
   }
   function teamOf(id) {
@@ -227,7 +228,19 @@
     if (S.G.state.winner !== null) { if (!S.live.endedAt) S.live.endedAt = now; } else S.live.endedAt = 0;
     return JSON.stringify({ id: S.live.id, body: liveRest(liveDoc(S.live, S.G, now, [])) });
   }
-  function sessionTake() { if (!S) return JSON.stringify({ ok: false }); var o = { ok: true, changed: S.changed, points: S.n, G: S.G }; return JSON.stringify(o); }
+  function sessionTake() { if (!S) return JSON.stringify({ ok: false }); var o = { ok: true, changed: S.changed, points: S.n, G: S.G, wq: S.wq }; return JSON.stringify(o); }
+  /* 7.94: placar para o relógio (protocolo v2, /bx/score — docs/relogio-protocolo.md). Mesmos números do ao vivo (liveDoc).
+     s = games de cada set (super tie-break: os pontos do desempate) e, se a partida não acabou, o set atual por último. */
+  function wearScore(G, id, q) {
+    if (!G || !G.state) return JSON.stringify({ v: 2, on: 0 });
+    var s = G.state, m = G.meta || {}, d = E().display(s), over = s.winner !== null, n = function (x) { return +x | 0; }, nm = m.names || [];
+    var sets = (s.sets || []).map(function (r) { var g = r.games || [0, 0]; return r.kind === 'super' && r.tb ? [n(r.tb[0]), n(r.tb[1])] : [n(g[0]), n(g[1])]; });
+    if (!over) sets.push([n(s.games[0]), n(s.games[1])]);
+    return JSON.stringify({ v: 2, id: String(id || '').slice(0, 40), q: q | 0, on: 1, end: over ? 1 : 0,
+      n: [String(nm[0] || '').slice(0, 40), String(nm[1] || '').slice(0, 40)], s: sets.slice(-5),
+      p: over ? ['', ''] : [String(d.points[0]), String(d.points[1])], sv: over ? -1 : (d.server === 0 || d.server === 1 ? d.server : -1), k: liveStake(s).t });
+  }
+  function sessionWear() { if (!S) return JSON.stringify({ v: 2, on: 0 }); S.wq++; return wearScore(S.G, S.wid, S.wq); }
 
   /* 7.87: pronúncia só no texto que vai para a voz (a tela continua "ACE"). Cada voz lê do seu jeito:
      a grafia fonética por idioma faz o "ace" soar como em inglês ("eis", que se lê "êis"). Para ajustar outra palavra, acrescente aqui. */
@@ -243,7 +256,7 @@
   }
 
   return {
-    say: say, SAY: SAY,
+    say: say, SAY: SAY, wearScore: wearScore, sessionWear: sessionWear,
     LOCK_MS: LOCK_MS, MODES: MODES, GN: GN,
     spokenDur: spokenDur, restLine: restLine, speakNames: speakNames, alertInfo: alertInfo, alertText: alertText, serveLine: serveLine, setText: setText,
     applyPoint: applyPoint, applyUndo: applyUndo, info: info,
